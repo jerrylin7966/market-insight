@@ -4,6 +4,8 @@ export type PlatformId =
   | 'trading212'
   | 'kraken'
   | 'binance'
+  | 'coinbase'
+  | 'phantom'
   | 'revolut_balance'
   | 'revolut_stocks'
   | 'revolut_crypto'
@@ -11,9 +13,11 @@ export type PlatformId =
   | 'china_bank'
   | 'ctbc_balance'
   | 'ctbc_stocks'
-  | 'dbs';
+  | 'dbs'
+  | 'tiktok_rsu'
+  | 'meta_rsu';
 
-export type PlatformCategory = 'bank' | 'broker' | 'crypto' | 'manual';
+export type PlatformCategory = 'bank' | 'broker' | 'crypto' | 'manual' | 'rsu';
 
 export interface PlatformMeta {
   id: PlatformId;
@@ -26,7 +30,9 @@ export interface PlatformMeta {
 export const PLATFORMS: Record<PlatformId, PlatformMeta> = {
   trading212:      { id: 'trading212',      name: 'Trading 212',     category: 'broker', currency: 'GBP', flag: '🇬🇧' },
   kraken:          { id: 'kraken',          name: 'Kraken',          category: 'crypto', currency: 'USD', flag: '🌐' },
-  binance:         { id: 'binance',         name: 'Binance',         category: 'crypto', currency: 'USD', flag: '🌐' },
+  binance:         { id: 'binance',         name: 'Binance',         category: 'manual', currency: 'USD', flag: '🌐' },
+  coinbase:        { id: 'coinbase',        name: 'Coinbase',        category: 'manual', currency: 'USD', flag: '🇺🇸' },
+  phantom:         { id: 'phantom',         name: 'Phantom',         category: 'manual', currency: 'USD', flag: '🌐' },
   revolut_balance: { id: 'revolut_balance', name: 'Revolut Balance', category: 'manual', currency: 'GBP', flag: '🇬🇧' },
   revolut_stocks:  { id: 'revolut_stocks',  name: 'Revolut Stocks',  category: 'manual', currency: 'GBP', flag: '🇬🇧' },
   revolut_crypto:  { id: 'revolut_crypto',  name: 'Revolut Crypto',  category: 'manual', currency: 'GBP', flag: '🇬🇧' },
@@ -35,6 +41,8 @@ export const PLATFORMS: Record<PlatformId, PlatformMeta> = {
   ctbc_balance:    { id: 'ctbc_balance',    name: 'CTBC Balance',    category: 'manual', currency: 'TWD', flag: '🇹🇼' },
   ctbc_stocks:     { id: 'ctbc_stocks',     name: 'CTBC Stocks',     category: 'manual', currency: 'TWD', flag: '🇹🇼' },
   dbs:             { id: 'dbs',             name: 'DBS',             category: 'manual', currency: 'SGD', flag: '🇸🇬' },
+  tiktok_rsu:      { id: 'tiktok_rsu',      name: 'TikTok RSU',      category: 'rsu',    currency: 'USD', flag: '🎵' },
+  meta_rsu:        { id: 'meta_rsu',        name: 'Meta RSU',        category: 'rsu',    currency: 'USD', flag: '🔵' },
 };
 
 export interface FetchResult {

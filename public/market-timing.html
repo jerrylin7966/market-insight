@@ -84,6 +84,7 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
   <header>
     <div class="logo">ASSET HUB</div>
     <div class="header-right">
+      <button class="btn-nav" onclick="location.href='/'">← Asset Hub</button>
       <button class="btn-nav" onclick="triggerWeeklyEmail()" id="btn-send-email" data-i18n="btn-send-email">Send report</button>
       <button class="btn-nav" id="lang-btn" onclick="toggleLang()">繁中</button>
     </div>
@@ -154,16 +155,16 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
         <div style="flex:0 0 65%">
           <div class="chart-range" style="margin-bottom:8px">
             <button class="range-btn" onclick="switchRatioMode('hourly',1,'W',this)">1W</button>
-            <button class="range-btn" onclick="switchRatioMode('hourly',2,'W',this)">2W</button>
+            <button class="range-btn" data-range="2W" onclick="switchRatioMode('hourly',2,'W',this)">2W</button>
             <button class="range-btn" onclick="switchRatioMode('daily',1,'M',this)">1M</button>
             <button class="range-btn" onclick="switchRatioMode('daily',3,'M',this)">3M</button>
             <button class="range-btn" onclick="switchRatioMode('daily',6,'M',this)">6M</button>
-            <button class="range-btn active" id="ratio-range-1y" onclick="switchRatioMode('daily',1,'Y',this)">1Y</button>
+            <button class="range-btn" onclick="switchRatioMode('daily',1,'Y',this)">1Y</button>
             <button class="range-btn" onclick="switchRatioMode('daily',3,'Y',this)">3Y</button>
             <button class="range-btn" onclick="switchRatioMode('daily',5,'Y',this)">5Y</button>
             <button class="range-btn" onclick="switchRatioMode('daily','ALL',null,this)">ALL</button>
           </div>
-          <div class="chart-container" style="height:380px"><canvas id="ratio-chart"></canvas></div>
+          <div id="ratio-chart-container" style="position:relative;height:380px;width:100%;min-height:380px;"><canvas id="ratio-chart"></canvas></div>
           <div class="mkt-note" style="margin-top:0.5rem">Ratio above amber 200 SMA = healthy bull. Ratio breaks below 200 SMA = Phase 2 critical warning ⚠</div>
         </div>
         <!-- Status panel (35%) -->
@@ -617,12 +618,11 @@ async function loadMarketCharts(){
     renderSignalCard(lastSignalData);
   }
 
+  // Cache daily ratio data for when user switches to 1M/3M/etc later
   if(ratioRes.status==='fulfilled'&&ratioRes.value?.dates?.length){
     dailyRatioData=ratioRes.value;
-    lastRatioData=dailyRatioData;
-    renderRatioChart(dailyRatioData,'daily');
-    setRatioRange(1,'Y',document.getElementById('ratio-range-1y'));
   }
+  await initRatioChart();
 
   if(vixRes.status==='fulfilled'&&vixRes.value?.series?.length){
     const r=vixRes.value;
@@ -675,7 +675,7 @@ async function loadMarketCharts(){
 }
 
 // ── ratio chart ───────────────────────────────────────────────────────────
-function renderRatioChart(d,mode){
+function buildRatioChart(d,mode){
   const isHourly=mode==='hourly';
   const labels   =isHourly?d.map(r=>r.date)    :d.dates;
   const ratios   =isHourly?d.map(r=>r.ratio)    :d.ratios;
@@ -704,6 +704,21 @@ function renderRatioChart(d,mode){
   }}});
 }
 
+async function initRatioChart(){
+  console.log('[initRatioChart] start');
+  const data=await loadRatioData('hourly');
+  if(!data||data.error){console.log('[initRatioChart] no data or error:',data?.error);return;}
+  currentRatioMode='hourly';
+  lastRatioData=data;
+  buildRatioChart(data,'hourly');
+  console.log('[initRatioChart] after buildRatioChart — labels.length:',ratioChart?.data?.labels?.length,'first:',ratioChart?.data?.labels?.[0],'last:',ratioChart?.data?.labels?.[ratioChart.data.labels.length-1]);
+  console.log('[initRatioChart] calling setRatioRange(28, D)');
+  setRatioRange(28,'D');
+  console.log('[initRatioChart] after setRatioRange — x.min:',ratioChart?.options?.scales?.x?.min,'x.max:',ratioChart?.options?.scales?.x?.max);
+  document.querySelectorAll('.chart-range .range-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.chart-range .range-btn').forEach(b=>{if(b.textContent.trim()==='2W')b.classList.add('active');});
+}
+
 async function loadRatioData(mode){
   if(mode==='hourly'&&!hourlyRatioData){
     const res=await fetch('/api/market/ratio-hourly',{headers:authHeader()});
@@ -717,34 +732,36 @@ async function loadRatioData(mode){
 }
 
 async function switchRatioMode(mode,value,unit,btn){
-  const activeBtn=btn||event.target;
-  document.querySelectorAll('.chart-range .range-btn').forEach(b=>b.classList.remove('active'));
-  activeBtn.classList.add('active');
+  const activeBtn=btn||(typeof event!=='undefined'?event.target:null);
+  if(activeBtn){
+    document.querySelectorAll('.chart-range .range-btn').forEach(b=>b.classList.remove('active'));
+    activeBtn.classList.add('active');
+  }
   const data=await loadRatioData(mode);
   if(!data||data.error)return;
-  if(currentRatioMode!==mode){
-    currentRatioMode=mode;
-    lastRatioData=data;
-    renderRatioChart(data,mode);
-  }
-  setRatioRange(value,unit,activeBtn);
+  currentRatioMode=mode;
+  lastRatioData=data;
+  buildRatioChart(data,mode);
+  if(value!=null)setRatioRange(value,unit);
 }
 
-function setRatioRange(value,unit,btn){
+function setRatioRange(value,unit){
   if(!ratioChart)return;
-  const now=new Date();
+  const labels=ratioChart.data.labels;
   if(value==='ALL'){
     ratioChart.options.scales.x.min=undefined;
     ratioChart.options.scales.x.max=undefined;
   }else{
-    const start=new Date(now);
-    if(unit==='W')start.setDate(now.getDate()-(value*7));
-    if(unit==='M')start.setMonth(now.getMonth()-value);
-    if(unit==='Y')start.setFullYear(now.getFullYear()-value);
-    ratioChart.options.scales.x.min=start.toISOString().slice(0,10);
-    ratioChart.options.scales.x.max=now.toISOString().slice(0,10);
+    const start=new Date();
+    if(unit==='D')start.setDate(start.getDate()-value);
+    if(unit==='W')start.setDate(start.getDate()-(value*7));
+    if(unit==='M')start.setMonth(start.getMonth()-value);
+    if(unit==='Y')start.setFullYear(start.getFullYear()-value);
+    const minLabel=labels.find(l=>new Date(l)>=start)||labels[0];
+    ratioChart.options.scales.x.min=minLabel;
+    ratioChart.options.scales.x.max=labels[labels.length-1];
   }
-  ratioChart.update();
+  ratioChart.update('none');
 }
 
 async function triggerWeeklyEmail(){

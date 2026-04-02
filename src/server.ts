@@ -52,7 +52,7 @@ app.get('/api/history', auth, (req, res) => {
 
 app.post('/api/manual', auth, (req: Request<{}, {}, ManualUpdatePayload>, res) => {
   const { platform, balanceNative } = req.body;
-  if (!['revolut_balance','revolut_stocks','revolut_crypto','tiger','china_bank','ctbc_balance','ctbc_stocks','dbs'].includes(platform)) { res.status(400).json({ error: 'Platform does not support manual updates' }); return; }
+  if (!['binance','coinbase','phantom','revolut_balance','revolut_stocks','revolut_crypto','tiger','china_bank','ctbc_balance','ctbc_stocks','dbs','tiktok_rsu','meta_rsu'].includes(platform)) { res.status(400).json({ error: 'Platform does not support manual updates' }); return; }
   if (typeof balanceNative !== 'number' || balanceNative < 0) { res.status(400).json({ error: 'Invalid amount' }); return; }
   upsertManualBalance(platform, balanceNative);
   res.json({ ok: true, platform, balanceNative, updatedAt: new Date().toISOString() });

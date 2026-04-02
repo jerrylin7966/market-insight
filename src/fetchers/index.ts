@@ -1,7 +1,6 @@
 import { fetchTrading212 } from './trading212';
 import { fetchKraken }     from './kraken';
-import { fetchBinance }    from './binance';
-import { fetchRevolutBalance, fetchRevolutStocks, fetchRevolutCrypto, fetchTiger, fetchChinaBank, fetchCtbcBalance, fetchCtbcStocks, fetchDbs } from './manual';
+import { fetchBinance, fetchCoinbase, fetchPhantom, fetchRevolutBalance, fetchRevolutStocks, fetchRevolutCrypto, fetchTiger, fetchChinaBank, fetchCtbcBalance, fetchCtbcStocks, fetchDbs, fetchTiktokRsu, fetchMetaRsu } from './manual';
 import { upsertSnapshot, getManualBalance } from '../db';
 import { warmRates }       from '../fx';
 import type { FetchResult } from '../types';
@@ -28,6 +27,8 @@ export async function runAllFetchers(): Promise<RunResult> {
     safe(fetchTrading212),
     safe(fetchKraken),
     safe(fetchBinance),
+    safe(fetchCoinbase),
+    safe(fetchPhantom),
     safe(fetchRevolutBalance),
     safe(fetchRevolutStocks),
     safe(fetchRevolutCrypto),
@@ -36,9 +37,11 @@ export async function runAllFetchers(): Promise<RunResult> {
     safe(fetchCtbcBalance),
     safe(fetchCtbcStocks),
     safe(fetchDbs),
+    safe(fetchTiktokRsu),
+    safe(fetchMetaRsu),
   ]);
 
-  const MANUAL_PLATFORMS = new Set(['revolut_balance','revolut_stocks','revolut_crypto','tiger','china_bank','ctbc_balance','ctbc_stocks','dbs']);
+  const MANUAL_PLATFORMS = new Set(['binance','coinbase','phantom','revolut_balance','revolut_stocks','revolut_crypto','tiger','china_bank','ctbc_balance','ctbc_stocks','dbs','tiktok_rsu','meta_rsu']);
 
   for (const r of results) {
     if (MANUAL_PLATFORMS.has(r.platform) && r.balanceNative === 0 && !getManualBalance(r.platform)) continue;

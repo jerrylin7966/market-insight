@@ -12,6 +12,9 @@ async function fetchManual(platform: PlatformId, currency: string): Promise<Fetc
   return { platform, balanceNative: stored.balanceNative, currency, balanceUsd: usd, fxRate, fetchedAt: new Date().toISOString() };
 }
 
+export async function fetchBinance():        Promise<FetchResult> { return fetchManual('binance',         'USD'); }
+export async function fetchCoinbase():       Promise<FetchResult> { return fetchManual('coinbase',        'USD'); }
+export async function fetchPhantom():        Promise<FetchResult> { return fetchManual('phantom',         'USD'); }
 export async function fetchRevolutBalance(): Promise<FetchResult> { return fetchManual('revolut_balance', 'GBP'); }
 export async function fetchRevolutStocks():  Promise<FetchResult> { return fetchManual('revolut_stocks',  'GBP'); }
 export async function fetchRevolutCrypto():  Promise<FetchResult> { return fetchManual('revolut_crypto',  'GBP'); }
@@ -20,3 +23,5 @@ export async function fetchChinaBank():      Promise<FetchResult> { return fetch
 export async function fetchCtbcBalance():    Promise<FetchResult> { return fetchManual('ctbc_balance',    'TWD'); }
 export async function fetchCtbcStocks():     Promise<FetchResult> { return fetchManual('ctbc_stocks',     'TWD'); }
 export async function fetchDbs():            Promise<FetchResult> { return fetchManual('dbs',             'SGD'); }
+export async function fetchTiktokRsu():      Promise<FetchResult> { return fetchManual('tiktok_rsu',      'USD'); }
+export async function fetchMetaRsu():        Promise<FetchResult> { return fetchManual('meta_rsu',        'USD'); }

@@ -156,6 +156,8 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
       <div class="platform-grid" id="group-crypto"></div>
       <div class="group-label" data-i18n="group-manual">Manual</div>
       <div id="group-manual"></div>
+      <div class="group-label" data-i18n="group-rsu">RSU</div>
+      <div class="platform-grid" id="group-rsu"></div>
     </div>
 
     <div id="page-market" style="display:none">
@@ -386,6 +388,7 @@ const translations={
     'group-broker':'Brokers',
     'group-crypto':'Crypto',
     'group-manual':'Manual',
+    'group-rsu':'RSU',
     'update-balance':'Update balance',
     'save':'Save',
     'no-data':'No data yet',
@@ -447,6 +450,7 @@ const translations={
     'group-broker':'券商',
     'group-crypto':'加密貨幣',
     'group-manual':'手動輸入',
+    'group-rsu':'RSU 股票',
     'update-balance':'更新餘額',
     'save':'儲存',
     'no-data':'尚無資料',
@@ -813,18 +817,21 @@ async function loadMarketCharts(){
 function renderSummary(data){
   document.getElementById('total-num').textContent=Math.round(data.totalUsd).toLocaleString('en-US');
   document.getElementById('last-updated').textContent='as of '+new Date(data.asOf).toLocaleTimeString();
-  ['bank','broker','crypto'].forEach(g=>document.getElementById('group-'+g).innerHTML='');
+  ['bank','broker','crypto','rsu'].forEach(g=>document.getElementById('group-'+g).innerHTML='');
   document.getElementById('group-manual').innerHTML='';
   const manualById={};
   for(const p of data.platforms){
-    if(p.category!=='manual'){
+    if(p.category==='manual'){
+      manualById[p.id]=p;
+    }else{
       const group=document.getElementById('group-'+p.category);
       if(group)group.appendChild(buildCard(p));
-    }else{
-      manualById[p.id]=p;
     }
   }
   const manualSubGroups=[
+    {label:'Binance',ids:['binance']},
+    {label:'Coinbase',ids:['coinbase']},
+    {label:'Phantom',ids:['phantom']},
     {label:'Revolut',ids:['revolut_balance','revolut_stocks','revolut_crypto']},
     {label:'Tiger Trade',ids:['tiger']},
     {label:'China Bank',ids:['china_bank']},
@@ -847,7 +854,7 @@ function renderSummary(data){
 
 function buildCard(p){
   const div=document.createElement('div');
-  div.className='platform-card'+(p.hasError?' has-error':'')+(p.category==='manual'?' manual-platform':'');
+  div.className='platform-card'+(p.hasError?' has-error':'')+((p.category==='manual'||p.category==='rsu')?' manual-platform':'');
   const isConnected=!p.hasError&&p.balanceUsd!==null;
   const methodLabel={[`api-key`]:'API','oauth':'OAuth','public-rpc':'RPC','manual':'Manual'}[p.method??'manual']??'—';
   let balHtml=p.balanceUsd!==null
@@ -859,7 +866,7 @@ function buildCard(p){
     if(p.connectUrl)errHtml+=`<a class="card-connect" href="${p.connectUrl}">Connect now →</a>`;
   }
   let manualHtml='';
-  if(p.category==='manual'){
+  if(p.category==='manual'||p.category==='rsu'){
     manualHtml=`<div class="manual-form"><label>Update balance (${p.currency})</label><div class="manual-form-row"><input class="manual-input" type="number" id="manual-${p.id}" data-currency="${p.currency}" placeholder="e.g. 150000"><button class="manual-save" onclick="saveManual('${p.id}')">Save</button></div></div>`;
   }
   div.innerHTML=`
