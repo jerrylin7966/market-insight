@@ -3,7 +3,10 @@ import { Resend } from 'resend';
 import { getLatestSnapshots, getSnapshotHistory } from './db';
 import { PLATFORMS } from './types';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+async function getResend() {
+  if (!process.env.RESEND_API_KEY) throw new Error('RESEND_API_KEY not set');
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 const RECIPIENTS: string[] = (process.env.WEEKLY_EMAIL_RECIPIENTS ?? '')
   .split(',').map(e => e.trim()).filter(Boolean);
@@ -190,7 +193,7 @@ export async function sendWeeklyEmail(): Promise<void> {
   const weekStr = new Date().toLocaleDateString('zh-TW', { month: 'long', day: 'numeric' });
 
   try {
-    await resend.emails.send({
+    await (await getResend()).emails.send({
       from: FROM_EMAIL,
       to: RECIPIENTS,
       subject: `📊 每週資產報告 ${weekStr} · ${phase}`,
