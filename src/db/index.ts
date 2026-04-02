@@ -41,6 +41,11 @@ function initSchema(db: Database.Database): void {
       expires_at    TEXT NOT NULL,
       updated_at    TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS market_cache (
+      key        TEXT PRIMARY KEY,
+      data       TEXT NOT NULL,
+      cached_at  TEXT NOT NULL
+    );
   `);
 }
 
@@ -97,6 +102,28 @@ export function getManualBalance(platform: PlatformId): { balanceNative: number;
   ).get(platform) as any;
   if (!row) return null;
   return { balanceNative: row.balance_native, updatedAt: row.updated_at };
+}
+
+export function setMarketCache(key: string, data: any): void {
+  const db = getDb();
+  db.prepare(`
+    INSERT INTO market_cache (key, data, cached_at)
+    VALUES (?, ?, ?)
+    ON CONFLICT(key) DO UPDATE SET
+      data      = excluded.data,
+      cached_at = excluded.cached_at
+  `).run(key, JSON.stringify(data), new Date().toISOString());
+}
+
+export function getMarketCache(key: string, maxAgeHours: number = 26): any | null {
+  const db = getDb();
+  const row = db.prepare(
+    `SELECT data, cached_at FROM market_cache WHERE key = ?`
+  ).get(key) as { data: string; cached_at: string } | undefined;
+  if (!row) return null;
+  const ageHours = (Date.now() - new Date(row.cached_at).getTime()) / (1000 * 60 * 60);
+  if (ageHours > maxAgeHours) return null;
+  return JSON.parse(row.data);
 }
 
 export function saveOAuthToken(platform: string, accessToken: string, refreshToken: string | null, expiresAt: Date): void {

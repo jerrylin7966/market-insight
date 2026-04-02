@@ -6,7 +6,7 @@ import path from 'path';
 import { startScheduler } from './scheduler';
 import { runAllFetchers } from './fetchers';
 import { sendWeeklyEmail } from './mailer';
-import { getLatestSnapshots, getSnapshotHistory, upsertManualBalance, getOAuthToken } from './db';
+import { getLatestSnapshots, getSnapshotHistory, upsertManualBalance, getOAuthToken, setMarketCache, getMarketCache } from './db';
 import { buildAuthUrl, exchangeCode } from './fetchers/truelayer';
 import { PLATFORMS } from './types';
 import type { ManualUpdatePayload } from './types';
@@ -60,6 +60,8 @@ app.post('/api/manual', auth, (req: Request<{}, {}, ManualUpdatePayload>, res) =
 
 app.get('/api/market/vix', auth, async (req, res) => {
   try {
+    const cached = getMarketCache('vix');
+    if (cached) { res.json(cached); return; }
     const [vixRes, vxvRes] = await Promise.all([
       axios.get('https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?interval=1wk&range=2y', { timeout: 10000 }),
       axios.get('https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX3M?interval=1wk&range=2y', { timeout: 10000 }),
@@ -86,7 +88,9 @@ app.get('/api/market/vix', auth, async (req, res) => {
     if (lastRatio < 0.85)       { state = 'EXTREME COMPLACENCY'; uiColor = 'red';   }
     else if (lastRatio > 1.05)  { state = 'PANIC / OPPORTUNITY'; uiColor = 'green'; }
     else                        { state = 'NEUTRAL';              uiColor = 'gray';  }
-    res.json({ series, state, uiColor });
+    const result = { series, state, uiColor };
+    setMarketCache('vix', result);
+    res.json(result);
   } catch (err: any) {
     res.status(502).json({ error: err.message });
   }
@@ -94,6 +98,8 @@ app.get('/api/market/vix', auth, async (req, res) => {
 
 app.get('/api/market/breadth', auth, async (req, res) => {
   try {
+    const cached = getMarketCache('breadth');
+    if (cached) { res.json(cached); return; }
     const [spyRes, rspRes] = await Promise.all([
       axios.get('https://query1.finance.yahoo.com/v8/finance/chart/SPY?interval=1d&range=2y', { timeout: 10000 }),
       axios.get('https://query1.finance.yahoo.com/v8/finance/chart/RSP?interval=1d&range=2y', { timeout: 10000 }),
@@ -147,7 +153,7 @@ app.get('/api/market/breadth', auth, async (req, res) => {
     else if (priceHealth === 'Bearish' && internalHealth === 'Strong') { interpretation = 'Accumulation — price lagging but stocks rising under the hood.'; interpretationColor = 'amber'; }
     else                                                                { interpretation = 'Capitulation — maximum systemic weakness.';                      interpretationColor = 'red';   }
 
-    res.json({
+    const result = {
       priceHealth, internalHealth, isDivergent, interpretation, interpretationColor,
       adLine:      dates.map((d, i) => ({ date: d, value: Math.round(ratioValues[i] * 100000) / 100000 })),
       prices:      dates.map((d, i) => ({ date: d, value: priceValues[i] })),
@@ -155,7 +161,9 @@ app.get('/api/market/breadth', auth, async (req, res) => {
       priceSma200:  dates.map((d, i) => ({ date: d, value: priceSma[i] })),
       currentPrice, currentAdValue,
       metrics: { lastPrice: currentPrice, lastAD: currentAdValue },
-    });
+    };
+    setMarketCache('breadth', result);
+    res.json(result);
   } catch (err: any) {
     res.status(502).json({ error: err.message });
   }
@@ -163,6 +171,8 @@ app.get('/api/market/breadth', auth, async (req, res) => {
 
 app.get('/api/market/ratio', auth, async (req, res) => {
   try {
+    const cached = getMarketCache('ratio');
+    if (cached) { res.json(cached); return; }
     const [soxxRes, qqqRes] = await Promise.all([
       axios.get('https://query1.finance.yahoo.com/v8/finance/chart/SOXX?interval=1d&range=max', { timeout: 10000 }),
       axios.get('https://query1.finance.yahoo.com/v8/finance/chart/QQQ?interval=1d&range=max',  { timeout: 10000 }),
@@ -221,7 +231,9 @@ app.get('/api/market/ratio', auth, async (req, res) => {
     else                                                                 slopeLabel = 'neutral';
 
     console.log('[Ratio] Last 5 SMA200:', sma200.slice(-5));
-    res.json({ dates, ratios: ratioArray, sma200, status, currentRatio: lastRatio, currentSma: lastSma, soxxNorm, qqqNorm, slope7d: slopeValue, slope7dDates, slopeLabel });
+    const result = { dates, ratios: ratioArray, sma200, status, currentRatio: lastRatio, currentSma: lastSma, soxxNorm, qqqNorm, slope7d: slopeValue, slope7dDates, slopeLabel };
+    setMarketCache('ratio', result);
+    res.json(result);
   } catch (err: any) {
     res.status(502).json({ error: err.message });
   }
@@ -293,6 +305,8 @@ app.get('/api/market/ratio-hourly', auth, async (req, res) => {
 
 app.get('/api/market/heatmap', auth, async (req, res) => {
   try {
+    const cached = getMarketCache('heatmap');
+    if (cached) { res.json(cached); return; }
     const [spyRes, qqqRes, soxxRes] = await Promise.all([
       axios.get('https://query1.finance.yahoo.com/v8/finance/chart/SPY?interval=1d&range=1y',  { timeout: 10000 }),
       axios.get('https://query1.finance.yahoo.com/v8/finance/chart/QQQ?interval=1d&range=1y',  { timeout: 10000 }),
@@ -305,11 +319,13 @@ app.get('/api/market/heatmap', auth, async (req, res) => {
       const high52w = Math.max(...closes);
       return { pct: ((high52w - latest) / high52w) * 100, latest, high52w };
     };
-    res.json({
+    const result = {
       spy:  calc(spyRes.data?.chart?.result?.[0]),
       qqq:  calc(qqqRes.data?.chart?.result?.[0]),
       soxx: calc(soxxRes.data?.chart?.result?.[0]),
-    });
+    };
+    setMarketCache('heatmap', result);
+    res.json(result);
   } catch (err: any) {
     res.status(502).json({ error: err.message });
   }
@@ -317,6 +333,8 @@ app.get('/api/market/heatmap', auth, async (req, res) => {
 
 app.get('/api/market/claims', auth, async (req, res) => {
   try {
+    const cached = getMarketCache('claims');
+    if (cached) { res.json(cached); return; }
     const apiKey = process.env.FRED_API_KEY;
     if (!apiKey) { res.status(503).json({ error: 'FRED_API_KEY not configured' }); return; }
     const url = `https://api.stlouisfed.org/fred/series/observations?series_id=IC4WSA&api_key=${apiKey}&file_type=json&sort_order=desc&limit=104`;
@@ -338,7 +356,9 @@ app.get('/api/market/claims', auth, async (req, res) => {
       ? 'Claims Decelerating — Floor Support ✅'
       : 'Claims Rising — Macro Risk ⚠';
 
-    res.json({ data, latest, previous, fourWeeksAgo, trend, trendColor, floorStatus });
+    const result = { data, latest, previous, fourWeeksAgo, trend, trendColor, floorStatus };
+    setMarketCache('claims', result);
+    res.json(result);
   } catch (err: any) {
     res.status(502).json({ error: err.message });
   }
@@ -366,6 +386,8 @@ function determinePhase(m: MarketMetrics): { phase: string; score: number; color
 
 app.get('/api/market/signals', auth, async (req, res) => {
   try {
+    const cached = getMarketCache('signals');
+    if (cached) { res.json(cached); return; }
     const toMap = (result: any): Map<string, number> => {
       const ts: number[]              = result?.timestamp ?? [];
       const closes: (number | null)[] = result?.indicators?.quote?.[0]?.close ?? [];
@@ -464,7 +486,9 @@ app.get('/api/market/signals', auth, async (req, res) => {
       { indicator: 'Macro Floor',   scored: macroFloor.isImproving,                value: macroFloor.current ? `Claims ${macroFloor.isImproving ? 'improving' : 'worsening'} (${Math.round(macroFloor.current).toLocaleString()}K)` : 'No FRED data' },
     ];
 
-    res.json({ phase, score, color, scoreBreakdown, metrics });
+    const result = { phase, score, color, scoreBreakdown, metrics };
+    setMarketCache('signals', result);
+    res.json(result);
   } catch (err: any) {
     res.status(502).json({ error: err.message });
   }
