@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+asset-hub.db
+tiger_private_key.pem
+*.log
+.DS_Store
+asset-hub.db-shm
+asset-hub.db-wal
