@@ -556,7 +556,6 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.listen(PORT, () => {
   console.log(`\nAsset Hub running at http://localhost:${PORT}`);
-  console.log(`Password: ${process.env.DASHBOARD_PASSWORD}`);
   startScheduler();
 });
 
