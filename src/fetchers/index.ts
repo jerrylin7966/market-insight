@@ -44,8 +44,8 @@ export async function runAllFetchers(): Promise<RunResult> {
   const MANUAL_PLATFORMS = new Set(['binance','coinbase','phantom','revolut_balance','revolut_stocks','revolut_crypto','tiger','china_bank','ctbc_balance','ctbc_stocks','dbs','tiktok_rsu','meta_rsu']);
 
   for (const r of results) {
-    if (MANUAL_PLATFORMS.has(r.platform) && r.balanceNative === 0 && !getManualBalance(r.platform)) continue;
-    upsertSnapshot({
+    if (MANUAL_PLATFORMS.has(r.platform) && r.balanceNative === 0 && !(await getManualBalance(r.platform))) continue;
+    await upsertSnapshot({
       date:          today,
       platform:      r.platform,
       balanceNative: r.balanceNative,

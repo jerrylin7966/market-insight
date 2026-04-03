@@ -1,24 +1,20 @@
-import Database from 'better-sqlite3';
-import path from 'path';
+import { Pool } from 'pg';
 import type { DailySnapshot, PlatformId } from '../types';
 
-const DB_PATH = path.join(process.cwd(), 'asset-hub.db');
-let _db: Database.Database | null = null;
+let _pool: Pool | null = null;
 
-export function getDb(): Database.Database {
-  if (!_db) {
-    _db = new Database(DB_PATH);
-    _db.pragma('journal_mode = WAL');
-    _db.pragma('foreign_keys = ON');
-    initSchema(_db);
+export function getPool(): Pool {
+  if (!_pool) {
+    _pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
   }
-  return _db;
+  return _pool;
 }
 
-function initSchema(db: Database.Database): void {
-  db.exec(`
+export async function initSchema(): Promise<void> {
+  const pool = getPool();
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS snapshots (
-      id             INTEGER PRIMARY KEY AUTOINCREMENT,
+      id             SERIAL PRIMARY KEY,
       date           TEXT NOT NULL,
       platform       TEXT NOT NULL,
       balance_native REAL NOT NULL DEFAULT 0,
@@ -47,103 +43,105 @@ function initSchema(db: Database.Database): void {
       cached_at  TEXT NOT NULL
     );
   `);
+  console.log('[DB] Schema initialised on PostgreSQL');
 }
 
-export function upsertSnapshot(snap: Omit<DailySnapshot, 'id'>): void {
-  const db = getDb();
-  db.prepare(`
+export async function upsertSnapshot(snap: Omit<DailySnapshot, 'id'>): Promise<void> {
+  const pool = getPool();
+  await pool.query(`
     INSERT INTO snapshots (date, platform, balance_native, currency, balance_usd, fx_rate, created_at)
-    VALUES (@date, @platform, @balanceNative, @currency, @balanceUsd, @fxRate, @createdAt)
+    VALUES ($1,$2,$3,$4,$5,$6,$7)
     ON CONFLICT(date, platform) DO UPDATE SET
-      balance_native = excluded.balance_native,
-      balance_usd    = excluded.balance_usd,
-      fx_rate        = excluded.fx_rate,
-      created_at     = excluded.created_at
-  `).run(snap);
+      balance_native = EXCLUDED.balance_native,
+      balance_usd    = EXCLUDED.balance_usd,
+      fx_rate        = EXCLUDED.fx_rate,
+      created_at     = EXCLUDED.created_at
+  `, [snap.date, snap.platform, snap.balanceNative, snap.currency, snap.balanceUsd, snap.fxRate, snap.createdAt]);
 }
 
-export function getLatestSnapshots(): any[] {
-  const db = getDb();
-  return db.prepare(`
+export async function getLatestSnapshots(): Promise<any[]> {
+  const pool = getPool();
+  const res = await pool.query(`
     SELECT s.* FROM snapshots s
     INNER JOIN (
-      SELECT platform, MAX(date) AS max_date
-      FROM snapshots GROUP BY platform
+      SELECT platform, MAX(date) AS max_date FROM snapshots GROUP BY platform
     ) latest ON s.platform = latest.platform AND s.date = latest.max_date
     ORDER BY s.platform
-  `).all();
+  `);
+  return res.rows;
 }
 
-export function getSnapshotHistory(days: number = 90): any[] {
-  const db = getDb();
-  return db.prepare(`
+export async function getSnapshotHistory(days: number = 90): Promise<any[]> {
+  const pool = getPool();
+  const res = await pool.query(`
     SELECT date, SUM(balance_usd) AS total_usd
     FROM snapshots
-    WHERE date >= date('now', '-' || ? || ' days')
+    WHERE date >= (CURRENT_DATE - $1 * INTERVAL '1 day')::TEXT
     GROUP BY date ORDER BY date ASC
-  `).all(days);
+  `, [days]);
+  return res.rows;
 }
 
-export function upsertManualBalance(platform: PlatformId, balanceNative: number): void {
-  const db = getDb();
-  db.prepare(`
+export async function upsertManualBalance(platform: PlatformId, balanceNative: number): Promise<void> {
+  const pool = getPool();
+  await pool.query(`
     INSERT INTO manual_balances (platform, balance_native, updated_at)
-    VALUES (?, ?, ?)
+    VALUES ($1,$2,$3)
     ON CONFLICT(platform) DO UPDATE SET
-      balance_native = excluded.balance_native,
-      updated_at     = excluded.updated_at
-  `).run(platform, balanceNative, new Date().toISOString());
+      balance_native = EXCLUDED.balance_native,
+      updated_at     = EXCLUDED.updated_at
+  `, [platform, balanceNative, new Date().toISOString()]);
 }
 
-export function getManualBalance(platform: PlatformId): { balanceNative: number; updatedAt: string } | null {
-  const db = getDb();
-  const row = db.prepare(
-    `SELECT balance_native, updated_at FROM manual_balances WHERE platform = ?`
-  ).get(platform) as any;
-  if (!row) return null;
-  return { balanceNative: row.balance_native, updatedAt: row.updated_at };
+export async function getManualBalance(platform: PlatformId): Promise<{ balanceNative: number; updatedAt: string } | null> {
+  const pool = getPool();
+  const res = await pool.query(
+    `SELECT balance_native, updated_at FROM manual_balances WHERE platform = $1`, [platform]
+  );
+  if (!res.rows[0]) return null;
+  return { balanceNative: res.rows[0].balance_native, updatedAt: res.rows[0].updated_at };
 }
 
-export function setMarketCache(key: string, data: any): void {
-  const db = getDb();
-  db.prepare(`
-    INSERT INTO market_cache (key, data, cached_at)
-    VALUES (?, ?, ?)
-    ON CONFLICT(key) DO UPDATE SET
-      data      = excluded.data,
-      cached_at = excluded.cached_at
-  `).run(key, JSON.stringify(data), new Date().toISOString());
-}
-
-export function getMarketCache(key: string, maxAgeHours: number = 26): any | null {
-  const db = getDb();
-  const row = db.prepare(
-    `SELECT data, cached_at FROM market_cache WHERE key = ?`
-  ).get(key) as { data: string; cached_at: string } | undefined;
-  if (!row) return null;
-  const ageHours = (Date.now() - new Date(row.cached_at).getTime()) / (1000 * 60 * 60);
-  if (ageHours > maxAgeHours) return null;
-  return JSON.parse(row.data);
-}
-
-export function saveOAuthToken(platform: string, accessToken: string, refreshToken: string | null, expiresAt: Date): void {
-  const db = getDb();
-  db.prepare(`
+export async function saveOAuthToken(platform: string, accessToken: string, refreshToken: string | null, expiresAt: Date): Promise<void> {
+  const pool = getPool();
+  await pool.query(`
     INSERT INTO oauth_tokens (platform, access_token, refresh_token, expires_at, updated_at)
-    VALUES (?, ?, ?, ?, ?)
+    VALUES ($1,$2,$3,$4,$5)
     ON CONFLICT(platform) DO UPDATE SET
-      access_token  = excluded.access_token,
-      refresh_token = excluded.refresh_token,
-      expires_at    = excluded.expires_at,
-      updated_at    = excluded.updated_at
-  `).run(platform, accessToken, refreshToken, expiresAt.toISOString(), new Date().toISOString());
+      access_token  = EXCLUDED.access_token,
+      refresh_token = EXCLUDED.refresh_token,
+      expires_at    = EXCLUDED.expires_at,
+      updated_at    = EXCLUDED.updated_at
+  `, [platform, accessToken, refreshToken, expiresAt.toISOString(), new Date().toISOString()]);
 }
 
-export function getOAuthToken(platform: string): { accessToken: string; refreshToken: string | null; expiresAt: Date } | null {
-  const db = getDb();
-  const row = db.prepare(
-    `SELECT access_token, refresh_token, expires_at FROM oauth_tokens WHERE platform = ?`
-  ).get(platform) as any;
-  if (!row) return null;
-  return { accessToken: row.access_token, refreshToken: row.refresh_token, expiresAt: new Date(row.expires_at) };
+export async function getOAuthToken(platform: string): Promise<{ accessToken: string; refreshToken: string | null; expiresAt: Date } | null> {
+  const pool = getPool();
+  const res = await pool.query(
+    `SELECT access_token, refresh_token, expires_at FROM oauth_tokens WHERE platform = $1`, [platform]
+  );
+  if (!res.rows[0]) return null;
+  return { accessToken: res.rows[0].access_token, refreshToken: res.rows[0].refresh_token, expiresAt: new Date(res.rows[0].expires_at) };
+}
+
+export async function setMarketCache(key: string, data: any): Promise<void> {
+  const pool = getPool();
+  await pool.query(`
+    INSERT INTO market_cache (key, data, cached_at)
+    VALUES ($1,$2,$3)
+    ON CONFLICT(key) DO UPDATE SET
+      data      = EXCLUDED.data,
+      cached_at = EXCLUDED.cached_at
+  `, [key, JSON.stringify(data), new Date().toISOString()]);
+}
+
+export async function getMarketCache(key: string, maxAgeHours: number = 26): Promise<any | null> {
+  const pool = getPool();
+  const res = await pool.query(
+    `SELECT data, cached_at FROM market_cache WHERE key = $1`, [key]
+  );
+  if (!res.rows[0]) return null;
+  const ageHours = (Date.now() - new Date(res.rows[0].cached_at).getTime()) / (1000 * 60 * 60);
+  if (ageHours > maxAgeHours) return null;
+  return JSON.parse(res.rows[0].data);
 }

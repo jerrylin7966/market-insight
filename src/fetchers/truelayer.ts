@@ -7,7 +7,7 @@ const AUTH_URL = 'https://auth.truelayer.com';
 const API_URL  = 'https://api.truelayer.com';
 
 export async function refreshToken(platform: 'hsbc' | 'revolut'): Promise<string | null> {
-  const stored = getOAuthToken(platform);
+  const stored = await getOAuthToken(platform);
   if (!stored?.refreshToken) return null;
   if (stored.expiresAt.getTime() - Date.now() > 5 * 60 * 1000) return stored.accessToken;
 
@@ -23,7 +23,7 @@ export async function refreshToken(platform: 'hsbc' | 'revolut'): Promise<string
     );
     const { access_token, refresh_token, expires_in } = res.data;
     const expiresAt = new Date(Date.now() + expires_in * 1000);
-    saveOAuthToken(platform, access_token, refresh_token ?? stored.refreshToken, expiresAt);
+    await saveOAuthToken(platform, access_token, refresh_token ?? stored.refreshToken, expiresAt);
     return access_token;
   } catch (err: any) {
     console.error(`[TrueLayer] Token refresh failed for ${platform}:`, err?.message);
@@ -91,6 +91,6 @@ export async function exchangeCode(code: string, provider: 'hsbc' | 'revolut', r
     { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, timeout: 10000 }
   );
   const { access_token, refresh_token, expires_in } = res.data;
-  saveOAuthToken(provider, access_token, refresh_token, new Date(Date.now() + expires_in * 1000));
+  await saveOAuthToken(provider, access_token, refresh_token, new Date(Date.now() + expires_in * 1000));
   console.log(`[TrueLayer] ${provider} tokens saved`);
 }

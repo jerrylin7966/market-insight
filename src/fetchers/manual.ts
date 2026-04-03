@@ -3,7 +3,7 @@ import { toUsd } from '../fx';
 import type { FetchResult, PlatformId } from '../types';
 
 async function fetchManual(platform: PlatformId, currency: string): Promise<FetchResult> {
-  const stored = getManualBalance(platform);
+  const stored = await getManualBalance(platform);
   if (!stored) {
     return { platform, balanceNative: 0, currency, balanceUsd: 0, fxRate: 1, fetchedAt: new Date().toISOString() };
   }

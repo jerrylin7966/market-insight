@@ -156,11 +156,11 @@ export async function sendWeeklyEmail(): Promise<void> {
   console.log('[Mailer] Starting weekly email generation...');
 
   // Get asset data
-  const snapshots = getLatestSnapshots();
+  const snapshots = await getLatestSnapshots();
   const totalUsd = snapshots.reduce((sum, s) => sum + s.balance_usd, 0);
 
   // Calculate weekly change (compare latest day vs ~7 days prior)
-  const history = getSnapshotHistory(14);
+  const history = await getSnapshotHistory(14);
   const weeklyChange = history.length >= 2
     ? history[history.length - 1].total_usd - history[Math.max(0, history.length - 8)].total_usd
     : 0;

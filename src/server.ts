@@ -6,7 +6,7 @@ import path from 'path';
 import { startScheduler } from './scheduler';
 import { runAllFetchers } from './fetchers';
 import { sendWeeklyEmail } from './mailer';
-import { getLatestSnapshots, getSnapshotHistory, upsertManualBalance, getOAuthToken, setMarketCache, getMarketCache } from './db';
+import { initSchema, getLatestSnapshots, getSnapshotHistory, upsertManualBalance, getOAuthToken, setMarketCache, getMarketCache } from './db';
 import { buildAuthUrl, exchangeCode } from './fetchers/truelayer';
 import { PLATFORMS } from './types';
 import type { ManualUpdatePayload } from './types';
@@ -27,8 +27,8 @@ function auth(req: Request, res: Response, next: NextFunction): void {
   next();
 }
 
-app.get('/api/summary', auth, (req, res) => {
-  const snapshots = getLatestSnapshots();
+app.get('/api/summary', auth, async (req, res) => {
+  const snapshots = await getLatestSnapshots();
   const totalUsd  = snapshots.reduce((sum, s) => sum + s.balance_usd, 0);
   const platforms = Object.values(PLATFORMS).map(meta => {
     const snap = snapshots.find((s: any) => s.platform === meta.id);
@@ -45,22 +45,22 @@ app.get('/api/summary', auth, (req, res) => {
   res.json({ totalUsd, platforms, asOf: new Date().toISOString() });
 });
 
-app.get('/api/history', auth, (req, res) => {
+app.get('/api/history', auth, async (req, res) => {
   const days = parseInt(req.query.days as string ?? '90', 10);
-  res.json(getSnapshotHistory(days));
+  res.json(await getSnapshotHistory(days));
 });
 
-app.post('/api/manual', auth, (req: Request<{}, {}, ManualUpdatePayload>, res) => {
+app.post('/api/manual', auth, async (req: Request<{}, {}, ManualUpdatePayload>, res) => {
   const { platform, balanceNative } = req.body;
   if (!['binance','coinbase','phantom','revolut_balance','revolut_stocks','revolut_crypto','tiger','china_bank','ctbc_balance','ctbc_stocks','dbs','tiktok_rsu','meta_rsu'].includes(platform)) { res.status(400).json({ error: 'Platform does not support manual updates' }); return; }
   if (typeof balanceNative !== 'number' || balanceNative < 0) { res.status(400).json({ error: 'Invalid amount' }); return; }
-  upsertManualBalance(platform, balanceNative);
+  await upsertManualBalance(platform, balanceNative);
   res.json({ ok: true, platform, balanceNative, updatedAt: new Date().toISOString() });
 });
 
 app.get('/api/market/vix', auth, async (req, res) => {
   try {
-    const cached = getMarketCache('vix');
+    const cached = await getMarketCache('vix');
     if (cached) { res.json(cached); return; }
     const [vixRes, vxvRes] = await Promise.all([
       axios.get('https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?interval=1wk&range=2y', { timeout: 10000 }),
@@ -89,7 +89,7 @@ app.get('/api/market/vix', auth, async (req, res) => {
     else if (lastRatio > 1.05)  { state = 'PANIC / OPPORTUNITY'; uiColor = 'green'; }
     else                        { state = 'NEUTRAL';              uiColor = 'gray';  }
     const result = { series, state, uiColor };
-    setMarketCache('vix', result);
+    await setMarketCache('vix', result);
     res.json(result);
   } catch (err: any) {
     res.status(502).json({ error: err.message });
@@ -98,7 +98,7 @@ app.get('/api/market/vix', auth, async (req, res) => {
 
 app.get('/api/market/breadth', auth, async (req, res) => {
   try {
-    const cached = getMarketCache('breadth');
+    const cached = await getMarketCache('breadth');
     if (cached) { res.json(cached); return; }
     const [spyRes, rspRes] = await Promise.all([
       axios.get('https://query1.finance.yahoo.com/v8/finance/chart/SPY?interval=1d&range=2y', { timeout: 10000 }),
@@ -162,7 +162,7 @@ app.get('/api/market/breadth', auth, async (req, res) => {
       currentPrice, currentAdValue,
       metrics: { lastPrice: currentPrice, lastAD: currentAdValue },
     };
-    setMarketCache('breadth', result);
+    await setMarketCache('breadth', result);
     res.json(result);
   } catch (err: any) {
     res.status(502).json({ error: err.message });
@@ -171,7 +171,7 @@ app.get('/api/market/breadth', auth, async (req, res) => {
 
 app.get('/api/market/ratio', auth, async (req, res) => {
   try {
-    const cached = getMarketCache('ratio');
+    const cached = await getMarketCache('ratio');
     if (cached) { res.json(cached); return; }
     const [soxxRes, qqqRes] = await Promise.all([
       axios.get('https://query1.finance.yahoo.com/v8/finance/chart/SOXX?interval=1d&range=max', { timeout: 10000 }),
@@ -232,7 +232,7 @@ app.get('/api/market/ratio', auth, async (req, res) => {
 
     console.log('[Ratio] Last 5 SMA200:', sma200.slice(-5));
     const result = { dates, ratios: ratioArray, sma200, status, currentRatio: lastRatio, currentSma: lastSma, soxxNorm, qqqNorm, slope7d: slopeValue, slope7dDates, slopeLabel };
-    setMarketCache('ratio', result);
+    await setMarketCache('ratio', result);
     res.json(result);
   } catch (err: any) {
     res.status(502).json({ error: err.message });
@@ -305,7 +305,7 @@ app.get('/api/market/ratio-hourly', auth, async (req, res) => {
 
 app.get('/api/market/heatmap', auth, async (req, res) => {
   try {
-    const cached = getMarketCache('heatmap');
+    const cached = await getMarketCache('heatmap');
     if (cached) { res.json(cached); return; }
     const [spyRes, qqqRes, soxxRes] = await Promise.all([
       axios.get('https://query1.finance.yahoo.com/v8/finance/chart/SPY?interval=1d&range=1y',  { timeout: 10000 }),
@@ -324,7 +324,7 @@ app.get('/api/market/heatmap', auth, async (req, res) => {
       qqq:  calc(qqqRes.data?.chart?.result?.[0]),
       soxx: calc(soxxRes.data?.chart?.result?.[0]),
     };
-    setMarketCache('heatmap', result);
+    await setMarketCache('heatmap', result);
     res.json(result);
   } catch (err: any) {
     res.status(502).json({ error: err.message });
@@ -333,7 +333,7 @@ app.get('/api/market/heatmap', auth, async (req, res) => {
 
 app.get('/api/market/claims', auth, async (req, res) => {
   try {
-    const cached = getMarketCache('claims');
+    const cached = await getMarketCache('claims');
     if (cached) { res.json(cached); return; }
     const apiKey = process.env.FRED_API_KEY;
     if (!apiKey) { res.status(503).json({ error: 'FRED_API_KEY not configured' }); return; }
@@ -357,7 +357,7 @@ app.get('/api/market/claims', auth, async (req, res) => {
       : 'Claims Rising — Macro Risk ⚠';
 
     const result = { data, latest, previous, fourWeeksAgo, trend, trendColor, floorStatus };
-    setMarketCache('claims', result);
+    await setMarketCache('claims', result);
     res.json(result);
   } catch (err: any) {
     res.status(502).json({ error: err.message });
@@ -386,7 +386,7 @@ function determinePhase(m: MarketMetrics): { phase: string; score: number; color
 
 app.get('/api/market/signals', auth, async (req, res) => {
   try {
-    const cached = getMarketCache('signals');
+    const cached = await getMarketCache('signals');
     if (cached) { res.json(cached); return; }
     const toMap = (result: any): Map<string, number> => {
       const ts: number[]              = result?.timestamp ?? [];
@@ -487,7 +487,7 @@ app.get('/api/market/signals', auth, async (req, res) => {
     ];
 
     const result = { phase, score, color, scoreBreakdown, metrics };
-    setMarketCache('signals', result);
+    await setMarketCache('signals', result);
     res.json(result);
   } catch (err: any) {
     res.status(502).json({ error: err.message });
@@ -554,9 +554,10 @@ app.get('/auth/truelayer/callback', async (req, res) => {
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-app.listen(PORT, () => {
-  console.log(`\nAsset Hub running at http://localhost:${PORT}`);
+app.listen(PORT, async () => {
+  await initSchema();
   startScheduler();
+  console.log(`\nAsset Hub running at http://localhost:${PORT}`);
 });
 
 export default app;
