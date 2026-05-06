@@ -370,6 +370,7 @@ interface MarketMetrics {
   indexHealth:   { avgDistFromHigh: number; spy: number; qqq: number; soxx: number };
   breadth:       { ratio: number; sma200: number | null; status: 'Healthy' | 'Narrow' };
   macroFloor:    { current: number; previous: number; isImproving: boolean };
+  cli:           { usa: boolean; g7: boolean; isBullish: boolean };
 }
 
 function determinePhase(m: MarketMetrics): { phase: string; score: number; color: string } {
@@ -379,9 +380,136 @@ function determinePhase(m: MarketMetrics): { phase: string; score: number; color
   if (m.indexHealth.avgDistFromHigh < 5)        score++;
   if (m.breadth.status === 'Healthy')           score++;
   if (m.macroFloor.isImproving)                 score++;
-  if (score >= 4) return { phase: 'PHASE 1 — GREEN',    score, color: 'green'  };
-  if (score >= 2) return { phase: 'PHASE 2-3 — WATCH',  score, color: 'yellow' };
+  if (m.cli.isBullish)                          score++;
+  if (score >= 5) return { phase: 'PHASE 1 — GREEN',    score, color: 'green'  };
+  if (score >= 3) return { phase: 'PHASE 2-3 — WATCH',  score, color: 'yellow' };
   return              { phase: 'PHASE 4 — RED',          score, color: 'red'    };
+}
+
+// ── OECD CLI helper ───────────────────────────────────────────────────────────
+// Primary: FRED hosts OECD CLI series (same key already used for claims)
+// Fallback: sdmx.oecd.org new REST API
+const FRED_CLI_SERIES: [string, string][] = [
+  ['USA', 'USALOLITONOSTSAM'],
+  ['GBR', 'GBRLOLITONOSTSAM'],
+  ['DEU', 'DEULOLITONOSTSAM'],
+  ['JPN', 'JPNLOLITONOSTSAM'],
+  ['G-7', 'G7LOLITONOSTSAM'],
+];
+
+function analyseCliSeries(series: { date: string; value: number }[]) {
+  if (!series?.length) return null;
+  const last  = series[series.length - 1];
+  const mo3   = series.slice(-4, -1);
+  const trend = mo3.length >= 3 ? (last.value > mo3[0].value ? 'rising' : 'falling') : 'unknown';
+  const expanding = last.value > 100;
+  const isBullish = expanding && trend === 'rising';
+  const signal    = expanding && trend === 'rising' ? 'Expanding ↑'
+                  : expanding                       ? 'Decelerating ↓'
+                  : trend === 'rising'              ? 'Recovery ↑'
+                  :                                   'Contraction ↓';
+  const color     = isBullish ? 'green' : (!expanding && trend !== 'rising') ? 'red' : 'amber';
+  return { series, latestDate: last.date, latest: last.value, trend, expanding, isBullish, signal, color };
+}
+
+// Parse either SDMX-JSON 1.0 (top-level dataSets/structure) or
+// SDMX-JSON 2.0 (wrapped under data.dataSets / data.structure)
+function parseSdmxJson(raw: any): Record<string, { date: string; value: number }[]> {
+  const structure   = raw.data?.structure   ?? raw.structure;
+  const datasetArr  = raw.data?.dataSets    ?? raw.dataSets;
+  if (!structure || !datasetArr?.length) throw new Error('Unrecognised SDMX-JSON shape');
+
+  const seriesDims: any[] = structure.dimensions.series;
+  const obsDims: any[]    = structure.dimensions.observation;
+  const timePeriods: string[] = obsDims
+    .find((d: any) => d.id === 'TIME_PERIOD').values.map((v: any) => v.id);
+  const locDimIdx = seriesDims.findIndex((d: any) =>
+    d.id === 'REF_AREA' || d.id === 'LOCATION');
+  const locValues: any[] = seriesDims[locDimIdx].values;
+
+  const countries: Record<string, { date: string; value: number }[]> = {};
+  const seriesMap = datasetArr[0].series as Record<string, any>;
+  for (const [key, s] of Object.entries(seriesMap)) {
+    const locId: string = locValues[key.split(':').map(Number)[locDimIdx]]?.id ?? 'UNK';
+    const obs = (s as any).observations as Record<string, any[]>;
+    const pts = Object.entries(obs)
+      .map(([ti, arr]) => ({ date: timePeriods[Number(ti)], value: arr[0] as number }))
+      .filter((p): p is { date: string; value: number } => p.value != null && !isNaN(p.value));
+    pts.sort((a, b) => a.date.localeCompare(b.date));
+    if (!countries[locId]) countries[locId] = [];
+    countries[locId].push(...pts);
+  }
+  return countries;
+}
+
+async function fetchOecdCli(): Promise<{ countries: Record<string, any>; scored: boolean } | null> {
+  const cached = await getMarketCache('oecd_cli');
+  if (cached) return cached;
+
+  // ── Try OECD SDMX directly (quick probe — 403s fast so low cost) ──────────
+  const SDMX_URLS = [
+    'https://sdmx.oecd.org/public/rest/data/OECD.SDD.STES,DSD_STES@CLI,4.0/M.USA+GBR+DEU+JPN+G-7.LI.AA?startPeriod=2004-01',
+    'https://data-api.oecd.org/v1/data/OECD.SDD.STES,DSD_STES@CLI,4.0/M.USA+GBR+DEU+JPN+G-7.LI.AA?startPeriod=2004-01&format=jsondata',
+  ];
+  for (const url of SDMX_URLS) {
+    try {
+      const r = await axios.get(url, {
+        headers: {
+          'Accept':      'application/vnd.sdmx.data+json;version=2.0, application/json',
+          'User-Agent':  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Referer':     'https://data-explorer.oecd.org/',
+          'Origin':      'https://data-explorer.oecd.org',
+        },
+        timeout: 4000,  // short — it 403s fast; don't block
+      });
+      const countries = parseSdmxJson(r.data);
+      if (Object.keys(countries).length === 0) continue;
+      const analysed: Record<string, any> = {};
+      for (const [loc, pts] of Object.entries(countries)) analysed[loc] = analyseCliSeries(pts);
+      if (analysed['G7M'] && !analysed['G-7']) { analysed['G-7'] = analysed['G7M']; delete analysed['G7M']; }
+      const scored = (analysed['USA']?.isBullish ?? false) || (analysed['G-7']?.isBullish ?? false);
+      const result = { countries: analysed, scored, source: 'OECD-SDMX' };
+      await setMarketCache('oecd_cli', result);
+      console.log(`[OECD CLI] ✓ SDMX — loaded ${Object.keys(analysed).join(', ')} — USA latest: ${analysed['USA']?.latestDate}`);
+      return result;
+    } catch { /* 403 or network error — fall through */ }
+  }
+
+  // ── FRED mirror (lagged to ~early 2024 after OECD migration) ─────────────
+  const fredKey = process.env.FRED_API_KEY;
+  if (!fredKey) return null;
+  try {
+    const fetches = FRED_CLI_SERIES.map(([country, seriesId]) =>
+      axios.get('https://api.stlouisfed.org/fred/series/observations', {
+        params: { series_id: seriesId, api_key: fredKey, file_type: 'json',
+                  sort_order: 'asc', observation_start: '2004-01-01' },
+        timeout: 10000,
+      })
+      .then(r => ({ country, obs: r.data?.observations as any[] }))
+      .catch(() => ({ country, obs: null }))
+    );
+    const results = await Promise.all(fetches);
+    const countries: Record<string, { date: string; value: number }[]> = {};
+    for (const { country, obs } of results) {
+      if (!obs?.length) continue;
+      const pts = obs
+        .map((o: any) => ({ date: o.date.slice(0, 7), value: parseFloat(o.value) }))
+        .filter(p => !isNaN(p.value));
+      if (pts.length) countries[country] = pts;
+    }
+    if (Object.keys(countries).length > 0) {
+      const analysed: Record<string, any> = {};
+      for (const [loc, pts] of Object.entries(countries)) analysed[loc] = analyseCliSeries(pts);
+      const scored = (analysed['USA']?.isBullish ?? false) || (analysed['G-7']?.isBullish ?? false);
+      const result = { countries: analysed, scored, source: 'FRED (data to ~early 2024 — OECD API restricted)' };
+      await setMarketCache('oecd_cli', result);
+      console.log(`[OECD CLI/FRED] ✓ loaded ${Object.keys(analysed).join(', ')} — USA latest: ${analysed['USA']?.latestDate}`);
+      return result;
+    }
+  } catch (err: any) {
+    console.error('[OECD CLI/FRED] Error:', err?.message);
+  }
+  return null;
 }
 
 app.get('/api/market/signals', auth, async (req, res) => {
@@ -475,15 +603,30 @@ app.get('/api/market/signals', auth, async (req, res) => {
       }
     }
 
-    const metrics: MarketMetrics = { soxxQqqRatio, vixStructure, indexHealth, breadth, macroFloor };
+    // 6. OECD CLI — non-blocking: return cached value instantly; if cold, start
+    //    background fetch and use null (shows ○ 0) until cache is warm next call
+    const cliData = await Promise.race<any>([
+      fetchOecdCli(),
+      new Promise<null>(r => setTimeout(() => r(null), 1500)),
+    ]);
+    const cliUsa  = cliData?.countries?.['USA'];
+    const cliG7   = cliData?.countries?.['G-7'];
+    const cli = {
+      usa:       cliUsa?.isBullish ?? false,
+      g7:        cliG7?.isBullish  ?? false,
+      isBullish: (cliUsa?.isBullish ?? false) || (cliG7?.isBullish ?? false),
+    };
+
+    const metrics: MarketMetrics = { soxxQqqRatio, vixStructure, indexHealth, breadth, macroFloor, cli };
     const { phase, score, color } = determinePhase(metrics);
 
     const scoreBreakdown = [
-      { indicator: 'SOX/QQQ Ratio', scored: soxxQqqRatio.status === 'Bullish',     value: `${soxxQqqRatio.status} — ratio ${ratLatest.toFixed(4)}` },
-      { indicator: 'VIX Structure', scored: vixStructure.ratio < 1.0,              value: `${vixStructure.status} — ratio ${vixRatio.toFixed(3)}` },
-      { indicator: 'Index Health',  scored: indexHealth.avgDistFromHigh < 5,       value: `Avg ${indexHealth.avgDistFromHigh.toFixed(1)}% from high` },
-      { indicator: 'Breadth',       scored: breadth.status === 'Healthy',          value: `${breadth.status} — RSP/SPY ${bLatest.toFixed(4)}` },
-      { indicator: 'Macro Floor',   scored: macroFloor.isImproving,                value: macroFloor.current ? `Claims ${macroFloor.isImproving ? 'improving' : 'worsening'} (${Math.round(macroFloor.current).toLocaleString()}K)` : 'No FRED data' },
+      { indicator: 'SOX/QQQ Ratio', scored: soxxQqqRatio.status === 'Bullish',   value: `${soxxQqqRatio.status} — ratio ${ratLatest.toFixed(4)}` },
+      { indicator: 'VIX Structure', scored: vixStructure.ratio < 1.0,            value: `${vixStructure.status} — ratio ${vixRatio.toFixed(3)}` },
+      { indicator: 'Index Health',  scored: indexHealth.avgDistFromHigh < 5,     value: `Avg ${indexHealth.avgDistFromHigh.toFixed(1)}% from high` },
+      { indicator: 'Breadth',       scored: breadth.status === 'Healthy',        value: `${breadth.status} — RSP/SPY ${bLatest.toFixed(4)}` },
+      { indicator: 'Macro Floor',   scored: macroFloor.isImproving,              value: macroFloor.current ? `Claims ${macroFloor.isImproving ? 'improving' : 'worsening'} (${Math.round(macroFloor.current).toLocaleString()}K)` : 'No FRED data' },
+      { indicator: 'OECD CLI',      scored: cli.isBullish,                       value: cliData ? `USA ${cliUsa?.signal ?? '—'} · G-7 ${cliG7?.signal ?? '—'}` : 'Unavailable' },
     ];
 
     const result = { phase, score, color, scoreBreakdown, metrics };
@@ -491,6 +634,15 @@ app.get('/api/market/signals', auth, async (req, res) => {
     res.json(result);
   } catch (err: any) {
     res.status(502).json({ error: err.message });
+  }
+});
+
+app.get('/api/market/oecd-cli', auth, async (req, res) => {
+  try {
+    const result = await fetchOecdCli();
+    res.json(result ?? { error: 'OECD CLI data unavailable — check server logs', countries: null });
+  } catch (err: any) {
+    res.json({ error: err.message, countries: null });
   }
 });
 

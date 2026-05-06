@@ -1,0 +1,6 @@
+name = "market-insight"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "public"
+
+[vars]
+FRED_API_KEY = "e2cb31396b55aa6b693a2e5d60c00faa"

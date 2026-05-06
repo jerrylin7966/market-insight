@@ -3,13 +3,13 @@ import { toUsd } from '../fx';
 import type { FetchResult, PlatformId } from '../types';
 
 async function fetchManual(platform: PlatformId, currency: string): Promise<FetchResult> {
-  const stored = await getManualBalance(platform);
-  if (!stored) {
+  const balanceNative = await getManualBalance(platform);
+  if (balanceNative === null) {
     return { platform, balanceNative: 0, currency, balanceUsd: 0, fxRate: 1, fetchedAt: new Date().toISOString() };
   }
-  const { usd, fxRate } = await toUsd(stored.balanceNative, currency);
-  console.log(`[${platform}] ${currency} ${stored.balanceNative.toFixed(2)} → $${usd.toFixed(2)}`);
-  return { platform, balanceNative: stored.balanceNative, currency, balanceUsd: usd, fxRate, fetchedAt: new Date().toISOString() };
+  const { usd, fxRate } = await toUsd(balanceNative, currency);
+  console.log(`[${platform}] ${currency} ${balanceNative.toFixed(2)} → $${usd.toFixed(2)}`);
+  return { platform, balanceNative, currency, balanceUsd: usd, fxRate, fetchedAt: new Date().toISOString() };
 }
 
 export async function fetchBinance():        Promise<FetchResult> { return fetchManual('binance',         'USD'); }

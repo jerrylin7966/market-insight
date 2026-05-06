@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { toUsd } from '../fx';
-import { getOAuthToken, saveOAuthToken } from '../db';
+import { getOAuthToken, setOAuthToken } from '../db';
 import type { FetchResult, PlatformId } from '../types';
 
 const AUTH_URL = 'https://auth.truelayer.com';
@@ -23,7 +23,7 @@ export async function refreshToken(platform: 'hsbc' | 'revolut'): Promise<string
     );
     const { access_token, refresh_token, expires_in } = res.data;
     const expiresAt = new Date(Date.now() + expires_in * 1000);
-    await saveOAuthToken(platform, access_token, refresh_token ?? stored.refreshToken, expiresAt);
+    await setOAuthToken(platform, { access_token, refresh_token: refresh_token ?? stored.refresh_token, expires_at: expiresAt.toISOString() });
     return access_token;
   } catch (err: any) {
     console.error(`[TrueLayer] Token refresh failed for ${platform}:`, err?.message);
@@ -91,6 +91,6 @@ export async function exchangeCode(code: string, provider: 'hsbc' | 'revolut', r
     { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, timeout: 10000 }
   );
   const { access_token, refresh_token, expires_in } = res.data;
-  await saveOAuthToken(provider, access_token, refresh_token, new Date(Date.now() + expires_in * 1000));
+  await setOAuthToken(provider, { access_token, refresh_token, expires_at: new Date(Date.now() + expires_in * 1000).toISOString() });
   console.log(`[TrueLayer] ${provider} tokens saved`);
 }

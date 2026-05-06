@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Asset Hub — Market Timing</title>
+<title>Market Timing Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
@@ -12,15 +12,6 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0d0f0e;--bg2:#141714;--bg3:#1b1e1b;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#e8ebe6;--muted:#7a8278;--accent:#4eca8b;--red:#e05c5c;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans)}
-#auth-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100}
-#auth-overlay.hidden{display:none}
-.auth-box{background:var(--bg2);border:0.5px solid var(--border2);border-radius:16px;padding:2.5rem;width:320px}
-.auth-box h1{font-size:20px;font-weight:500;margin-bottom:8px}
-.auth-box p{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
-.auth-box input{width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:14px;padding:10px 12px;outline:none;margin-bottom:12px}
-.auth-box input:focus{border-color:var(--accent)}
-.auth-box button{width:100%;background:var(--accent);color:#0d0f0e;border:none;border-radius:8px;font-size:14px;font-weight:500;padding:11px;cursor:pointer}
-#auth-error{color:var(--red);font-size:12px;margin-top:8px;display:none}
 #app{opacity:0;transition:opacity 0.3s}
 #app.ready{opacity:1}
 header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;border-bottom:0.5px solid var(--border)}
@@ -70,22 +61,11 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
 </head>
 <body>
 
-<div id="auth-overlay">
-  <div class="auth-box">
-    <h1>Asset Hub</h1>
-    <p>Enter your dashboard password to continue.</p>
-    <input type="password" id="password-input" placeholder="Password">
-    <button onclick="login()">Unlock</button>
-    <p id="auth-error">Incorrect password</p>
-  </div>
-</div>
 
 <div id="app">
   <header>
-    <div class="logo">ASSET HUB</div>
+    <div class="logo">MARKET TIMING</div>
     <div class="header-right">
-      <button class="btn-nav" onclick="location.href='/'">← Asset Hub</button>
-      <button class="btn-nav" onclick="triggerWeeklyEmail()" id="btn-send-email" data-i18n="btn-send-email">Send report</button>
       <button class="btn-nav" id="lang-btn" onclick="toggleLang()">繁中</button>
     </div>
   </header>
@@ -314,7 +294,16 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
       <!-- Country cards -->
       <div id="cli-cards" style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:1rem 0"></div>
       <!-- Chart -->
-      <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:4px">CLI Value (100 = long-term trend baseline)</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div style="font-size:10px;color:var(--muted);font-family:var(--mono)">CLI Value (100 = long-term trend baseline)</div>
+        <div class="chart-range" id="cli-range-btns">
+          <button class="range-btn" onclick="setCLIRange(2,this)">2Y</button>
+          <button class="range-btn active" onclick="setCLIRange(4,this)">4Y</button>
+          <button class="range-btn" onclick="setCLIRange(10,this)">10Y</button>
+          <button class="range-btn" onclick="setCLIRange(null,this)">ALL</button>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:4px;opacity:0.5">scroll to zoom · drag to pan</div>
       <div class="chart-container" style="height:260px"><canvas id="cli-chart"></canvas></div>
       <!-- Interpretation table -->
       <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono);margin-top:1rem">
@@ -483,7 +472,6 @@ function toggleLang(){
 let currentLang=localStorage.getItem('lang')||'en';
 function t(key){return(translations[currentLang]||translations.en)[key]||key;}
 
-let password='';
 let vixChart=null;
 let breadthPriceChart=null;
 let breadthAdChart=null;
@@ -496,23 +484,9 @@ let cliChart=null;
 let lastSignalData=null,lastRatioData=null,lastVixData=null;
 let lastHealthData=null,lastBreadthData=null,lastClaimsData=null,lastCliData=null;
 
-function authHeader(){return{'Authorization':'Basic '+btoa(':'+password)};}
 
-function login(){
-  password=document.getElementById('password-input').value;
-  sessionStorage.setItem('hub_pw',password);
-  loadMarketPage();
-}
-document.getElementById('password-input').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
 
-async function loadMarketPage(){
-  const testRes=await fetch('/api/summary',{headers:authHeader()});
-  if(testRes.status===401){document.getElementById('auth-error').style.display='block';return;}
-  document.getElementById('auth-overlay').classList.add('hidden');
-  document.getElementById('app').classList.add('ready');
-  document.getElementById('auth-error').style.display='none';
-  loadMarketCharts();
-}
+
 
 // ── render functions ──────────────────────────────────────────────────────
 function renderSignalCard(s){
@@ -698,15 +672,14 @@ const _bt={backgroundColor:'#1b1e1b',borderColor:'rgba(255,255,255,0.1)',borderW
 
 // ── main data load ────────────────────────────────────────────────────────
 async function loadMarketCharts(){
-  const h=authHeader();
   const [signalsRes,ratioRes,vixRes,heatmapRes,breadthRes,claimsRes,cliRes]=await Promise.allSettled([
-    fetch('/api/market/signals',  {headers:h}).then(r=>r.json()),
-    fetch('/api/market/ratio',    {headers:h}).then(r=>r.json()),
-    fetch('/api/market/vix',      {headers:h}).then(r=>r.json()),
-    fetch('/api/market/heatmap',  {headers:h}).then(r=>r.json()),
-    fetch('/api/market/breadth',  {headers:h}).then(r=>r.json()),
-    fetch('/api/market/claims',   {headers:h}).then(r=>r.json()),
-    fetch('/api/market/oecd-cli', {headers:h}).then(r=>r.json()),
+    fetch('/api/market/signals').then(r=>r.json()),
+    fetch('/api/market/ratio').then(r=>r.json()),
+    fetch('/api/market/vix').then(r=>r.json()),
+    fetch('/api/market/heatmap').then(r=>r.json()),
+    fetch('/api/market/breadth').then(r=>r.json()),
+    fetch('/api/market/claims').then(r=>r.json()),
+    fetch('/api/market/oecd-cli').then(r=>r.json()),
   ]);
 
   if(signalsRes.status==='fulfilled'&&signalsRes.value?.scoreBreakdown){
@@ -799,6 +772,7 @@ async function loadMarketCharts(){
         plugins:{
           legend:{display:true,labels:{color:'rgba(255,255,255,0.5)',font:{size:10},boxWidth:12,padding:10}},
           tooltip:{..._bt,mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': '+Number(c.parsed.y).toFixed(2)}},
+          zoom:{zoom:{wheel:{enabled:true},pinch:{enabled:true},mode:'x'},pan:{enabled:true,mode:'x'},limits:{x:{minRange:6}}},
         },
         scales:{
           x:{..._bs.x,ticks:{..._bs.x.ticks,maxTicksLimit:10}},
@@ -806,14 +780,33 @@ async function loadMarketCharts(){
         }
       }
     });
-    // Trim chart to last 4 years by default
-    const cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-4);
-    const minLabel=allDates.find(d=>new Date(d+'-01')>=cutoff)||allDates[0];
-    // Show all 20 years by default
-    cliChart.options.scales.x.min=allDates[0];
+    // Default to last 4 years
+    const cutoff4=new Date();cutoff4.setFullYear(cutoff4.getFullYear()-4);
+    const minLabel=allDates.find(d=>new Date(d+'-01')>=cutoff4)||allDates[0];
+    cliChart.options.scales.x.min=minLabel;
     cliChart.options.scales.x.max=allDates[allDates.length-1];
     cliChart.update('none');
   }
+}
+
+// ── CLI range buttons ────────────────────────────────────────────────────
+function setCLIRange(years,btn){
+  if(!cliChart)return;
+  document.querySelectorAll('#cli-range-btns .range-btn, .chart-container canvas#cli-chart').forEach(()=>{});
+  btn.closest('.chart-range').querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const labels=cliChart.data.labels;
+  if(!labels||!labels.length)return;
+  if(years===null){
+    cliChart.options.scales.x.min=labels[0];
+  } else {
+    const cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-years);
+    const minL=labels.find(d=>new Date(d+'-01')>=cutoff)||labels[0];
+    cliChart.options.scales.x.min=minL;
+  }
+  cliChart.options.scales.x.max=labels[labels.length-1];
+  cliChart.resetZoom();
+  cliChart.update('none');
 }
 
 // ── ratio chart ───────────────────────────────────────────────────────────
@@ -863,11 +856,11 @@ async function initRatioChart(){
 
 async function loadRatioData(mode){
   if(mode==='hourly'&&!hourlyRatioData){
-    const res=await fetch('/api/market/ratio-hourly',{headers:authHeader()});
+    const res=await fetch('/api/market/ratio-hourly');
     hourlyRatioData=await res.json();
   }
   if(mode==='daily'&&!dailyRatioData){
-    const res=await fetch('/api/market/ratio',{headers:authHeader()});
+    const res=await fetch('/api/market/ratio');
     dailyRatioData=await res.json();
   }
   return mode==='hourly'?hourlyRatioData:dailyRatioData;
@@ -910,7 +903,7 @@ async function triggerWeeklyEmail(){
   const btn=document.getElementById('btn-send-email');
   btn.textContent='Sending...';btn.disabled=true;
   try{
-    const res=await fetch('/api/send-weekly-email',{method:'POST',headers:authHeader()});
+    const res=await fetch('/api/send-weekly-email',{method:'POST'});
     const data=await res.json();
     btn.textContent=data.ok?'✓ Sent':'✗ Failed';
     setTimeout(()=>{btn.textContent=t('btn-send-email');},3000);
@@ -922,8 +915,9 @@ async function triggerWeeklyEmail(){
 
 // ── boot ──────────────────────────────────────────────────────────────────
 applyTranslations(currentLang);
-const saved=sessionStorage.getItem('hub_pw');
-if(saved){password=saved;loadMarketPage();}
+
+document.getElementById('app').classList.add('ready');
+loadMarketCharts();
 </script>
 </body>
 </html>
