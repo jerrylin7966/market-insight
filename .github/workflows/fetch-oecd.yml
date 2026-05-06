@@ -1,0 +1,41 @@
+name: Fetch OECD CLI data
+
+on:
+  schedule:
+    - cron: '0 2 * * *'   # 2 AM UTC daily (10 AM SGT)
+  workflow_dispatch:        # allow manual trigger from GitHub UI
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Fetch OECD CLI data
+        run: |
+          python3 market-insight/scripts/fetch-oecd-cli.py market-insight/public/data/oecd-cli.json "${{ secrets.FRED_API_KEY }}"
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add market-insight/public/data/oecd-cli.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: update OECD CLI data $(date -u +%Y-%m-%d) [skip ci]"
+            git push
+          fi
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy public --project-name=market-insight
+          workingDirectory: market-insight
