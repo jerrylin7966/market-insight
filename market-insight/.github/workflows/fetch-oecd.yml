@@ -31,3 +31,11 @@ jobs:
             git commit -m "chore: update OECD CLI data $(date -u +%Y-%m-%d) [skip ci]"
             git push
           fi
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy public --project-name=market-insight
+          workingDirectory: market-insight
