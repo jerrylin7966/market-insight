@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.jerryl.oecd-refresh</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/jerryl/asset-hub/refresh-oecd.sh</string>
+  </array>
+
+  <!-- Run daily at 10:00 AM SGT (02:00 UTC) -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>10</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/Users/jerryl/asset-hub/refresh-oecd.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/jerryl/asset-hub/refresh-oecd.log</string>
+
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>
