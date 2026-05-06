@@ -22,20 +22,26 @@ function analyseCfnai(ma3Series, rawSeries) {
   };
 }
 
+async function fredFetch(url) {
+  // Try twice — transient FRED failures are common
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const r = await fetch(url, { signal: AbortSignal.timeout(12000) });
+      if (r.ok) return r.json();
+    } catch { /* retry */ }
+  }
+  return null;
+}
+
 export const onRequestGet = async (ctx) => {
-  return withCache(ctx, 'cfnai', 21600, async () => {
+  return withCache(ctx, 'cfnai-v3', 21600, async () => {
     const fredKey = ctx.env.FRED_API_KEY;
     if (!fredKey) return { error: 'No FRED API key', isBullish: false, scored: false };
 
+    const base = `https://api.stlouisfed.org/fred/series/observations?api_key=${fredKey}&file_type=json&sort_order=asc&observation_start=2004-01-01`;
     const [ma3Body, rawBody] = await Promise.all([
-      fetch(
-        `https://api.stlouisfed.org/fred/series/observations?series_id=CFNAIMA3&api_key=${fredKey}&file_type=json&sort_order=asc&observation_start=2004-01-01`,
-        { signal: AbortSignal.timeout(10000) }
-      ).then(r => r.ok ? r.json() : null).catch(() => null),
-      fetch(
-        `https://api.stlouisfed.org/fred/series/observations?series_id=CFNAI&api_key=${fredKey}&file_type=json&sort_order=asc&observation_start=2004-01-01`,
-        { signal: AbortSignal.timeout(10000) }
-      ).then(r => r.ok ? r.json() : null).catch(() => null),
+      fredFetch(`${base}&series_id=CFNAIMA3`),
+      fredFetch(`${base}&series_id=CFNAI`),
     ]);
 
     const parseSeries = body => (body?.observations ?? [])
