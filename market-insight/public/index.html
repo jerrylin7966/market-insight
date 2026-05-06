@@ -670,6 +670,65 @@ const _bs={
 };
 const _bt={backgroundColor:'#1b1e1b',borderColor:'rgba(255,255,255,0.1)',borderWidth:0.5,titleColor:'#7a8278',bodyColor:'#e8ebe6',bodyFont:{family:'DM Mono',size:13}};
 
+// ── OECD CLI — browser-side fetch (bypasses Cloudflare IP blocks) ─────────
+function _parseSdmx(raw){
+  const structure=raw.data?.structure??raw.structure;
+  const datasets=raw.data?.dataSets??raw.dataSets;
+  if(!structure||!datasets?.length)throw new Error('bad shape');
+  const seriesDims=structure.dimensions.series;
+  const obsDims=structure.dimensions.observation;
+  const timePeriods=obsDims.find(d=>d.id==='TIME_PERIOD').values.map(v=>v.id);
+  const locIdx=seriesDims.findIndex(d=>d.id==='REF_AREA'||d.id==='LOCATION');
+  const locVals=seriesDims[locIdx].values;
+  const raw_countries={};
+  for(const[key,s] of Object.entries(datasets[0].series)){
+    const locId=locVals[key.split(':').map(Number)[locIdx]]?.id??'UNK';
+    const pts=Object.entries(s.observations??{})
+      .map(([ti,arr])=>({date:timePeriods[Number(ti)],value:arr[0]}))
+      .filter(p=>p.value!=null&&!isNaN(p.value));
+    pts.sort((a,b)=>a.date.localeCompare(b.date));
+    if(!raw_countries[locId])raw_countries[locId]=[];
+    raw_countries[locId].push(...pts);
+  }
+  if(raw_countries['G7M']&&!raw_countries['G-7']){raw_countries['G-7']=raw_countries['G7M'];delete raw_countries['G7M'];}
+  return raw_countries;
+}
+function _analyseCli(series){
+  if(!series?.length)return null;
+  const last=series[series.length-1];
+  const mo3=series.slice(-4,-1);
+  const trend=mo3.length>=3?(last.value>mo3[0].value?'rising':'falling'):'unknown';
+  const expanding=last.value>100;
+  const isBullish=expanding&&trend==='rising';
+  const signal=expanding&&trend==='rising'?'Expanding ↑':expanding?'Decelerating ↓':trend==='rising'?'Recovery ↑':'Contraction ↓';
+  const color=isBullish?'green':(!expanding&&trend!=='rising'?'red':'amber');
+  return{series,latestDate:last.date,latest:last.value,trend,expanding,isBullish,signal,color};
+}
+async function fetchCliDirect(){
+  // Try OECD SDMX directly from the browser (residential IP, no block)
+  const OECD_URLS=[
+    'https://sdmx.oecd.org/public/rest/data/OECD.SDD.STES,DSD_STES@DF_CLI,1.0/M.USA+GBR+DEU+JPN+G-7.LI.AA?startPeriod=2004-01&format=jsondata',
+    'https://sdmx.oecd.org/public/rest/data/OECD.SDD.STES,DSD_STES@CLI,4.0/M.USA+GBR+DEU+JPN+G-7.LI.AA?startPeriod=2004-01&format=jsondata',
+  ];
+  for(const url of OECD_URLS){
+    try{
+      const r=await fetch(url,{headers:{'Accept':'application/vnd.sdmx.data+json;version=2.0, application/json'},signal:AbortSignal.timeout(12000)});
+      if(r.ok){
+        const raw=await r.json();
+        const ctrs=_parseSdmx(raw);
+        if(Object.keys(ctrs).length){
+          const analysed={};
+          for(const[loc,pts] of Object.entries(ctrs))analysed[loc]=_analyseCli(pts);
+          const scored=(analysed['USA']?.isBullish??false)||(analysed['G-7']?.isBullish??false);
+          return{countries:analysed,scored,source:'OECD-SDMX (live)'};
+        }
+      }
+    }catch{}
+  }
+  // Fallback: server-side (FRED mirror via Cloudflare Function)
+  return fetch('/api/market/oecd-cli').then(r=>r.json());
+}
+
 // ── main data load ────────────────────────────────────────────────────────
 async function loadMarketCharts(){
   const [signalsRes,ratioRes,vixRes,heatmapRes,breadthRes,claimsRes,cliRes]=await Promise.allSettled([
@@ -679,7 +738,7 @@ async function loadMarketCharts(){
     fetch('/api/market/heatmap').then(r=>r.json()),
     fetch('/api/market/breadth').then(r=>r.json()),
     fetch('/api/market/claims').then(r=>r.json()),
-    fetch('/api/market/oecd-cli').then(r=>r.json()),
+    fetchCliDirect(),
   ]);
 
   if(signalsRes.status==='fulfilled'&&signalsRes.value?.scoreBreakdown){
