@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CFNAI Explained: The Economic Indicator That Predicts Market Regimes | MarketPhase</title>
+<meta name="description" content="The Chicago Fed National Activity Index (CFNAI) combines 85 economic indicators into one number. Learn how CFNAI-MA3 predicts recessions and market regimes — and how we use it in our signal model.">
+<meta name="keywords" content="CFNAI explained, Chicago Fed National Activity Index, CFNAI-MA3, economic indicator stocks, recession indicator, FRED economic data">
+<link rel="canonical" href="https://marketphase.pages.dev/guides/cfnai-indicator.html">
+<meta property="og:title" content="CFNAI Explained: The Economic Indicator That Predicts Market Regimes">
+<meta property="og:description" content="85 economic indicators, one number. Learn how the Chicago Fed National Activity Index tracks the business cycle and what it means for markets.">
+<meta property="og:type" content="article">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "CFNAI Explained: The Economic Indicator That Predicts Market Regimes",
+  "author": {"@type": "Organization", "name": "MarketPhase"},
+  "publisher": {"@type": "Organization", "name": "MarketPhase"},
+  "dateModified": "2025-01-01"
+}
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--bg2:#f8fafc;--bg3:#f1f5f9;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--subtle:#94a3b8;--accent:#1d4ed8;--green:#16a34a;--font:'Inter',system-ui,sans-serif;--max:1200px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.container{max-width:var(--max);margin:0 auto;padding:0 1.5rem}
+header{background:#0f172a;color:#fff;position:sticky;top:0;z-index:100}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;max-width:var(--max);margin:0 auto;height:60px}
+.logo{font-size:20px;font-weight:700;color:#fff}.logo span{color:#60a5fa}
+.nav-links{display:flex;gap:1.75rem;align-items:center}
+.nav-links a{color:rgba(255,255,255,0.8);font-size:14px;font-weight:500}
+.nav-links a:hover{color:#fff;text-decoration:none}
+.nav-cta{background:#1d4ed8;color:#fff!important;padding:7px 18px;border-radius:6px;font-size:13px!important}
+.article-layout{display:grid;grid-template-columns:1fr 320px;gap:3rem;max-width:var(--max);margin:0 auto;padding:48px 1.5rem}
+.article-tag{display:inline-block;background:#dcfce7;color:#15803d;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;padding:4px 12px;border-radius:20px;margin-bottom:12px}
+.article-body h2{font-size:1.35rem;font-weight:700;color:var(--text);margin:2.5rem 0 1rem;letter-spacing:-0.3px}
+.article-body h3{font-size:1.1rem;font-weight:600;color:var(--text);margin:2rem 0 0.75rem}
+.article-body p{font-size:1rem;color:#1e293b;line-height:1.8;margin-bottom:1.25rem}
+.article-body ul,.article-body ol{margin:0 0 1.25rem 1.5rem}
+.article-body li{font-size:1rem;color:#1e293b;line-height:1.8;margin-bottom:6px}
+.callout{background:var(--bg2);border-left:4px solid var(--green);border-radius:0 8px 8px 0;padding:1rem 1.25rem;margin:1.75rem 0}
+.callout p{margin:0;font-size:0.95rem}
+.cfnai-table{width:100%;border-collapse:collapse;margin:1.5rem 0;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.cfnai-table th{background:var(--bg3);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.cfnai-table td{padding:12px 14px;font-size:14px;border-bottom:1px solid var(--border)}
+.cfnai-table tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-green{background:#dcfce7;color:#15803d}.badge-amber{background:#fef3c7;color:#b45309}.badge-red{background:#fee2e2;color:#b91c1c}
+.sidebar-sticky{position:sticky;top:76px}
+.sidebar-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1.25rem}
+.sidebar-card h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px}
+.sidebar-card a{display:block;font-size:13px;color:var(--accent);margin-bottom:8px}
+.ad-label{font-size:10px;color:var(--subtle);text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:4px}
+footer{background:#0f172a;color:rgba(255,255,255,0.5);padding:32px 0;margin-top:48px;text-align:center;font-size:13px}
+footer a{color:rgba(255,255,255,0.6)}
+@media(max-width:768px){.article-layout{grid-template-columns:1fr}.nav-links{display:none}}
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <a href="/" class="logo">Market<span>Phase</span></a>
+    <div class="nav-links">
+      <a href="/">Home</a><a href="/dashboard.html">Live Dashboard</a><a href="/guides/">Guides</a>
+      <a href="/dashboard.html" class="nav-cta">→ Live Signals</a>
+    </div>
+  </nav>
+</header>
+
+<div style="background:var(--bg3);border-bottom:1px solid var(--border);text-align:center;padding:10px">
+  <span class="ad-label">Advertisement</span>
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+
+<div style="background:var(--bg2);border-bottom:1px solid var(--border)">
+  <div class="container" style="padding-top:48px;padding-bottom:40px">
+    <a href="/guides/" style="font-size:13px;color:var(--muted)">← All Guides</a>
+    <div style="margin-top:16px"><span class="article-tag">Macro Economics</span></div>
+    <h1 style="font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;letter-spacing:-0.5px;line-height:1.2;margin:12px 0 16px;max-width:720px">CFNAI Explained: The Economic Indicator That Predicts Market Regimes</h1>
+    <div style="display:flex;gap:20px;font-size:13px;color:var(--muted);flex-wrap:wrap">
+      <span>📅 Updated 2025</span><span>⏱ 7 min read</span><span>👤 MarketPhase Research</span>
+    </div>
+  </div>
+</div>
+
+<div class="article-layout">
+  <article class="article-body">
+
+    <p>Most economic indicators measure one thing. GDP measures output. The unemployment rate measures labor market health. CPI measures inflation. But markets respond to the full constellation of economic activity — not any single variable. The Chicago Fed National Activity Index (CFNAI) was designed to solve that problem.</p>
+
+    <p>CFNAI aggregates 85 monthly economic indicators into a single number. It was specifically designed to track the business cycle — and its 3-month moving average (CFNAI-MA3) has been one of the most reliable recession-prediction tools available since its introduction in 2001.</p>
+
+    <h2>What Is the CFNAI?</h2>
+
+    <p>The Chicago Fed National Activity Index is produced monthly by the Federal Reserve Bank of Chicago. It's a weighted average of 85 economic indicators drawn from four broad categories:</p>
+
+    <ul>
+      <li><strong>Production and income</strong> (23 indicators): industrial production, manufacturing output, capacity utilization</li>
+      <li><strong>Employment, unemployment, and hours</strong> (24 indicators): payrolls, unemployment rate, average workweek</li>
+      <li><strong>Personal consumption and housing</strong> (15 indicators): retail sales, housing starts, building permits</li>
+      <li><strong>Sales, orders, and inventories</strong> (23 indicators): wholesale orders, business inventories, durable goods</li>
+    </ul>
+
+    <p>The index is constructed to have a mean of 0 and a standard deviation of 1. Zero represents trend-rate economic growth — the long-run average. Above zero means growth is above trend. Below zero means growth is below trend.</p>
+
+    <div class="callout">
+      <p><strong>Data source:</strong> CFNAI is published by the Federal Reserve Bank of Chicago and freely available via FRED (Federal Reserve Bank of St. Louis). Series IDs: <code>CFNAIMA3</code> (3-month average) and <code>CFNAI</code> (monthly). Released approximately 4 weeks after the reference month.</p>
+    </div>
+
+    <h2>CFNAI vs CFNAI-MA3</h2>
+
+    <p>The monthly CFNAI reading is volatile — individual months can swing substantially due to weather disruptions, data revisions, and statistical noise. The Chicago Fed explicitly recommends using CFNAI-MA3, the 3-month moving average, as the primary signal for assessing economic conditions. The MA3 smooths short-term noise to reveal the underlying trend.</p>
+
+    <p>At MarketPhase, we use CFNAI-MA3 as our macro indicator. It's updated monthly and reflects the most recent 3 months of broad economic activity.</p>
+
+    <!-- In-article ad -->
+    <div style="text-align:center;margin:2.5rem 0;padding:16px;background:var(--bg3);border-radius:8px">
+      <span class="ad-label">Advertisement</span>
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
+    <h2>How to Read CFNAI-MA3</h2>
+
+    <table class="cfnai-table">
+      <thead>
+        <tr><th>CFNAI-MA3 Range</th><th>Economic Condition</th><th>Market Signal</th><th>Historical Context</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Above +0.20</strong></td>
+          <td>Strong expansion</td>
+          <td><span class="badge badge-green">Strongly Bullish</span></td>
+          <td>Economy growing well above long-run trend; low recession risk</td>
+        </tr>
+        <tr>
+          <td><strong>0 to +0.20</strong></td>
+          <td>Moderate expansion</td>
+          <td><span class="badge badge-green">Bullish</span></td>
+          <td>Growth at or slightly above trend; favorable for equities</td>
+        </tr>
+        <tr>
+          <td><strong>−0.70 to 0</strong></td>
+          <td>Below-trend growth</td>
+          <td><span class="badge badge-amber">Cautious</span></td>
+          <td>Slowing but not recessionary; watch for further deterioration</td>
+        </tr>
+        <tr>
+          <td><strong>Below −0.70</strong></td>
+          <td>Recession risk</td>
+          <td><span class="badge badge-red">Bearish</span></td>
+          <td>Historical threshold for increased recession probability</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>The −0.70 threshold is significant: the Chicago Fed's own research shows that when CFNAI-MA3 falls below −0.70, the probability of an ongoing recession beginning is substantially elevated. This threshold has been crossed prior to or during every major U.S. recession since the series began.</p>
+
+    <h2>Why CFNAI Instead of GDP?</h2>
+
+    <p>GDP is the most well-known measure of economic activity, but it has serious practical limitations as a real-time signal:</p>
+
+    <ul>
+      <li><strong>Publication lag:</strong> The initial GDP estimate is released 30 days after the quarter ends — meaning it reflects activity that ended up to 4 months ago. CFNAI reflects data through last month.</li>
+      <li><strong>Significant revisions:</strong> Initial GDP readings are often revised substantially. The 2008 recession wasn't officially confirmed until a year after it began.</li>
+      <li><strong>Quarterly frequency:</strong> GDP is quarterly. CFNAI is monthly — far more useful for tracking changes in real time.</li>
+      <li><strong>Single dimension:</strong> GDP measures output. CFNAI reflects output, employment, consumption, and inventories simultaneously.</li>
+    </ul>
+
+    <p>CFNAI gives you a more complete, more timely picture of economic health — which is exactly what's needed to assess the macro backdrop for equity markets.</p>
+
+    <h2>CFNAI and Stock Market Performance</h2>
+
+    <p>The relationship between CFNAI and equity markets isn't one of perfect correlation — stocks are forward-looking and often price in economic changes before they show up in the data. But the macro regime matters enormously for risk-adjusted returns over 3–12 month horizons:</p>
+
+    <ul>
+      <li>During periods when CFNAI-MA3 is <strong>above 0</strong>, the economy is expanding above trend. This has historically been associated with lower volatility and better equity returns on average.</li>
+      <li>During periods when CFNAI-MA3 is <strong>between −0.70 and 0</strong>, the market tends to be more volatile and returns more dispersed.</li>
+      <li>When CFNAI-MA3 is <strong>below −0.70</strong>, equity markets have historically experienced significantly higher drawdown risk. The 2001, 2008–2009, and 2020 bear markets all coincided with CFNAI-MA3 below this threshold.</li>
+    </ul>
+
+    <h2>How We Use It in the MarketPhase Model</h2>
+
+    <p>In our six-signal model, CFNAI-MA3 above 0 scores as a bullish point (+1). Below 0 scores as bearish (0 points). We use the simple zero crossing as our threshold because:</p>
+
+    <ol>
+      <li>It's clearly defined and objective — no ambiguity about whether the signal is "on" or "off"</li>
+      <li>Zero represents the long-run average growth rate. Being above it means the economy is doing better than its historical average — a fundamentally supportive backdrop for equities.</li>
+      <li>Crossing below 0 has historically been a useful early warning of slowing economic conditions, even before the deeper −0.70 recession threshold is reached</li>
+    </ol>
+
+    <p>You can see the current CFNAI-MA3 reading and its historical chart on the <a href="/dashboard.html">live MarketPhase dashboard</a>, updated monthly when the Chicago Fed releases new data.</p>
+
+    <h2>Limitations to Know</h2>
+
+    <p>No indicator is perfect. CFNAI has a few notable limitations:</p>
+
+    <ul>
+      <li><strong>Publication lag:</strong> Although more timely than GDP, CFNAI still lags by about 4–5 weeks. The dashboard will always show the most recently released value from FRED.</li>
+      <li><strong>Revisions:</strong> The monthly reading is revised as underlying data series are revised. The MA3 smooths much of this, but the most recent print can change.</li>
+      <li><strong>Not a market timing tool on its own:</strong> CFNAI reflects current and recent economic conditions — it's one piece of the puzzle, not the whole answer. That's why we combine it with five other signals across technical, sentiment, and breadth categories.</li>
+    </ul>
+
+    <div class="callout">
+      <p><strong>Bottom line:</strong> CFNAI-MA3 is one of the most comprehensive, timely, and well-validated macro indicators available. Above 0 = above-trend growth = bullish macro backdrop. Below −0.70 = recession risk. Used alongside technical and sentiment signals, it significantly improves the reliability of market regime identification.</p>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-top:2.5rem">
+      <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:12px">Continue reading</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <a href="/guides/vix-explained.html" style="border:1px solid var(--border);border-radius:8px;padding:12px;display:block;color:inherit">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">ALSO READ</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text)">VIX Term Structure Guide →</div>
+        </a>
+        <a href="/guides/market-timing.html" style="border:1px solid var(--border);border-radius:8px;padding:12px;display:block;color:inherit">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">START HERE</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text)">Market Timing Framework →</div>
+        </a>
+      </div>
+    </div>
+
+  </article>
+
+  <aside>
+    <div class="sidebar-sticky">
+      <div style="text-align:center;margin-bottom:16px">
+        <span class="ad-label">Advertisement</span>
+        <ins class="adsbygoogle" style="display:inline-block;width:300px;height:250px" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+      <div class="sidebar-card">
+        <h3>📈 Live CFNAI Reading</h3>
+        <div id="sidebar-cfnai" style="font-size:13px;color:var(--muted)">Loading…</div>
+        <a href="/dashboard.html" style="display:block;margin-top:12px;background:#1d4ed8;color:#fff;text-align:center;padding:9px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none">View Dashboard →</a>
+      </div>
+      <div class="sidebar-card">
+        <h3>📚 Related Guides</h3>
+        <a href="/guides/market-timing.html">Market Timing Framework</a>
+        <a href="/guides/vix-explained.html">VIX Explained</a>
+        <a href="/guides/soxx-qqq-ratio.html">SOXX/QQQ Ratio</a>
+      </div>
+      <div class="sidebar-card" style="background:#dcfce7;border-color:rgba(22,163,74,0.2)">
+        <h3 style="color:#15803d">CFNAI-MA3 Quick Reference</h3>
+        <div style="font-size:13px;color:#14532d;line-height:2">
+          <div>🟢 Above +0.20 — Strong expansion</div>
+          <div>🟢 0 to +0.20 — Above-trend growth</div>
+          <div>🟡 −0.70 to 0 — Below trend</div>
+          <div>🔴 Below −0.70 — Recession risk</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  <p><a href="/">MarketPhase</a> · <a href="/guides/">Guides</a> · <a href="/dashboard.html">Live Dashboard</a></p>
+  <p style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.3)">For informational purposes only. Not financial advice.</p>
+</footer>
+
+<script>
+fetch('https://main.market-insight-eht.pages.dev/api/market/cfnai')
+  .then(r=>r.json()).then(d=>{
+    const el = document.getElementById('sidebar-cfnai');
+    if(d?.ma3Latest != null) {
+      el.innerHTML = `<strong>CFNAI-MA3: ${d.ma3Latest.toFixed(2)}</strong><br><span style="color:var(--subtle);font-size:12px">${d.signal ?? ''} · ${d.ma3LatestDate ?? ''}</span>`;
+    }
+  }).catch(()=>{});
+</script>
+</body>
+</html>
