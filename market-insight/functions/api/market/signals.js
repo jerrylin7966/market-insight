@@ -25,9 +25,13 @@ export const onRequestGet = async (ctx) => {
         ? fetch(`https://api.stlouisfed.org/fred/series/observations?series_id=IC4WSA&api_key=${fredKey}&file_type=json&sort_order=desc&limit=10`,
             { signal: AbortSignal.timeout(10000) }).then(r => r.ok ? r.json() : null).catch(() => null)
         : Promise.resolve(null),
+      fredKey
+        ? fetch(`https://api.stlouisfed.org/fred/series/observations?series_id=CFNAIMA3&api_key=${fredKey}&file_type=json&sort_order=desc&limit=5`,
+            { signal: AbortSignal.timeout(10000) }).then(r => r.ok ? r.json() : null).catch(() => null)
+        : Promise.resolve(null),
     ];
 
-    const [soxxData, qqqData, spyData, rspData, vixData, vix3mData, claimsBody] = await Promise.all(fetches);
+    const [soxxData, qqqData, spyData, rspData, vixData, vix3mData, claimsBody, cfnaiBody] = await Promise.all(fetches);
 
     const soxxR = soxxData?.chart?.result?.[0];
     const qqqR  = qqqData?.chart?.result?.[0];
@@ -106,8 +110,18 @@ export const onRequestGet = async (ctx) => {
       }
     }
 
-    // 6. OECD CLI — best-effort; scores 0 if unavailable
-    const cli = { usa: false, g7: false, isBullish: false };
+    // 6. CFNAI-MA3 (Chicago Fed) — above 0 = above-trend growth = bullish
+    let cli = { ma3Latest: null, isBullish: false, unavailable: true };
+    if (cfnaiBody) {
+      const obs = (cfnaiBody.observations ?? [])
+        .map(o => ({ date: o.date.slice(0, 7), value: parseFloat(o.value) }))
+        .filter(p => !isNaN(p.value))
+        .sort((a, b) => a.date.localeCompare(b.date));
+      if (obs.length) {
+        const latest = obs[obs.length - 1].value;
+        cli = { ma3Latest: latest, latestDate: obs[obs.length - 1].date, isBullish: latest > 0, unavailable: false };
+      }
+    }
 
     let score = 0;
     if (!soxxQqqRatio.unavailable && soxxQqqRatio.status === 'Bullish') score++;
@@ -134,7 +148,8 @@ export const onRequestGet = async (ctx) => {
         value: breadth.unavailable ? 'Data unavailable' : `${breadth.status} — RSP/SPY ${fmtRatio(bLatest)}` },
       { indicator: 'Macro Floor',   scored: !macroFloor.unavailable && macroFloor.isImproving,
         value: macroFloor.unavailable ? 'No FRED data' : `Claims ${macroFloor.isImproving ? 'improving' : 'worsening'} (${Math.round(macroFloor.current).toLocaleString()}K)` },
-      { indicator: 'OECD CLI',      scored: cli.isBullish, value: 'See CLI section below' },
+      { indicator: 'CFNAI',         scored: cli.isBullish,
+        value: cli.unavailable ? 'No FRED data' : `MA3: ${cli.ma3Latest?.toFixed(2)} (${cli.isBullish ? 'above trend' : 'below trend'}) · ${cli.latestDate ?? ''}` },
     ];
 
     return { phase, score, color, scoreBreakdown, metrics: { soxxQqqRatio, vixStructure, indexHealth, breadth, macroFloor, cli } };

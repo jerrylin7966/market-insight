@@ -91,7 +91,7 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
           <tr><td>Index Health</td><td id="sig-idx-val">—</td><td id="sig-idx-score" style="text-align:right">○ +0</td></tr>
           <tr><td>Breadth</td><td id="sig-breadth-val">—</td><td id="sig-breadth-score" style="text-align:right">○ +0</td></tr>
           <tr><td>Macro Floor</td><td id="sig-macro-val">—</td><td id="sig-macro-score" style="text-align:right">○ +0</td></tr>
-          <tr><td>OECD CLI</td><td id="sig-cli-val">—</td><td id="sig-cli-score" style="text-align:right">○ +0</td></tr>
+          <tr><td>CFNAI</td><td id="sig-cli-val">—</td><td id="sig-cli-score" style="text-align:right">○ +0</td></tr>
         </tbody>
       </table>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
@@ -110,7 +110,7 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
         <tbody style="color:var(--text)">
           <tr>
             <td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#4eca8b;white-space:nowrap">🟢 Phase 1 — Green</td>
-            <td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Score ≥ 5/6 · SOX leading, breadth healthy, VIX calm, OECD expanding</td>
+            <td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Score ≥ 5/6 · SOX leading, breadth healthy, VIX calm, CFNAI above trend</td>
             <td style="padding:5px 8px;border-bottom:0.5px solid var(--border)" data-i18n="phase1-action">Hold longs · buy dips aggressively</td>
           </tr>
           <tr>
@@ -282,20 +282,20 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
       <div class="mkt-note" style="margin-top:0.5rem">4-week MA smooths weekly noise. Rising claims confirm exit from Yellow Zone into true recessionary bear market. Used as lagging confirmation only.</div>
     </div>
 
-    <!-- Section 6: OECD Composite Leading Indicators -->
+    <!-- Section 6: Chicago Fed CFNAI -->
     <div class="mkt-section">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
         <div>
-          <div class="mkt-label" data-i18n="cli-section">OECD Leading Indicators</div>
-          <div class="mkt-desc" style="margin-bottom:0">Composite Leading Indicators (CLI) — Expansion vs Contraction</div>
+          <div class="mkt-label" data-i18n="cli-section">Economic Activity Index</div>
+          <div class="mkt-desc" style="margin-bottom:0">Chicago Fed National Activity Index (CFNAI-MA3) — Expansion vs Contraction</div>
         </div>
         <span id="cli-badge" class="signal-badge" style="display:none"></span>
       </div>
-      <!-- Country cards -->
-      <div id="cli-cards" style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:1rem 0"></div>
+      <!-- Summary cards -->
+      <div id="cli-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:1rem 0"></div>
       <!-- Chart -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-        <div style="font-size:10px;color:var(--muted);font-family:var(--mono)">CLI Value (100 = long-term trend baseline)</div>
+        <div style="font-size:10px;color:var(--muted);font-family:var(--mono)">CFNAI-MA3 (0 = long-term trend baseline)</div>
         <div class="chart-range" id="cli-range-btns">
           <button class="range-btn" onclick="setCLIRange(2,this)">2Y</button>
           <button class="range-btn active" onclick="setCLIRange(4,this)">4Y</button>
@@ -309,19 +309,19 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
       <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono);margin-top:1rem">
         <thead>
           <tr>
-            <th style="text-align:left;color:var(--muted);font-weight:400;padding:5px 8px;border-bottom:0.5px solid var(--border)">CLI State</th>
+            <th style="text-align:left;color:var(--muted);font-weight:400;padding:5px 8px;border-bottom:0.5px solid var(--border)">CFNAI-MA3</th>
             <th style="text-align:left;color:var(--muted);font-weight:400;padding:5px 8px;border-bottom:0.5px solid var(--border)">Meaning</th>
             <th style="text-align:left;color:var(--muted);font-weight:400;padding:5px 8px;border-bottom:0.5px solid var(--border)">Signal</th>
           </tr>
         </thead>
         <tbody style="color:var(--text)">
-          <tr><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#4eca8b">Above 100 ↑ Rising</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Expansion, accelerating</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">✅ Strongest macro tailwind</td></tr>
-          <tr><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#e8a84a">Above 100 ↓ Falling</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Expansion, decelerating</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">⚠ Growth peaking — watch for reversal</td></tr>
-          <tr><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#e8a84a">Below 100 ↑ Rising</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Contraction, recovering</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">↗ Early recovery — accumulation phase</td></tr>
-          <tr><td style="padding:5px 8px;color:#e05c5c">Below 100 ↓ Falling</td><td style="padding:5px 8px">Contraction, worsening</td><td style="padding:5px 8px">🔴 Maximum macro headwind — risk-off</td></tr>
+          <tr><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#4eca8b">> +0.20</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Strong expansion</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">✅ Strongest macro tailwind</td></tr>
+          <tr><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#4eca8b">0 to +0.20</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Moderate expansion</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">↑ Above-trend growth — bullish backdrop</td></tr>
+          <tr><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#e8a84a">−0.70 to 0</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Below-trend growth</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">⚠ Slowing — watch for deterioration</td></tr>
+          <tr><td style="padding:5px 8px;color:#e05c5c">< −0.70</td><td style="padding:5px 8px">Recession territory</td><td style="padding:5px 8px">🔴 Recession risk — risk-off mode</td></tr>
         </tbody>
       </table>
-      <div class="mkt-note" style="margin-top:0.75rem">OECD CLI anticipates turning points 6–9 months ahead. Amplitude-adjusted monthly series. <span id="cli-source-note" style="color:var(--accent)"></span></div>
+      <div class="mkt-note" style="margin-top:0.75rem">CFNAI-MA3 is a 3-month moving average of 85 US economic indicators. Below −0.70 historically coincides with recession onset. Monthly data via FRED. <span id="cli-source-note" style="color:var(--accent)"></span></div>
     </div>
 
   </main>
@@ -378,13 +378,13 @@ const translations={
     'claims-worsening':'↑ Claims Rising — Macro Risk',
     'score-scored':'✓ +1',
     'score-not-scored':'○ +0',
-    'cli-section':'OECD Leading Indicators',
+    'cli-section':'Economic Activity Index',
     'cli-expanding':'↑ Expanding',
-    'cli-decelerating':'↓ Decelerating',
+    'cli-decelerating':'↓ Below Trend',
     'cli-recovery':'↑ Recovery',
-    'cli-contraction':'↓ Contraction',
-    'cli-bullish':'OECD: Expansion + Rising',
-    'cli-bearish':'OECD: No Expansion Signal',
+    'cli-contraction':'↓ Recession Risk',
+    'cli-bullish':'CFNAI: Above Trend',
+    'cli-bearish':'CFNAI: Below Trend',
   },
   zh:{
     'page-title':'市場時機',
@@ -434,13 +434,13 @@ const translations={
     'claims-worsening':'↑ 申請人數上升 — 宏觀風險',
     'score-scored':'✓ +1',
     'score-not-scored':'○ +0',
-    'cli-section':'OECD 領先指標',
+    'cli-section':'經濟活動指標',
     'cli-expanding':'↑ 擴張',
-    'cli-decelerating':'↓ 減速',
+    'cli-decelerating':'↓ 低於趨勢',
     'cli-recovery':'↑ 復甦',
-    'cli-contraction':'↓ 收縮',
-    'cli-bullish':'OECD：擴張上升',
-    'cli-bearish':'OECD：無擴張信號',
+    'cli-contraction':'↓ 衰退風險',
+    'cli-bullish':'CFNAI：高於趨勢',
+    'cli-bearish':'CFNAI：低於趨勢',
   },
 };
 
@@ -606,47 +606,44 @@ function renderBreadthCard(b){
 }
 
 function renderCliCard(cli){
-  if(!cli?.countries)return;
+  if(cli?.error||(!cli?.ma3Series?.length&&!cli?.countries))return;
   const colorMap={green:'#4eca8b',amber:'#e8a84a',red:'#e05c5c'};
   const clsMap={green:'traffic-green',amber:'traffic-amber',red:'traffic-red'};
-  const displayOrder=['USA','G-7','GBR','DEU','JPN'];
-  const labels={USA:'USA',['G-7']:'G-7',GBR:'UK',DEU:'GER',JPN:'JPN'};
+  const col=colorMap[cli.color]||'var(--text)';
+  const cls=clsMap[cli.color]||'';
   const container=document.getElementById('cli-cards');
   if(container){
-    container.innerHTML=displayOrder.map(loc=>{
-      const d=cli.countries[loc];
-      if(!d)return'';
-      const c=colorMap[d.color]||'var(--text)';
-      const cl=clsMap[d.color]||'';
-      return`<div class="traffic-card ${cl}" style="border-color:${c};background:${c}18">
-        <div class="traffic-label">${labels[loc]||loc}</div>
-        <div style="font-family:var(--mono);font-size:22px;font-weight:300;color:${c};margin-bottom:4px">${d.latest?.toFixed(1)??'—'}</div>
-        <div style="font-size:10px;color:${c}">${d.signal||'—'}</div>
-        <div style="font-size:9px;color:var(--muted);margin-top:2px">${d.latestDate||''}</div>
+    const recessionFlag=cli.ma3Latest!=null&&cli.ma3Latest<-0.70;
+    container.innerHTML=`
+      <div class="traffic-card ${cls}" style="border-color:${col};background:${col}18">
+        <div class="traffic-label">CFNAI-MA3</div>
+        <div style="font-family:var(--mono);font-size:26px;font-weight:300;color:${col};margin-bottom:4px">${cli.ma3Latest!=null?cli.ma3Latest.toFixed(2):'—'}</div>
+        <div style="font-size:10px;color:${col}">${cli.signal||'—'}</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:2px">${cli.ma3LatestDate||''}</div>
+      </div>
+      <div class="traffic-card" style="border-color:rgba(255,255,255,0.1);background:rgba(255,255,255,0.02)">
+        <div class="traffic-label">CFNAI Raw</div>
+        <div style="font-family:var(--mono);font-size:26px;font-weight:300;color:var(--text);margin-bottom:4px">${cli.rawLatest!=null?cli.rawLatest.toFixed(2):'—'}</div>
+        <div style="font-size:10px;color:var(--muted)">Monthly reading</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:2px">${cli.rawLatestDate||''}</div>
+      </div>
+      <div class="traffic-card ${recessionFlag?'traffic-red':cli.isBullish?'traffic-green':'traffic-amber'}"
+           style="border-color:${recessionFlag?'#e05c5c':cli.isBullish?'#4eca8b':'#e8a84a'};background:${recessionFlag?'rgba(224,92,92,0.08)':cli.isBullish?'rgba(78,202,139,0.08)':'rgba(232,168,74,0.08)'}">
+        <div class="traffic-label">Market Score</div>
+        <div style="font-family:var(--mono);font-size:26px;font-weight:300;color:${recessionFlag?'#e05c5c':cli.isBullish?'#4eca8b':'#e8a84a'};margin-bottom:4px">${cli.isBullish?'+1':'0'}</div>
+        <div style="font-size:10px;color:${recessionFlag?'#e05c5c':cli.isBullish?'#4eca8b':'#e8a84a'}">${recessionFlag?'Recession Risk':cli.isBullish?'Above Trend':'Below Trend'}</div>
       </div>`;
-    }).join('');
   }
   const badge=document.getElementById('cli-badge');
-  const usaBullish=cli.countries['USA']?.isBullish;
-  const g7Bullish=cli.countries['G-7']?.isBullish;
-  const bullish=usaBullish||g7Bullish;
   if(badge){
-    badge.textContent=bullish?t('cli-bullish'):t('cli-bearish');
-    badge.className='signal-badge '+(bullish?'sig-green':'sig-red');
+    badge.textContent=cli.isBullish?t('cli-bullish'):t('cli-bearish');
+    badge.className='signal-badge '+(cli.isBullish?'sig-green':'sig-red');
     badge.style.display='';
   }
-  // Source + freshness note
   const noteEl=document.getElementById('cli-source-note');
   if(noteEl){
-    const usaLatest=cli.countries?.['USA']?.latestDate??'';
-    const src=cli.source??'';
-    if(src.includes('FRED')){
-      noteEl.style.color='#e8a84a';
-      noteEl.textContent=`⚠ Data via FRED mirror — last point: ${usaLatest}. OECD SDMX unreachable; may lag current date by ~2 years.`;
-    }else{
-      noteEl.style.color='var(--accent)';
-      noteEl.textContent=`Source: OECD SDMX · USA last data point: ${usaLatest}`;
-    }
+    noteEl.style.color='var(--accent)';
+    noteEl.textContent=`Source: FRED (CFNAI-MA3) · latest: ${cli.ma3LatestDate||'?'}`;
   }
 }
 
@@ -670,65 +667,6 @@ const _bs={
 };
 const _bt={backgroundColor:'#1b1e1b',borderColor:'rgba(255,255,255,0.1)',borderWidth:0.5,titleColor:'#7a8278',bodyColor:'#e8ebe6',bodyFont:{family:'DM Mono',size:13}};
 
-// ── OECD CLI — browser-side fetch (bypasses Cloudflare IP blocks) ─────────
-function _parseSdmx(raw){
-  const structure=raw.data?.structure??raw.structure;
-  const datasets=raw.data?.dataSets??raw.dataSets;
-  if(!structure||!datasets?.length)throw new Error('bad shape');
-  const seriesDims=structure.dimensions.series;
-  const obsDims=structure.dimensions.observation;
-  const timePeriods=obsDims.find(d=>d.id==='TIME_PERIOD').values.map(v=>v.id);
-  const locIdx=seriesDims.findIndex(d=>d.id==='REF_AREA'||d.id==='LOCATION');
-  const locVals=seriesDims[locIdx].values;
-  const raw_countries={};
-  for(const[key,s] of Object.entries(datasets[0].series)){
-    const locId=locVals[key.split(':').map(Number)[locIdx]]?.id??'UNK';
-    const pts=Object.entries(s.observations??{})
-      .map(([ti,arr])=>({date:timePeriods[Number(ti)],value:arr[0]}))
-      .filter(p=>p.value!=null&&!isNaN(p.value));
-    pts.sort((a,b)=>a.date.localeCompare(b.date));
-    if(!raw_countries[locId])raw_countries[locId]=[];
-    raw_countries[locId].push(...pts);
-  }
-  if(raw_countries['G7M']&&!raw_countries['G-7']){raw_countries['G-7']=raw_countries['G7M'];delete raw_countries['G7M'];}
-  return raw_countries;
-}
-function _analyseCli(series){
-  if(!series?.length)return null;
-  const last=series[series.length-1];
-  const mo3=series.slice(-4,-1);
-  const trend=mo3.length>=3?(last.value>mo3[0].value?'rising':'falling'):'unknown';
-  const expanding=last.value>100;
-  const isBullish=expanding&&trend==='rising';
-  const signal=expanding&&trend==='rising'?'Expanding ↑':expanding?'Decelerating ↓':trend==='rising'?'Recovery ↑':'Contraction ↓';
-  const color=isBullish?'green':(!expanding&&trend!=='rising'?'red':'amber');
-  return{series,latestDate:last.date,latest:last.value,trend,expanding,isBullish,signal,color};
-}
-async function fetchCliDirect(){
-  // Try OECD SDMX directly from the browser (residential IP, no block)
-  const OECD_URLS=[
-    'https://sdmx.oecd.org/public/rest/data/OECD.SDD.STES,DSD_STES@DF_CLI,1.0/M.USA+GBR+DEU+JPN+G-7.LI.AA?startPeriod=2004-01&format=jsondata',
-    'https://sdmx.oecd.org/public/rest/data/OECD.SDD.STES,DSD_STES@CLI,4.0/M.USA+GBR+DEU+JPN+G-7.LI.AA?startPeriod=2004-01&format=jsondata',
-  ];
-  for(const url of OECD_URLS){
-    try{
-      const r=await fetch(url,{headers:{'Accept':'application/vnd.sdmx.data+json;version=2.0, application/json'},signal:AbortSignal.timeout(12000)});
-      if(r.ok){
-        const raw=await r.json();
-        const ctrs=_parseSdmx(raw);
-        if(Object.keys(ctrs).length){
-          const analysed={};
-          for(const[loc,pts] of Object.entries(ctrs))analysed[loc]=_analyseCli(pts);
-          const scored=(analysed['USA']?.isBullish??false)||(analysed['G-7']?.isBullish??false);
-          return{countries:analysed,scored,source:'OECD-SDMX (live)'};
-        }
-      }
-    }catch{}
-  }
-  // Fallback: server-side (FRED mirror via Cloudflare Function)
-  return fetch('/api/market/oecd-cli').then(r=>r.json());
-}
-
 // ── main data load ────────────────────────────────────────────────────────
 async function loadMarketCharts(){
   const [signalsRes,ratioRes,vixRes,heatmapRes,breadthRes,claimsRes,cliRes]=await Promise.allSettled([
@@ -738,7 +676,7 @@ async function loadMarketCharts(){
     fetch('/api/market/heatmap').then(r=>r.json()),
     fetch('/api/market/breadth').then(r=>r.json()),
     fetch('/api/market/claims').then(r=>r.json()),
-    fetchCliDirect(),
+    fetch('/api/market/oecd-cli').then(r=>r.json()),
   ]);
 
   if(signalsRes.status==='fulfilled'&&signalsRes.value?.scoreBreakdown){
@@ -801,41 +739,32 @@ async function loadMarketCharts(){
     },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{..._bt,callbacks:{label:c=>Math.round(c.parsed.y).toLocaleString()+' K'}}},scales:{..._bs,y:{..._bs.y,ticks:{..._bs.y.ticks,callback:v=>Math.round(Number(v)/1000)+'K'}}}}});
   }
 
-  if(cliRes.status==='fulfilled'&&cliRes.value?.countries&&!cliRes.value.error){
+  if(cliRes.status==='fulfilled'&&cliRes.value?.ma3Series?.length&&!cliRes.value.error){
     const cli=cliRes.value;
     lastCliData=cli;
     renderCliCard(cli);
-    // Build chart — one line per country using their full series
-    const palette={USA:'#4eca8b','G-7':'#5b9fe8',GBR:'#e8a84a',DEU:'#e05c5c',JPN:'#a78bfa'};
-    const countryOrder=['USA','G-7','GBR','DEU','JPN'];
-    // Collect all dates across countries for shared x axis
-    const allDates=[...new Set(countryOrder.flatMap(loc=>cli.countries[loc]?.series?.map(p=>p.date)||[]))].sort();
-    const datasets=countryOrder.filter(loc=>cli.countries[loc]?.series?.length).map(loc=>{
-      const pts=cli.countries[loc].series;
-      const byDate=Object.fromEntries(pts.map(p=>[p.date,p.value]));
-      return{
-        label:loc==='G-7'?'G-7':loc,
-        data:allDates.map(d=>byDate[d]??null),
-        borderColor:palette[loc]||'#7a8278',
-        borderWidth:loc==='USA'||loc==='G-7'?2:1,
-        pointRadius:0,pointHoverRadius:4,
-        fill:false,tension:0.3,spanGaps:false,
-      };
-    });
-    // Add reference line at 100
-    datasets.push({label:'100 (baseline)',data:allDates.map(()=>100),borderColor:'rgba(255,255,255,0.2)',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false,spanGaps:true});
+    // CFNAI chart: MA3 (primary) + raw CFNAI (secondary) + reference lines
+    const allDates=cli.ma3Series.map(p=>p.date);
+    const rawByDate=Object.fromEntries((cli.rawSeries||[]).map(p=>[p.date,p.value]));
+    const datasets=[
+      {label:'CFNAI-MA3',data:cli.ma3Series.map(p=>p.value),borderColor:'#4eca8b',borderWidth:2,pointRadius:0,pointHoverRadius:4,fill:false,tension:0.3,spanGaps:false},
+      {label:'CFNAI Raw',data:allDates.map(d=>rawByDate[d]??null),borderColor:'rgba(122,130,120,0.5)',borderWidth:1,pointRadius:0,fill:false,tension:0.3,spanGaps:false},
+      {label:'+0.20',data:allDates.map(()=>0.20),borderColor:'rgba(78,202,139,0.3)',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false,spanGaps:true},
+      {label:'0 (baseline)',data:allDates.map(()=>0),borderColor:'rgba(255,255,255,0.25)',borderWidth:1,borderDash:[2,3],pointRadius:0,fill:false,spanGaps:true},
+      {label:'−0.70',data:allDates.map(()=>-0.70),borderColor:'rgba(224,92,92,0.4)',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false,spanGaps:true},
+    ];
     const ctx=document.getElementById('cli-chart').getContext('2d');
     if(cliChart)cliChart.destroy();
     cliChart=new Chart(ctx,{type:'line',data:{labels:allDates,datasets},
       options:{responsive:true,maintainAspectRatio:false,
         plugins:{
-          legend:{display:true,labels:{color:'rgba(255,255,255,0.5)',font:{size:10},boxWidth:12,padding:10}},
-          tooltip:{..._bt,mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': '+Number(c.parsed.y).toFixed(2)}},
+          legend:{display:true,labels:{color:'rgba(255,255,255,0.4)',font:{size:10},boxWidth:12,padding:10,filter:i=>i.datasetIndex<2}},
+          tooltip:{..._bt,mode:'index',intersect:false,filter:i=>i.datasetIndex<2,callbacks:{label:c=>c.dataset.label+': '+Number(c.parsed.y).toFixed(2)}},
           zoom:{zoom:{wheel:{enabled:true},pinch:{enabled:true},mode:'x'},pan:{enabled:true,mode:'x'},limits:{x:{minRange:6}}},
         },
         scales:{
           x:{..._bs.x,ticks:{..._bs.x.ticks,maxTicksLimit:10}},
-          y:{..._bs.y,ticks:{..._bs.y.ticks,callback:v=>Number(v).toFixed(1)}},
+          y:{..._bs.y,ticks:{..._bs.y.ticks,callback:v=>Number(v).toFixed(2)}},
         }
       }
     });
