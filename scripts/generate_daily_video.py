@@ -25,8 +25,8 @@ REPO_ROOT  = Path(__file__).parent.parent
 DAILY_DIR  = REPO_ROOT / "finance-hub" / "daily"
 TMP_DIR    = Path("/tmp/marketphase_video")
 
-# ElevenLabs — "Daniel" British male voice
-ELEVENLABS_VOICE_ID = "onwK4e9ZLuTAKqWW03F9"
+# ElevenLabs voice ID (from user's library)
+ELEVENLABS_VOICE_ID = "G17SuINrv2H9FC6nvetn"
 
 SLIDE_W, SLIDE_H = 1920, 1080
 FPS = 24
@@ -156,6 +156,9 @@ def tts_elevenlabs(text: str, out_path: Path) -> Path:
     if not ELEVENLABS_API_KEY:
         raise ValueError("ELEVENLABS_API_KEY not set")
 
+    voice_id = ELEVENLABS_VOICE_ID
+    print(f"  Using voice ID: {voice_id}", file=sys.stderr)
+
     # ElevenLabs has ~10k char limit on free tier; chunk if needed
     MAX_CHARS = 4500
     chunks = []
@@ -179,7 +182,7 @@ def tts_elevenlabs(text: str, out_path: Path) -> Path:
             "voice_settings": {"stability": 0.5, "similarity_boost": 0.75},
         }).encode()
         req = urllib.request.Request(
-            f"https://api.elevenlabs.io/v1/text-to-speech/{ELEVENLABS_VOICE_ID}",
+            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
             data=payload,
             headers={
                 "xi-api-key": ELEVENLABS_API_KEY,
