@@ -202,6 +202,27 @@ def fetch_pexels_image(keyword: str, idx: int, tmp_dir: Path) -> Path | None:
     """Try Pexels first, fall back to Pixabay."""
     img_path = tmp_dir / f"bg_{idx:03d}.jpg"
 
+    def _download_image(url: str, dest: Path) -> bool:
+        """Download an image URL to dest, following redirects with proper headers."""
+        try:
+            req = urllib.request.Request(
+                url,
+                headers={
+                    "User-Agent": "Mozilla/5.0 (compatible; MarketPhase/1.0)",
+                    "Accept": "image/jpeg,image/png,image/*",
+                },
+            )
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = resp.read()
+            if len(data) < 1000:
+                print(f"  Download too small ({len(data)} bytes), skipping", file=sys.stderr)
+                return False
+            dest.write_bytes(data)
+            return True
+        except Exception as e:
+            print(f"  Image download failed ({url[:60]}): {e}", file=sys.stderr)
+            return False
+
     # ── Try Pexels ──
     if PEXELS_API_KEY:
         try:
@@ -209,7 +230,7 @@ def fetch_pexels_image(keyword: str, idx: int, tmp_dir: Path) -> Path | None:
             req = urllib.request.Request(
                 f"https://api.pexels.com/v1/search?query={query}&per_page=8&orientation=landscape",
                 headers={
-                    "Authorization": PEXELS_API_KEY,
+                    "Authorization": PEXELS_API_KEY.strip(),
                     "User-Agent": "MarketPhase/1.0 (https://market-phase.com)",
                 },
             )
@@ -218,10 +239,12 @@ def fetch_pexels_image(keyword: str, idx: int, tmp_dir: Path) -> Path | None:
             photos = data.get("photos", [])
             if photos:
                 photo = random.choice(photos)
-                img_url = photo["src"]["large2x"]
-                print(f"  [Pexels] '{keyword}'", file=sys.stderr)
-                urllib.request.urlretrieve(img_url, str(img_path))
-                return img_path
+                img_url = photo["src"].get("large2x") or photo["src"].get("large") or photo["src"]["original"]
+                print(f"  [Pexels] '{keyword}' → {img_url[:60]}", file=sys.stderr)
+                if _download_image(img_url, img_path):
+                    return img_path
+            else:
+                print(f"  [Pexels] no photos for '{keyword}'", file=sys.stderr)
         except Exception as e:
             print(f"  Pexels failed ('{keyword}'): {e}", file=sys.stderr)
 
@@ -230,23 +253,27 @@ def fetch_pexels_image(keyword: str, idx: int, tmp_dir: Path) -> Path | None:
         try:
             query = urllib.parse.quote(keyword)
             req = urllib.request.Request(
-                f"https://pixabay.com/api/?key={PIXABAY_API_KEY}"
+                f"https://pixabay.com/api/?key={PIXABAY_API_KEY.strip()}"
                 f"&q={query}&image_type=photo&orientation=horizontal"
-                f"&per_page=8&safesearch=true&min_width=1280",
-                headers={"User-Agent": "MarketPhase/1.0"},
+                f"&per_page=8&safesearch=true",
+                headers={"User-Agent": "Mozilla/5.0 (compatible; MarketPhase/1.0)"},
             )
             with urllib.request.urlopen(req, timeout=15) as resp:
-                data = json.loads(resp.read())
+                raw = resp.read()
+            data = json.loads(raw)
             hits = data.get("hits", [])
+            print(f"  [Pixabay] '{keyword}' → {len(hits)} hits", file=sys.stderr)
             if hits:
                 hit = random.choice(hits)
-                img_url = hit.get("largeImageURL") or hit.get("webformatURL")
-                print(f"  [Pixabay] '{keyword}'", file=sys.stderr)
-                urllib.request.urlretrieve(img_url, str(img_path))
-                return img_path
+                # webformatURL is always accessible; largeImageURL needs partner access
+                img_url = hit.get("webformatURL") or hit.get("largeImageURL")
+                print(f"  [Pixabay] downloading {img_url[:60]}", file=sys.stderr)
+                if img_url and _download_image(img_url, img_path):
+                    return img_path
         except Exception as e:
             print(f"  Pixabay failed ('{keyword}'): {e}", file=sys.stderr)
 
+    print(f"  No image found for '{keyword}', using solid background", file=sys.stderr)
     return None
 
 
