@@ -87,7 +87,7 @@ Output a JSON object with exactly these two keys:
    - ELI5: Explain one complex concept with a dead-simple analogy (coffee, Monopoly, casino)
    - SPONSOR: At ~2 min weave in a 30-sec [SPONSOR] pitch framed as "protect yourself"
    - OUTRO: Slightly optimistic. End with fast disclaimer: "None of this is financial advice, purely for entertainment, always do your own research..."
-   - LENGTH: ~1500 words
+   - LENGTH: ~900 words (6 minutes at 150 words/minute) — be concise, cut any filler
 
 2. "slides": Array of 8-10 slide objects. Each slide covers one section of the video. Format:
    {{
@@ -147,7 +147,7 @@ def tts_elevenlabs(text: str, out_path: Path) -> Path:
     voice_id = ELEVENLABS_VOICE_ID
     print(f"  Using voice ID: {voice_id}", file=sys.stderr)
 
-    MAX_CHARS = 4500
+    MAX_CHARS = 5000
     chunks = []
     while text:
         if len(text) <= MAX_CHARS:
