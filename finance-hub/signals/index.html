@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Timing Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0f0e;--bg2:#141714;--bg3:#1b1e1b;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#e8ebe6;--muted:#7a8278;--accent:#4eca8b;--red:#e05c5c;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans)}
+#app{opacity:0;transition:opacity 0.3s}
+#app.ready{opacity:1}
+header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;border-bottom:0.5px solid var(--border)}
+.logo{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--accent);letter-spacing:0.08em}
+.header-right{display:flex;align-items:center;gap:10px}
+.btn-nav{background:var(--bg3);border:0.5px solid var(--border2);color:var(--muted);border-radius:8px;font-size:12px;padding:7px 14px;cursor:pointer;font-family:var(--sans);transition:all 0.15s}
+.btn-nav:hover{border-color:var(--accent);color:var(--accent)}
+.btn-nav:disabled{opacity:0.4;cursor:default}
+main{padding:2rem;max-width:1280px;margin:0 auto}
+.chart-range{display:flex;gap:4px}
+.range-btn{background:none;border:0.5px solid transparent;color:var(--muted);border-radius:6px;font-size:11px;padding:4px 8px;cursor:pointer;font-family:var(--mono)}
+.range-btn.active,.range-btn:hover{border-color:var(--border2);color:var(--text)}
+.chart-container{position:relative;height:180px}
+.mkt-section{background:var(--bg2);border:0.5px solid var(--border);border-radius:14px;padding:1.5rem;margin-bottom:1.25rem}
+.mkt-label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.mkt-desc{font-size:13px;color:var(--text);margin-bottom:1rem}
+.mkt-note{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.7;font-family:var(--mono)}
+.signal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.signal-heading{font-family:var(--mono);font-size:18px;font-weight:300;color:var(--text)}
+.signal-badge{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.07em;padding:6px 16px;border-radius:6px;border:0.5px solid}
+.sig-green{color:#4eca8b;border-color:rgba(78,202,139,0.35);background:rgba(78,202,139,0.08)}
+.sig-yellow{color:#e8a838;border-color:rgba(232,168,56,0.35);background:rgba(232,168,56,0.08)}
+.sig-red{color:#e05c5c;border-color:rgba(224,92,92,0.35);background:rgba(224,92,92,0.08)}
+.sig-grey{color:var(--muted);border-color:rgba(122,130,120,0.35);background:rgba(122,130,120,0.08)}
+.status-table{width:100%;border-collapse:collapse;margin-top:1rem}
+.status-table td{font-size:12px;font-family:var(--mono);padding:9px 12px;border-bottom:0.5px solid var(--border);color:var(--muted);vertical-align:middle}
+.status-table tr:last-child td{border-bottom:none}
+.status-table td:first-child{color:var(--text)}
+.status-table td:nth-child(2){color:var(--text)}
+.traffic-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0.75rem 0}
+.traffic-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:1.25rem;text-align:center;transition:all 0.3s}
+.traffic-label{font-size:12px;font-weight:500;color:var(--text);margin-bottom:8px;letter-spacing:0.04em}
+.traffic-pct{font-family:var(--mono);font-size:26px;font-weight:300;margin-bottom:4px}
+.traffic-sub{font-size:10px;color:var(--muted)}
+.traffic-green{border-color:#4eca8b!important;background:rgba(78,202,139,0.08)!important}
+.traffic-green .traffic-pct{color:#4eca8b}
+.traffic-amber{border-color:#e8a84a!important;background:rgba(232,168,74,0.08)!important}
+.traffic-amber .traffic-pct{color:#e8a84a}
+.traffic-red{border-color:#e05c5c!important;background:rgba(224,92,92,0.08)!important}
+.traffic-red .traffic-pct{color:#e05c5c}
+.divergence-box{padding:10px 14px;border-radius:8px;font-size:12px;font-family:var(--mono);margin-top:8px;line-height:1.5}
+.divergence-alert{background:rgba(224,92,92,0.08);border:0.5px solid rgba(224,92,92,0.35);color:#e05c5c}
+.divergence-amber{background:rgba(232,168,74,0.08);border:0.5px solid rgba(232,168,74,0.35);color:#e8a84a}
+.divergence-green{background:rgba(78,202,139,0.08);border:0.5px solid rgba(78,202,139,0.35);color:#4eca8b}
+.divergence-ok{background:rgba(255,255,255,0.02);border:0.5px solid var(--border);color:var(--muted)}
+</style>
+</head>
+<body>
+
+
+<div id="app">
+  <header>
+    <div class="logo">MARKET TIMING</div>
+    <div class="header-right">
+      <button class="btn-nav" id="lang-btn" onclick="toggleLang()">繁中</button>
+    </div>
+  </header>
+  <main>
+
+    <!-- Signal -->
+    <div class="mkt-section">
+      <div class="signal-header">
+        <div class="signal-heading" data-i18n="page-title">Market Timing</div>
+        <span id="auto-signal-badge" class="signal-badge sig-yellow" style="font-size:13px;padding:8px 20px">🟡 CAUTION — Loading…</span>
+      </div>
+      <table class="status-table" id="sig-breakdown-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;color:var(--muted);font-weight:400;padding:5px 8px;border-bottom:0.5px solid var(--border)">Indicator</th>
+            <th style="text-align:left;color:var(--muted);font-weight:400;padding:5px 8px;border-bottom:0.5px solid var(--border)">Value</th>
+            <th style="text-align:right;color:var(--muted);font-weight:400;padding:5px 8px;border-bottom:0.5px solid var(--border)">Score</th>
+          </tr>
+        </thead>
+        <tbody id="sig-breakdown-body">
+          <tr><td>SOX/QQQ Ratio</td><td id="sig-ratio-val">—</td><td id="sig-ratio-score" style="text-align:right">○ +0</td></tr>
+          <tr><td>VIX Structure</td><td id="sig-vix-val">—</td><td id="sig-vix-score" style="text-align:right">○ +0</td></tr>
+          <tr><td>Index Health</td><td id="sig-idx-val">—</td><td id="sig-idx-score" style="text-align:right">○ +0</td></tr>
+          <tr><td>Breadth</td><td id="sig-breadth-val">—</td><td id="sig-breadth-score" style="text-align:right">○ +0</td></tr>
+          <tr><td>Macro Floor</td><td id="sig-macro-val">—</td><td id="sig-macro-score" style="text-align:right">○ +0</td></tr>
+          <tr><td>CFNAI</td><td id="sig-cli-val">—</td><td id="sig-cli-score" style="text-align:right">○ +0</td></tr>
+        </tbody>
+      </table>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+        <div class="mkt-note">Auto-calculated · updates on page load</div>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--muted)"><span data-i18n="score-label">Score</span>: <span id="sig-total-score" style="color:var(--text);font-weight:500">— / 6</span></div>
+      </div>
+      <!-- Phase reference table -->
+      <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono);margin-top:1.25rem;border-top:0.5px solid var(--border)">
+        <thead>
+          <tr>
+            <th style="text-align:left;color:var(--muted);font-weight:400;padding:6px 8px 5px;border-bottom:0.5px solid var(--border)">Phase</th>
+            <th style="text-align:left;color:var(--muted);font-weight:400;padding:6px 8px 5px;border-bottom:0.5px solid var(--border)">Trigger</th>
+            <th style="text-align:left;color:var(--muted);font-weight:400;padding:6px 8px 5px;border-bottom:0.5px solid var(--border)">Action</th>
+          </tr>
+        </thead>
+        <tbody style="color:var(--text)">
+          <tr>
+            <td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#4eca8b;white-space:nowrap">🟢 Phase 1 — Green</td>
+            <td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Score ≥ 5/6 · SOX leading, breadth healthy, VIX calm, CFNAI above trend</td>
+            <td style="padding:5px 8px;border-bottom:0.5px solid var(--border)" data-i18n="phase1-action">Hold longs · buy dips aggressively</td>
+          </tr>
+          <tr>
+            <td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#e8a84a;white-space:nowrap">🟡 Phase 2-3 — Watch</td>
+            <td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Score 3–4/6 · mixed signals, SOX diverging</td>
+            <td style="padding:5px 8px;border-bottom:0.5px solid var(--border)" data-i18n="phase2-action">Reduce risk · tighten stops · no new longs</td>
+          </tr>
+          <tr>
+            <td style="padding:5px 8px;color:#e05c5c;white-space:nowrap">🔴 Phase 4 — Red</td>
+            <td style="padding:5px 8px">Score ≤ 2/6 · Nasdaq breakdown, SOX bear market</td>
+            <td style="padding:5px 8px" data-i18n="phase3-action">Exit growth positions · move to cash</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Section 1: SOX / QQQ Ratio -->
+    <div class="mkt-section">
+      <div class="mkt-label" data-i18n="early-warning">Early Warning (SOX / QQQ Ratio)</div>
+      <div class="mkt-desc">SOXX / QQQ Daily Ratio with 200-Day SMA + Normalized Prices</div>
+      <div style="display:flex;gap:1.25rem;margin-top:1rem;align-items:flex-start">
+        <!-- Chart (65%) -->
+        <div style="flex:0 0 65%">
+          <div class="chart-range" style="margin-bottom:8px">
+            <button class="range-btn" onclick="switchRatioMode('hourly',1,'W',this)">1W</button>
+            <button class="range-btn" data-range="2W" onclick="switchRatioMode('hourly',2,'W',this)">2W</button>
+            <button class="range-btn" onclick="switchRatioMode('daily',1,'M',this)">1M</button>
+            <button class="range-btn" onclick="switchRatioMode('daily',3,'M',this)">3M</button>
+            <button class="range-btn" onclick="switchRatioMode('daily',6,'M',this)">6M</button>
+            <button class="range-btn" onclick="switchRatioMode('daily',1,'Y',this)">1Y</button>
+            <button class="range-btn" onclick="switchRatioMode('daily',3,'Y',this)">3Y</button>
+            <button class="range-btn" onclick="switchRatioMode('daily',5,'Y',this)">5Y</button>
+            <button class="range-btn" onclick="switchRatioMode('daily','ALL',null,this)">ALL</button>
+          </div>
+          <div id="ratio-chart-container" style="position:relative;height:380px;width:100%;min-height:380px;"><canvas id="ratio-chart"></canvas></div>
+          <div class="mkt-note" style="margin-top:0.5rem">Ratio above amber 200 SMA = healthy bull. Ratio breaks below 200 SMA = Phase 2 critical warning ⚠</div>
+        </div>
+        <!-- Status panel (35%) -->
+        <div id="ratio-panel" style="flex:1;background:var(--bg2);border:0.5px solid var(--border);border-radius:14px;padding:1.25rem;min-width:0">
+          <span id="ratio-status-badge" class="signal-badge" style="display:block;width:100%;text-align:center;margin-bottom:4px"></span>
+          <div style="font-size:10px;color:var(--muted);text-align:center;margin-bottom:1rem;font-family:var(--mono)">7-day trend · last 7 trading days</div>
+          <div id="ratio-phase" style="font-size:12px;color:var(--muted);margin-bottom:2px">Phase: —</div>
+          <div id="ratio-insight" style="font-size:12px;color:var(--text);margin-bottom:6px;line-height:1.5">—</div>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:1.25rem">Based on 7-day ratio slope</div>
+          <!-- Mini reference table -->
+          <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono)">
+            <thead>
+              <tr>
+                <th style="text-align:left;color:var(--muted);font-weight:400;padding:4px 6px;border-bottom:0.5px solid var(--border)">Slope</th>
+                <th style="text-align:left;color:var(--muted);font-weight:400;padding:4px 6px;border-bottom:0.5px solid var(--border)">Phase</th>
+                <th style="text-align:left;color:var(--muted);font-weight:400;padding:4px 6px;border-bottom:0.5px solid var(--border)">Signal</th>
+              </tr>
+            </thead>
+            <tbody style="color:var(--text)">
+              <tr><td style="padding:4px 6px;border-bottom:0.5px solid var(--border)">↑ Sharp Up</td><td style="padding:4px 6px;border-bottom:0.5px solid var(--border)">Early/Mid Bull</td><td style="padding:4px 6px;border-bottom:0.5px solid var(--border)">Buy dips aggressively</td></tr>
+              <tr><td style="padding:4px 6px;border-bottom:0.5px solid var(--border)">↘ Divergent</td><td style="padding:4px 6px;border-bottom:0.5px solid var(--border)">Late Bull</td><td style="padding:4px 6px;border-bottom:0.5px solid var(--border)">Optimal sell window</td></tr>
+              <tr><td style="padding:4px 6px;border-bottom:0.5px solid var(--border)">↓ Sharp Down</td><td style="padding:4px 6px;border-bottom:0.5px solid var(--border)">Early Bear</td><td style="padding:4px 6px;border-bottom:0.5px solid var(--border)">Exit all growth</td></tr>
+              <tr><td style="padding:4px 6px">→ Neutral</td><td style="padding:4px 6px">Transition</td><td style="padding:4px 6px">Monitor direction</td></tr>
+            </tbody>
+          </table>
+          <!-- Stats -->
+          <div style="margin-top:1.25rem;display:flex;flex-direction:column;gap:6px;font-size:12px;font-family:var(--mono)">
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Current Ratio</span><span id="ratio-stat-ratio">—</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">200 SMA</span><span id="ratio-stat-sma">—</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Status</span><span id="ratio-stat-status" style="font-weight:500">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: VIX Term Structure -->
+    <div class="mkt-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div>
+          <div class="mkt-label" data-i18n="vix-section">VIX Term Structure</div>
+          <div class="mkt-desc" style="margin-bottom:0">VIX / VIX3M Ratio — Complacency vs Panic</div>
+        </div>
+        <span id="vix-state-badge" class="signal-badge" style="display:none"></span>
+      </div>
+      <div class="chart-container" style="height:300px;margin-top:1rem"><canvas id="vix-chart"></canvas></div>
+      <div class="mkt-note">&lt; 0.85 = Extreme complacency, Late Bull warning 🟡 · &gt; 1.05 = Backwardation, Panic / Bottoming 🟢</div>
+    </div>
+
+    <!-- Section 3: Index Health -->
+    <div class="mkt-section">
+      <div class="mkt-label" data-i18n="index-health">Index Health — Traffic Light</div>
+      <div class="mkt-desc">Distance from 52-Week High</div>
+      <div class="traffic-grid">
+        <div class="traffic-card" id="tl-spy">
+          <div class="traffic-label">SPY</div>
+          <div class="traffic-pct" id="tl-spy-pct">—</div>
+          <div class="traffic-sub">from 52w high</div>
+        </div>
+        <div class="traffic-card" id="tl-qqq">
+          <div class="traffic-label">QQQ</div>
+          <div class="traffic-pct" id="tl-qqq-pct">—</div>
+          <div class="traffic-sub">from 52w high</div>
+        </div>
+        <div class="traffic-card" id="tl-soxx">
+          <div class="traffic-label">SOXX</div>
+          <div class="traffic-pct" id="tl-soxx-pct">—</div>
+          <div class="traffic-sub">from 52w high</div>
+        </div>
+      </div>
+      <div id="tl-context-bar" style="font-size:12px;font-family:var(--mono);padding:8px 0 6px;color:var(--muted)">Loading…</div>
+      <div class="divergence-box divergence-ok" id="tl-divergence"></div>
+    </div>
+
+    <!-- Section 4: Market Breadth -->
+    <div class="mkt-section">
+      <div class="mkt-label" data-i18n="breadth">Market Breadth</div>
+      <div class="mkt-desc">SPY Price + RSP/SPY Breadth Ratio vs 200-Day SMA</div>
+      <div id="breadth-status-card" style="display:none;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:0.5px solid var(--border);border-radius:10px;overflow:hidden;margin:1rem 0">
+        <div style="background:var(--bg3);padding:0.75rem 1rem;text-align:center">
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:4px">Price Health</div>
+          <div id="bd-price-health" style="font-size:13px;font-weight:500;font-family:var(--mono)">—</div>
+        </div>
+        <div style="background:var(--bg3);padding:0.75rem 1rem;text-align:center">
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:4px">Internal Health</div>
+          <div id="bd-internal-health" style="font-size:13px;font-weight:500;font-family:var(--mono)">—</div>
+        </div>
+        <div style="background:var(--bg3);padding:0.75rem 1rem;text-align:center">
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:4px">Divergence</div>
+          <div id="bd-divergence" style="font-size:13px;font-weight:500;font-family:var(--mono)">—</div>
+        </div>
+        <div style="background:var(--bg3);padding:0.75rem 1rem;text-align:center">
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:4px">Interpretation</div>
+          <div id="bd-interpretation" style="font-size:11px;font-family:var(--mono);line-height:1.4">—</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:4px">SPY Price vs 200 SMA</div>
+      <div class="chart-container" style="height:220px"><canvas id="breadth-price-chart"></canvas></div>
+      <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin:10px 0 4px">RSP/SPY Breadth Ratio vs 200 SMA</div>
+      <div class="chart-container" style="height:220px"><canvas id="breadth-ad-chart"></canvas></div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono);margin-top:1rem">
+        <thead>
+          <tr>
+            <th style="text-align:left;color:var(--muted);font-weight:400;padding:5px 8px;border-bottom:0.5px solid var(--border)">Price</th>
+            <th style="text-align:left;color:var(--muted);font-weight:400;padding:5px 8px;border-bottom:0.5px solid var(--border)">Internals</th>
+            <th style="text-align:left;color:var(--muted);font-weight:400;padding:5px 8px;border-bottom:0.5px solid var(--border)">Signal</th>
+            <th style="text-align:left;color:var(--muted);font-weight:400;padding:5px 8px;border-bottom:0.5px solid var(--border)">Interpretation</th>
+          </tr>
+        </thead>
+        <tbody style="color:var(--text)">
+          <tr><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#4eca8b">Bullish</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#4eca8b">Strong</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">✅ Confirm</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Broad participation. Safest to be long.</td></tr>
+          <tr><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#4eca8b">Bullish</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#e05c5c">Weak</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#e05c5c">⚠ Diverge</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Generals leading, soldiers retreating. High risk.</td></tr>
+          <tr><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#e05c5c">Bearish</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#4eca8b">Strong</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#e8a84a">↗ Accum</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Price lagging, stocks rising under the hood.</td></tr>
+          <tr><td style="padding:5px 8px;color:#e05c5c">Bearish</td><td style="padding:5px 8px;color:#e05c5c">Weak</td><td style="padding:5px 8px;color:#e05c5c">🔴 Capitul</td><td style="padding:5px 8px">Maximum systemic weakness.</td></tr>
+        </tbody>
+      </table>
+      <div class="mkt-note" style="margin-top:0.75rem">RSP/SPY ratio = Equal Weight vs Cap Weight S&P 500. Rising ratio = broad participation (healthy). Falling ratio = narrow leadership (warning).</div>
+    </div>
+
+    <!-- Section 5: Macro Floor -->
+    <div class="mkt-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div>
+          <div class="mkt-label" data-i18n="claims">Macro Floor</div>
+          <div class="mkt-desc" style="margin-bottom:0">4-Week MA of Initial Claims (IC4WSA)</div>
+        </div>
+        <span id="claims-badge" class="signal-badge" style="display:none"></span>
+      </div>
+      <div style="display:flex;gap:1.25rem;margin:0.75rem 0;font-size:12px;font-family:var(--mono)">
+        <div><span style="color:var(--muted)">Current </span><span id="claims-latest" style="font-weight:500">—</span></div>
+        <div><span style="color:var(--muted)">Prev week </span><span id="claims-previous">—</span></div>
+        <div><span style="color:var(--muted)">4wk ago </span><span id="claims-4wago">—</span></div>
+      </div>
+      <div class="chart-container" style="height:250px"><canvas id="claims-chart"></canvas></div>
+      <div class="mkt-note" style="margin-top:0.5rem">4-week MA smooths weekly noise. Rising claims confirm exit from Yellow Zone into true recessionary bear market. Used as lagging confirmation only.</div>
+    </div>
+
+    <!-- Section 6: Chicago Fed CFNAI -->
+    <div class="mkt-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div>
+          <div class="mkt-label" data-i18n="cli-section">Economic Activity Index</div>
+          <div class="mkt-desc" style="margin-bottom:0">Chicago Fed National Activity Index (CFNAI-MA3) — Expansion vs Contraction</div>
+        </div>
+        <span id="cli-badge" class="signal-badge" style="display:none"></span>
+      </div>
+      <!-- Summary cards -->
+      <div id="cli-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:1rem 0"></div>
+      <!-- Chart -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div style="font-size:10px;color:var(--muted);font-family:var(--mono)">CFNAI-MA3 (0 = long-term trend baseline)</div>
+        <div class="chart-range" id="cli-range-btns">
+          <button class="range-btn" onclick="setCLIRange(2,this)">2Y</button>
+          <button class="range-btn active" onclick="setCLIRange(4,this)">4Y</button>
+          <button class="range-btn" onclick="setCLIRange(10,this)">10Y</button>
+          <button class="range-btn" onclick="setCLIRange(null,this)">ALL</button>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:4px;opacity:0.5">scroll to zoom · drag to pan</div>
+      <div class="chart-container" style="height:260px"><canvas id="cli-chart"></canvas></div>
+      <!-- Interpretation table -->
+      <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono);margin-top:1rem">
+        <thead>
+          <tr>
+            <th style="text-align:left;color:var(--muted);font-weight:400;padding:5px 8px;border-bottom:0.5px solid var(--border)">CFNAI-MA3</th>
+            <th style="text-align:left;color:var(--muted);font-weight:400;padding:5px 8px;border-bottom:0.5px solid var(--border)">Meaning</th>
+            <th style="text-align:left;color:var(--muted);font-weight:400;padding:5px 8px;border-bottom:0.5px solid var(--border)">Signal</th>
+          </tr>
+        </thead>
+        <tbody style="color:var(--text)">
+          <tr><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#4eca8b">> +0.20</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Strong expansion</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">✅ Strongest macro tailwind</td></tr>
+          <tr><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#4eca8b">0 to +0.20</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Moderate expansion</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">↑ Above-trend growth — bullish backdrop</td></tr>
+          <tr><td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#e8a84a">−0.70 to 0</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Below-trend growth</td><td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">⚠ Slowing — watch for deterioration</td></tr>
+          <tr><td style="padding:5px 8px;color:#e05c5c">< −0.70</td><td style="padding:5px 8px">Recession territory</td><td style="padding:5px 8px">🔴 Recession risk — risk-off mode</td></tr>
+        </tbody>
+      </table>
+      <div class="mkt-note" style="margin-top:0.75rem">CFNAI-MA3 is a 3-month moving average of 85 US economic indicators. Below −0.70 historically coincides with recession onset. Monthly data via FRED. <span id="cli-source-note" style="color:var(--accent)"></span></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ── i18n ──────────────────────────────────────────────────────────────────
+const translations={
+  en:{
+    'page-title':'Market Timing',
+    'score-label':'Score',
+    'early-warning':'Early Warning (SOX / QQQ Ratio)',
+    'vix-section':'VIX Term Structure',
+    'index-health':'Index Health — Traffic Light',
+    'breadth':'Market Breadth',
+    'claims':'Macro Floor',
+    'btn-send-email':'Send report',
+    'phase1-action':'Hold longs · buy dips aggressively',
+    'phase2-action':'Reduce risk · tighten stops · no new longs',
+    'phase3-action':'Exit growth positions · move to cash',
+    'bullish':'BULLISH',
+    'bearish':'BEARISH',
+    'slope-sharp-up':'↑ SHARP UP',
+    'slope-divergent-down':'↘ DIVERGENT DOWN',
+    'slope-sharp-down':'↓ SHARP DOWN',
+    'slope-neutral':'→ NEUTRAL',
+    'phase-early-bull':'Early/Mid Bull',
+    'phase-late-bull':'Late Bull',
+    'phase-early-bear':'Early Bear',
+    'phase-transition':'Transition',
+    'insight-buy':'Buy dips aggressively — chips are leading',
+    'insight-sell':'Optimal Sell Window — look for S&P 500 peak in 3–9 months',
+    'insight-exit':'Exit all growth — cyclical lead has collapsed',
+    'insight-monitor':'Monitor for direction confirmation',
+    'phase-label':'Phase: ',
+    'vix-complacency':'EXTREME COMPLACENCY',
+    'vix-panic':'PANIC/OPPORTUNITY',
+    'vix-neutral':'NEUTRAL',
+    'tl-hold':'HOLD',
+    'tl-watch':'WATCH',
+    'tl-reduce':'REDUCE',
+    'div-sell-window':'⚠ SELL WINDOW ACTIVE — SOX is Red while S&P 500 is Green. Optimal distribution phase. Look for S&P 500 peak in 3–9 months.',
+    'div-watch':'👀 WATCH — SOX is lagging S&P 500. Monitor for further deterioration.',
+    'div-broad-strength':'✅ BROAD STRENGTH — All indices within 5% of highs. Bull market intact.',
+    'div-broad-weakness':'🔴 BROAD WEAKNESS — Full market correction. Risk-off mode.',
+    'div-mixed':'↔ MIXED SIGNALS — No clear divergence pattern detected.',
+    'bd-bullish':'BULLISH',
+    'bd-bearish':'BEARISH',
+    'bd-strong':'STRONG',
+    'bd-weak':'WEAK',
+    'bd-divergent':'⚠ YES',
+    'bd-not-divergent':'✓ NO',
+    'claims-improving':'↓ Claims Decelerating — Floor Support',
+    'claims-worsening':'↑ Claims Rising — Macro Risk',
+    'score-scored':'✓ +1',
+    'score-not-scored':'○ +0',
+    'cli-section':'Economic Activity Index',
+    'cli-expanding':'↑ Expanding',
+    'cli-decelerating':'↓ Below Trend',
+    'cli-recovery':'↑ Recovery',
+    'cli-contraction':'↓ Recession Risk',
+    'cli-bullish':'CFNAI: Above Trend',
+    'cli-bearish':'CFNAI: Below Trend',
+  },
+  zh:{
+    'page-title':'市場時機',
+    'score-label':'評分',
+    'early-warning':'早期預警（SOX / QQQ 比率）',
+    'vix-section':'VIX 期限結構',
+    'index-health':'指數健康度',
+    'breadth':'市場廣度',
+    'claims':'初次申請失業救濟人數',
+    'btn-send-email':'發送報告',
+    'phase1-action':'持有多倉，積極逢低買入',
+    'phase2-action':'降低風險，收緊止損，不開新倉',
+    'phase3-action':'退出成長倉位，轉移至現金',
+    'bullish':'看漲',
+    'bearish':'看跌',
+    'slope-sharp-up':'↑ 急速上升',
+    'slope-divergent-down':'↘ 背離下行',
+    'slope-sharp-down':'↓ 急速下跌',
+    'slope-neutral':'→ 中性',
+    'phase-early-bull':'牛市初/中期',
+    'phase-late-bull':'牛市末期',
+    'phase-early-bear':'熊市初期',
+    'phase-transition':'過渡期',
+    'insight-buy':'積極逢低買入 — 半導體正領漲',
+    'insight-sell':'最佳出貨視窗 — 標普500高峰預計3–9個月後',
+    'insight-exit':'退出所有成長倉位 — 週期領先地位崩潰',
+    'insight-monitor':'觀察方向確認訊號',
+    'phase-label':'階段：',
+    'vix-complacency':'極度自滿',
+    'vix-panic':'恐慌/機會',
+    'vix-neutral':'中性',
+    'tl-hold':'持倉',
+    'tl-watch':'觀察',
+    'tl-reduce':'減倉',
+    'div-sell-window':'⚠ 出貨視窗啟動 — SOX見紅但標普見綠。最佳派貨階段，預計標普3–9個月後見頂。',
+    'div-watch':'👀 注意 — SOX落後標普。繼續監察惡化跡象。',
+    'div-broad-strength':'✅ 全面強勢 — 所有指數距高點5%以內。牛市完好。',
+    'div-broad-weakness':'🔴 全面弱勢 — 全面回調。風險規避模式。',
+    'div-mixed':'↔ 訊號混合 — 未有明確背離形態。',
+    'bd-bullish':'看漲',
+    'bd-bearish':'看跌',
+    'bd-strong':'強勢',
+    'bd-weak':'弱勢',
+    'bd-divergent':'⚠ 是',
+    'bd-not-divergent':'✓ 否',
+    'claims-improving':'↓ 申請人數減少 — 宏觀底部支撐',
+    'claims-worsening':'↑ 申請人數上升 — 宏觀風險',
+    'score-scored':'✓ +1',
+    'score-not-scored':'○ +0',
+    'cli-section':'經濟活動指標',
+    'cli-expanding':'↑ 擴張',
+    'cli-decelerating':'↓ 低於趨勢',
+    'cli-recovery':'↑ 復甦',
+    'cli-contraction':'↓ 衰退風險',
+    'cli-bullish':'CFNAI：高於趨勢',
+    'cli-bearish':'CFNAI：低於趨勢',
+  },
+};
+
+function applyTranslations(lang){
+  const tr=translations[lang]||translations.en;
+  document.documentElement.lang=lang==='zh'?'zh-TW':'en';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    if(tr[key])el.textContent=tr[key];
+  });
+  const btn=document.getElementById('lang-btn');
+  if(btn)btn.textContent=lang==='zh'?'EN':'繁中';
+}
+
+function toggleLang(){
+  currentLang=currentLang==='en'?'zh':'en';
+  localStorage.setItem('lang',currentLang);
+  applyTranslations(currentLang);
+  if(lastSignalData) renderSignalCard(lastSignalData);
+  if(lastRatioData)  renderRatioPanel(lastRatioData,currentRatioMode);
+  if(lastVixData)    renderVixBadge(lastVixData);
+  if(lastHealthData) renderHealthBox(lastHealthData);
+  if(lastBreadthData)renderBreadthCard(lastBreadthData);
+  if(lastClaimsData) renderClaimsBadge(lastClaimsData);
+  if(lastCliData)    renderCliCard(lastCliData);
+}
+
+// ── globals ───────────────────────────────────────────────────────────────
+let currentLang=localStorage.getItem('lang')||'en';
+function t(key){return(translations[currentLang]||translations.en)[key]||key;}
+
+let vixChart=null;
+let breadthPriceChart=null;
+let breadthAdChart=null;
+let ratioChart=null;
+let dailyRatioData=null;
+let hourlyRatioData=null;
+let currentRatioMode='daily';
+let claimsChart=null;
+let cliChart=null;
+let lastSignalData=null,lastRatioData=null,lastVixData=null;
+let lastHealthData=null,lastBreadthData=null,lastClaimsData=null,lastCliData=null;
+
+
+
+
+
+// ── render functions ──────────────────────────────────────────────────────
+function renderSignalCard(s){
+  if(!s?.scoreBreakdown)return;
+  const phaseClasses={green:'sig-green',yellow:'sig-yellow',red:'sig-red'};
+  const badge=document.getElementById('auto-signal-badge');
+  badge.textContent=s.phase;
+  badge.className='signal-badge '+(phaseClasses[s.color]||'sig-yellow');
+  document.getElementById('sig-total-score').textContent=s.score+' / 6';
+  const ids=['sig-ratio-val','sig-vix-val','sig-idx-val','sig-breadth-val','sig-macro-val','sig-cli-val'];
+  const scoreIds=['sig-ratio-score','sig-vix-score','sig-idx-score','sig-breadth-score','sig-macro-score','sig-cli-score'];
+  s.scoreBreakdown.forEach((row,i)=>{
+    const valEl=document.getElementById(ids[i]);
+    const scoreEl=document.getElementById(scoreIds[i]);
+    if(valEl)valEl.textContent=row.value;
+    if(scoreEl){
+      scoreEl.textContent=row.scored?t('score-scored'):t('score-not-scored');
+      scoreEl.style.color=row.scored?'#4eca8b':'rgba(255,255,255,0.3)';
+    }
+  });
+}
+
+function renderRatioPanel(d,mode){
+  if(!d)return;
+  const isHourly=(mode||currentRatioMode)==='hourly';
+  const lastRow=isHourly?d[d.length-1]:null;
+  const slopeLabel=isHourly?(lastRow?.slopeLabel||'neutral'):d.slopeLabel;
+  const currentRatio=isHourly?lastRow?.currentRatio:d.currentRatio;
+  const currentSma=isHourly?lastRow?.currentSma:d.currentSma;
+  const rawStatus=isHourly?(currentRatio>(currentSma??0)?'BULLISH':'BEARISH'):d.status;
+  const slopeMap={
+    sharp_up:      {cls:'sig-green', label:t('slope-sharp-up'),       phase:t('phase-early-bull'), insight:t('insight-buy')},
+    divergent_down:{cls:'sig-yellow',label:t('slope-divergent-down'), phase:t('phase-late-bull'),  insight:t('insight-sell')},
+    sharp_down:    {cls:'sig-red',   label:t('slope-sharp-down'),     phase:t('phase-early-bear'), insight:t('insight-exit')},
+    neutral:       {cls:'sig-grey',  label:t('slope-neutral'),        phase:t('phase-transition'), insight:t('insight-monitor')},
+  };
+  const slope=slopeMap[slopeLabel]||slopeMap.neutral;
+  const badge=document.getElementById('ratio-status-badge');
+  badge.textContent=slope.label;
+  badge.className='signal-badge '+slope.cls;
+  badge.style.display='block';
+  document.getElementById('ratio-phase').textContent=t('phase-label')+slope.phase;
+  document.getElementById('ratio-insight').textContent=slope.insight;
+  if(currentRatio!=null)document.getElementById('ratio-stat-ratio').textContent=Number(currentRatio).toFixed(4);
+  if(currentSma!=null)document.getElementById('ratio-stat-sma').textContent=Number(currentSma).toFixed(4);
+  const statStatus=document.getElementById('ratio-stat-status');
+  statStatus.textContent=rawStatus==='BULLISH'?t('bullish'):t('bearish');
+  statStatus.style.color=rawStatus==='BULLISH'?'#4eca8b':'#e05c5c';
+}
+
+function renderVixBadge(r){
+  if(!r?.series?.length)return;
+  const vixBadge=document.getElementById('vix-state-badge');
+  const badgeCls={red:'sig-red',green:'sig-green',gray:'sig-grey'}[r.uiColor]||'sig-grey';
+  const stateMap={'EXTREME COMPLACENCY':t('vix-complacency'),'PANIC/OPPORTUNITY':t('vix-panic'),'NEUTRAL':t('vix-neutral')};
+  vixBadge.textContent=stateMap[r.state]||r.state;
+  vixBadge.className='signal-badge '+badgeCls;
+  vixBadge.style.display='';
+}
+
+function renderHealthBox(hm){
+  if(!hm||hm.error)return;
+  function getTrafficLight(pct){
+    if(pct<5)  return{bg:'rgba(78,202,139,0.15)', border:'#4eca8b',emoji:'🟢',action:t('tl-hold'),  cls:'traffic-green'};
+    if(pct<10) return{bg:'rgba(232,168,74,0.15)',  border:'#e8a84a',emoji:'🟡',action:t('tl-watch'), cls:'traffic-amber'};
+    return     {bg:'rgba(224,92,92,0.15)',          border:'#e05c5c',emoji:'🔴',action:t('tl-reduce'),cls:'traffic-red'};
+  }
+  const setCard=(key,data)=>{
+    if(!data)return null;
+    const el=document.getElementById('tl-'+key);
+    const pctEl=document.getElementById('tl-'+key+'-pct');
+    if(!el||!pctEl)return null;
+    const tl=getTrafficLight(data.pct);
+    pctEl.textContent='-'+data.pct.toFixed(1)+'%';
+    el.className='traffic-card '+tl.cls;
+    el.style.background=tl.bg;
+    el.style.borderColor=tl.border;
+    return tl;
+  };
+  const spyTl=setCard('spy',hm.spy);
+  const qqqTl=setCard('qqq',hm.qqq);
+  const soxxTl=setCard('soxx',hm.soxx);
+  if(spyTl&&qqqTl&&soxxTl){
+    const fmt=(name,data,tl)=>tl.emoji+' '+name+' -'+data.pct.toFixed(1)+'% from high · '+tl.action;
+    document.getElementById('tl-context-bar').innerHTML=
+      '<span style="margin-right:1.5rem">'+fmt('SPY',hm.spy,spyTl)+'</span>'+
+      '<span style="margin-right:1.5rem">'+fmt('QQQ',hm.qqq,qqqTl)+'</span>'+
+      '<span>'+fmt('SOXX',hm.soxx,soxxTl)+'</span>';
+  }
+  const divBox=document.getElementById('tl-divergence');
+  const spyG=hm.spy?.pct<5,soxxR=hm.soxx?.pct>=10,soxxY=hm.soxx?.pct>=5&&hm.soxx?.pct<10;
+  const allG=hm.spy?.pct<5&&hm.qqq?.pct<5&&hm.soxx?.pct<5;
+  const allR=hm.spy?.pct>=10&&hm.qqq?.pct>=10&&hm.soxx?.pct>=10;
+  if(soxxR&&spyG){divBox.className='divergence-box divergence-alert';divBox.textContent=t('div-sell-window');}
+  else if(soxxY&&spyG){divBox.className='divergence-box divergence-amber';divBox.textContent=t('div-watch');}
+  else if(allG){divBox.className='divergence-box divergence-green';divBox.textContent=t('div-broad-strength');}
+  else if(allR){divBox.className='divergence-box divergence-alert';divBox.textContent=t('div-broad-weakness');}
+  else{divBox.className='divergence-box divergence-ok';divBox.textContent=t('div-mixed');}
+}
+
+function renderBreadthCard(b){
+  if(!b?.prices?.length)return;
+  document.getElementById('breadth-status-card').style.display='grid';
+  const phEl=document.getElementById('bd-price-health');
+  phEl.textContent=b.priceHealth==='Bullish'?t('bd-bullish'):t('bd-bearish');
+  phEl.style.color=b.priceHealth==='Bullish'?'#4eca8b':'#e05c5c';
+  const ihEl=document.getElementById('bd-internal-health');
+  ihEl.textContent=b.internalHealth==='Strong'?t('bd-strong'):t('bd-weak');
+  ihEl.style.color=b.internalHealth==='Strong'?'#4eca8b':'#e05c5c';
+  const dvEl=document.getElementById('bd-divergence');
+  dvEl.textContent=b.isDivergent?t('bd-divergent'):t('bd-not-divergent');
+  dvEl.style.color=b.isDivergent?'#e05c5c':'#4eca8b';
+  const colorMap={green:'#4eca8b',red:'#e05c5c',amber:'#e8a84a'};
+  const intEl=document.getElementById('bd-interpretation');
+  intEl.textContent=b.interpretation;
+  intEl.style.color=colorMap[b.interpretationColor]||'var(--text)';
+}
+
+function renderCliCard(cli){
+  if(cli?.error||(!cli?.ma3Series?.length&&!cli?.countries))return;
+  const colorMap={green:'#4eca8b',amber:'#e8a84a',red:'#e05c5c'};
+  const clsMap={green:'traffic-green',amber:'traffic-amber',red:'traffic-red'};
+  const col=colorMap[cli.color]||'var(--text)';
+  const cls=clsMap[cli.color]||'';
+  const container=document.getElementById('cli-cards');
+  if(container){
+    const recessionFlag=cli.ma3Latest!=null&&cli.ma3Latest<-0.70;
+    container.innerHTML=`
+      <div class="traffic-card ${cls}" style="border-color:${col};background:${col}18">
+        <div class="traffic-label">CFNAI-MA3</div>
+        <div style="font-family:var(--mono);font-size:26px;font-weight:300;color:${col};margin-bottom:4px">${cli.ma3Latest!=null?cli.ma3Latest.toFixed(2):'—'}</div>
+        <div style="font-size:10px;color:${col}">${cli.signal||'—'}</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:2px">${cli.ma3LatestDate||''}</div>
+      </div>
+      <div class="traffic-card" style="border-color:rgba(255,255,255,0.1);background:rgba(255,255,255,0.02)">
+        <div class="traffic-label">CFNAI Raw</div>
+        <div style="font-family:var(--mono);font-size:26px;font-weight:300;color:var(--text);margin-bottom:4px">${cli.rawLatest!=null?cli.rawLatest.toFixed(2):'—'}</div>
+        <div style="font-size:10px;color:var(--muted)">Monthly reading</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:2px">${cli.rawLatestDate||''}</div>
+      </div>
+      <div class="traffic-card ${recessionFlag?'traffic-red':cli.isBullish?'traffic-green':'traffic-amber'}"
+           style="border-color:${recessionFlag?'#e05c5c':cli.isBullish?'#4eca8b':'#e8a84a'};background:${recessionFlag?'rgba(224,92,92,0.08)':cli.isBullish?'rgba(78,202,139,0.08)':'rgba(232,168,74,0.08)'}">
+        <div class="traffic-label">Market Score</div>
+        <div style="font-family:var(--mono);font-size:26px;font-weight:300;color:${recessionFlag?'#e05c5c':cli.isBullish?'#4eca8b':'#e8a84a'};margin-bottom:4px">${cli.isBullish?'+1':'0'}</div>
+        <div style="font-size:10px;color:${recessionFlag?'#e05c5c':cli.isBullish?'#4eca8b':'#e8a84a'}">${recessionFlag?'Recession Risk':cli.isBullish?'Above Trend':'Below Trend'}</div>
+      </div>`;
+  }
+  const badge=document.getElementById('cli-badge');
+  if(badge){
+    badge.textContent=cli.isBullish?t('cli-bullish'):t('cli-bearish');
+    badge.className='signal-badge '+(cli.isBullish?'sig-green':'sig-red');
+    badge.style.display='';
+  }
+  const noteEl=document.getElementById('cli-source-note');
+  if(noteEl){
+    noteEl.style.color='var(--accent)';
+    noteEl.textContent=`Source: FRED (CFNAI-MA3) · latest: ${cli.ma3LatestDate||'?'}`;
+  }
+}
+
+function renderClaimsBadge(cl){
+  if(!cl?.data?.length)return;
+  const badge=document.getElementById('claims-badge');
+  const improving=cl.trendColor==='green';
+  badge.textContent=improving?t('claims-improving'):t('claims-worsening');
+  badge.className='signal-badge '+(improving?'sig-green':'sig-red');
+  badge.style.display='';
+  const fmt=v=>v!=null?Math.round(v).toLocaleString()+' K':'—';
+  document.getElementById('claims-latest').textContent=fmt(cl.latest);
+  document.getElementById('claims-previous').textContent=fmt(cl.previous);
+  document.getElementById('claims-4wago').textContent=fmt(cl.fourWeeksAgo);
+}
+
+// ── chart helpers ─────────────────────────────────────────────────────────
+const _bs={
+  x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#7a8278',font:{family:'DM Mono',size:10},maxTicksLimit:8},border:{display:false}},
+  y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#7a8278',font:{family:'DM Mono',size:10}},border:{display:false}},
+};
+const _bt={backgroundColor:'#1b1e1b',borderColor:'rgba(255,255,255,0.1)',borderWidth:0.5,titleColor:'#7a8278',bodyColor:'#e8ebe6',bodyFont:{family:'DM Mono',size:13}};
+
+// ── main data load ────────────────────────────────────────────────────────
+async function loadMarketCharts(){
+  const [signalsRes,ratioRes,vixRes,heatmapRes,breadthRes,claimsRes,cliRes]=await Promise.allSettled([
+    fetch('https://main.market-insight-eht.pages.dev/api/market/signals').then(r=>r.json()),
+    fetch('https://main.market-insight-eht.pages.dev/api/market/ratio').then(r=>r.json()),
+    fetch('https://main.market-insight-eht.pages.dev/api/market/vix').then(r=>r.json()),
+    fetch('https://main.market-insight-eht.pages.dev/api/market/heatmap').then(r=>r.json()),
+    fetch('https://main.market-insight-eht.pages.dev/api/market/breadth').then(r=>r.json()),
+    fetch('https://main.market-insight-eht.pages.dev/api/market/claims').then(r=>r.json()),
+    fetch('https://main.market-insight-eht.pages.dev/api/market/cfnai').then(r=>r.json()),
+  ]);
+
+  if(signalsRes.status==='fulfilled'&&signalsRes.value?.scoreBreakdown){
+    lastSignalData=signalsRes.value;
+    renderSignalCard(lastSignalData);
+  }
+
+  // Cache daily ratio data for when user switches to 1M/3M/etc later
+  if(ratioRes.status==='fulfilled'&&ratioRes.value?.dates?.length){
+    dailyRatioData=ratioRes.value;
+  }
+  await initRatioChart();
+
+  if(vixRes.status==='fulfilled'&&vixRes.value?.series?.length){
+    const r=vixRes.value;
+    lastVixData=r;
+    renderVixBadge(r);
+    const labels=r.series.map(d=>d.date);
+    const ctx=document.getElementById('vix-chart').getContext('2d');
+    if(vixChart)vixChart.destroy();
+    vixChart=new Chart(ctx,{type:'line',data:{labels,datasets:[
+      {label:'VIX/VIX3M Ratio',data:r.series.map(d=>d.ratio),borderColor:'#e05c5c',borderWidth:1.5,pointRadius:0,pointHoverRadius:4,fill:true,backgroundColor:'rgba(224,92,92,0.06)',tension:0.4,spanGaps:true},
+      {label:'0.85',data:labels.map(()=>0.85),borderColor:'#e8a84a',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false,spanGaps:true},
+      {label:'1.05',data:labels.map(()=>1.05),borderColor:'#e05c5c',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false,spanGaps:true},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{..._bt,mode:'index',intersect:false,filter:i=>i.datasetIndex===0,callbacks:{label:c=>'VIX/VIX3M: '+Number(c.parsed.y).toFixed(3)}}},scales:{..._bs,y:{..._bs.y,ticks:{..._bs.y.ticks,callback:v=>Number(v).toFixed(2)}}}}});
+  }
+
+  if(heatmapRes.status==='fulfilled'&&heatmapRes.value&&!heatmapRes.value.error){
+    lastHealthData=heatmapRes.value;
+    renderHealthBox(lastHealthData);
+  }
+
+  if(breadthRes.status==='fulfilled'&&breadthRes.value?.prices?.length){
+    const b=breadthRes.value;
+    lastBreadthData=b;
+    renderBreadthCard(b);
+    const ctxP=document.getElementById('breadth-price-chart').getContext('2d');
+    if(breadthPriceChart)breadthPriceChart.destroy();
+    breadthPriceChart=new Chart(ctxP,{type:'line',data:{labels:b.prices.map(r=>r.date),datasets:[
+      {label:'SPY',        data:b.prices.map(r=>r.value),borderColor:'#5b9fe8',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(91,159,232,0.05)',tension:0.3,spanGaps:true},
+      {label:'200-day SMA',data:b.priceSma200.map(r=>r.value),borderColor:'#e8a84a',borderWidth:1.5,borderDash:[6,3],pointRadius:0,tension:0.3,spanGaps:false},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{..._bt,mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': $'+Number(c.parsed.y).toFixed(2)}}},scales:{..._bs,y:{..._bs.y,ticks:{..._bs.y.ticks,callback:v=>'$'+Number(v).toFixed(0)}}}}});
+    const ctxA=document.getElementById('breadth-ad-chart').getContext('2d');
+    if(breadthAdChart)breadthAdChart.destroy();
+    breadthAdChart=new Chart(ctxA,{type:'line',data:{labels:b.adLine.map(r=>r.date),datasets:[
+      {label:'RSP/SPY Ratio',data:b.adLine.map(r=>r.value),borderColor:'#4eca8b',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(78,202,139,0.05)',tension:0.3,spanGaps:true},
+      {label:'200-day SMA', data:b.adLineSma200.map(r=>r.value),borderColor:'#e8a84a',borderWidth:1.5,borderDash:[6,3],pointRadius:0,tension:0.3,spanGaps:false},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{..._bt,mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': '+Number(c.parsed.y).toFixed(4)}}},scales:{..._bs,y:{..._bs.y,ticks:{..._bs.y.ticks,callback:v=>Number(v).toFixed(3)}}}}});
+  }
+
+  if(claimsRes.status==='fulfilled'&&claimsRes.value?.data?.length){
+    const cl=claimsRes.value;
+    lastClaimsData=cl;
+    renderClaimsBadge(cl);
+    const ctx=document.getElementById('claims-chart').getContext('2d');
+    if(claimsChart)claimsChart.destroy();
+    claimsChart=new Chart(ctx,{type:'line',data:{
+      labels:cl.data.map(d=>d.date),
+      datasets:[{label:'4-Week MA Initial Claims',data:cl.data.map(d=>d.value),borderColor:'#a78bfa',borderWidth:1.5,pointRadius:0,pointHoverRadius:4,fill:true,backgroundColor:'rgba(167,139,250,0.06)',tension:0.3,spanGaps:true}]
+    },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{..._bt,callbacks:{label:c=>Math.round(c.parsed.y).toLocaleString()+' K'}}},scales:{..._bs,y:{..._bs.y,ticks:{..._bs.y.ticks,callback:v=>Math.round(Number(v)/1000)+'K'}}}}});
+  }
+
+  if(cliRes.status==='fulfilled'&&cliRes.value?.ma3Series?.length&&!cliRes.value.error){
+    const cli=cliRes.value;
+    lastCliData=cli;
+    renderCliCard(cli);
+    // CFNAI chart: MA3 (primary) + raw CFNAI (secondary) + reference lines
+    const allDates=cli.ma3Series.map(p=>p.date);
+    const rawByDate=Object.fromEntries((cli.rawSeries||[]).map(p=>[p.date,p.value]));
+    const datasets=[
+      {label:'CFNAI-MA3',data:cli.ma3Series.map(p=>p.value),borderColor:'#4eca8b',borderWidth:2,pointRadius:0,pointHoverRadius:4,fill:false,tension:0.3,spanGaps:false},
+      {label:'CFNAI Raw',data:allDates.map(d=>rawByDate[d]??null),borderColor:'rgba(122,130,120,0.5)',borderWidth:1,pointRadius:0,fill:false,tension:0.3,spanGaps:false},
+      {label:'+0.20',data:allDates.map(()=>0.20),borderColor:'rgba(78,202,139,0.3)',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false,spanGaps:true},
+      {label:'0 (baseline)',data:allDates.map(()=>0),borderColor:'rgba(255,255,255,0.25)',borderWidth:1,borderDash:[2,3],pointRadius:0,fill:false,spanGaps:true},
+      {label:'−0.70',data:allDates.map(()=>-0.70),borderColor:'rgba(224,92,92,0.4)',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false,spanGaps:true},
+    ];
+    const ctx=document.getElementById('cli-chart').getContext('2d');
+    if(cliChart)cliChart.destroy();
+    cliChart=new Chart(ctx,{type:'line',data:{labels:allDates,datasets},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{
+          legend:{display:true,labels:{color:'rgba(255,255,255,0.4)',font:{size:10},boxWidth:12,padding:10,filter:i=>i.datasetIndex<2}},
+          tooltip:{..._bt,mode:'index',intersect:false,filter:i=>i.datasetIndex<2,callbacks:{label:c=>c.dataset.label+': '+Number(c.parsed.y).toFixed(2)}},
+          zoom:{zoom:{wheel:{enabled:true},pinch:{enabled:true},mode:'x'},pan:{enabled:true,mode:'x'},limits:{x:{minRange:6}}},
+        },
+        scales:{
+          x:{..._bs.x,ticks:{..._bs.x.ticks,maxTicksLimit:10}},
+          y:{..._bs.y,ticks:{..._bs.y.ticks,callback:v=>Number(v).toFixed(2)}},
+        }
+      }
+    });
+    // Default to last 4 years
+    const cutoff4=new Date();cutoff4.setFullYear(cutoff4.getFullYear()-4);
+    const minLabel=allDates.find(d=>new Date(d+'-01')>=cutoff4)||allDates[0];
+    cliChart.options.scales.x.min=minLabel;
+    cliChart.options.scales.x.max=allDates[allDates.length-1];
+    cliChart.update('none');
+  }
+}
+
+// ── CLI range buttons ────────────────────────────────────────────────────
+function setCLIRange(years,btn){
+  if(!cliChart)return;
+  document.querySelectorAll('#cli-range-btns .range-btn, .chart-container canvas#cli-chart').forEach(()=>{});
+  btn.closest('.chart-range').querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const labels=cliChart.data.labels;
+  if(!labels||!labels.length)return;
+  if(years===null){
+    cliChart.options.scales.x.min=labels[0];
+  } else {
+    const cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-years);
+    const minL=labels.find(d=>new Date(d+'-01')>=cutoff)||labels[0];
+    cliChart.options.scales.x.min=minL;
+  }
+  cliChart.options.scales.x.max=labels[labels.length-1];
+  cliChart.resetZoom();
+  cliChart.update('none');
+}
+
+// ── ratio chart ───────────────────────────────────────────────────────────
+function buildRatioChart(d,mode){
+  const isHourly=mode==='hourly';
+  const labels   =isHourly?d.map(r=>r.date)    :d.dates;
+  const ratios   =isHourly?d.map(r=>r.ratio)    :d.ratios;
+  const smaData  =isHourly?d.map(r=>r.sma20)    :d.sma200;
+  const soxxNorm =isHourly?d.map(r=>r.soxxNorm) :d.soxxNorm;
+  const qqqNorm  =isHourly?d.map(r=>r.qqqNorm)  :d.qqqNorm;
+  const smaLabel =isHourly?'20-hour SMA':'200-day SMA';
+  renderRatioPanel(d,mode);
+  const ctx=document.getElementById('ratio-chart').getContext('2d');
+  if(ratioChart)ratioChart.destroy();
+  ratioChart=new Chart(ctx,{type:'line',data:{labels,datasets:[
+    {label:'SOXX/QQQ Ratio',data:ratios,  borderColor:'#ffffff',borderWidth:1.5,pointRadius:0,pointHoverRadius:4,fill:false,tension:0.3,spanGaps:true,yAxisID:'y'},
+    {label:smaLabel,        data:smaData, borderColor:'#e8a84a',borderWidth:1.5,borderDash:[6,3],pointRadius:0,tension:0.3,spanGaps:false,yAxisID:'y'},
+    {label:'SOXX (norm)',   data:soxxNorm,borderColor:'#4eca8b',borderWidth:1,pointRadius:0,fill:false,tension:0.3,spanGaps:true,yAxisID:'y2'},
+    {label:'QQQ (norm)',    data:qqqNorm, borderColor:'#5b9fe8',borderWidth:1,pointRadius:0,fill:false,tension:0.3,spanGaps:true,yAxisID:'y2'},
+  ]},options:{responsive:true,maintainAspectRatio:false,
+  plugins:{
+    legend:{display:true,labels:{color:'rgba(255,255,255,0.4)',font:{size:10},boxWidth:12,padding:10}},
+    tooltip:{..._bt,mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': '+(c.datasetIndex<2?Number(c.parsed.y).toFixed(4):Number(c.parsed.y).toFixed(1))}},
+    zoom:{zoom:{wheel:{enabled:true},pinch:{enabled:true},mode:'x'},pan:{enabled:true,mode:'x'},limits:{x:{minRange:10}}},
+  },
+  scales:{
+    ..._bs,
+    y:{..._bs.y,ticks:{..._bs.y.ticks,callback:v=>Number(v).toFixed(3)}},
+    y2:{position:'right',grid:{display:false},border:{display:false},ticks:{color:'rgba(255,255,255,0.3)',font:{size:10},callback:v=>v.toFixed(0)},title:{display:false}},
+  }}});
+}
+
+async function initRatioChart(){
+  console.log('[initRatioChart] start');
+  const data=await loadRatioData('hourly');
+  if(!data||data.error){console.log('[initRatioChart] no data or error:',data?.error);return;}
+  currentRatioMode='hourly';
+  lastRatioData=data;
+  buildRatioChart(data,'hourly');
+  console.log('[initRatioChart] after buildRatioChart — labels.length:',ratioChart?.data?.labels?.length,'first:',ratioChart?.data?.labels?.[0],'last:',ratioChart?.data?.labels?.[ratioChart.data.labels.length-1]);
+  console.log('[initRatioChart] calling setRatioRange(28, D)');
+  setRatioRange(28,'D');
+  console.log('[initRatioChart] after setRatioRange — x.min:',ratioChart?.options?.scales?.x?.min,'x.max:',ratioChart?.options?.scales?.x?.max);
+  document.querySelectorAll('.chart-range .range-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.chart-range .range-btn').forEach(b=>{if(b.textContent.trim()==='2W')b.classList.add('active');});
+}
+
+async function loadRatioData(mode){
+  if(mode==='hourly'&&!hourlyRatioData){
+    const res=await fetch('https://main.market-insight-eht.pages.dev/api/market/ratio-hourly');
+    hourlyRatioData=await res.json();
+  }
+  if(mode==='daily'&&!dailyRatioData){
+    const res=await fetch('https://main.market-insight-eht.pages.dev/api/market/ratio');
+    dailyRatioData=await res.json();
+  }
+  return mode==='hourly'?hourlyRatioData:dailyRatioData;
+}
+
+async function switchRatioMode(mode,value,unit,btn){
+  const activeBtn=btn||(typeof event!=='undefined'?event.target:null);
+  if(activeBtn){
+    document.querySelectorAll('.chart-range .range-btn').forEach(b=>b.classList.remove('active'));
+    activeBtn.classList.add('active');
+  }
+  const data=await loadRatioData(mode);
+  if(!data||data.error)return;
+  currentRatioMode=mode;
+  lastRatioData=data;
+  buildRatioChart(data,mode);
+  if(value!=null)setRatioRange(value,unit);
+}
+
+function setRatioRange(value,unit){
+  if(!ratioChart)return;
+  const labels=ratioChart.data.labels;
+  if(value==='ALL'){
+    ratioChart.options.scales.x.min=undefined;
+    ratioChart.options.scales.x.max=undefined;
+  }else{
+    const start=new Date();
+    if(unit==='D')start.setDate(start.getDate()-value);
+    if(unit==='W')start.setDate(start.getDate()-(value*7));
+    if(unit==='M')start.setMonth(start.getMonth()-value);
+    if(unit==='Y')start.setFullYear(start.getFullYear()-value);
+    const minLabel=labels.find(l=>new Date(l)>=start)||labels[0];
+    ratioChart.options.scales.x.min=minLabel;
+    ratioChart.options.scales.x.max=labels[labels.length-1];
+  }
+  ratioChart.update('none');
+}
+
+async function triggerWeeklyEmail(){
+  const btn=document.getElementById('btn-send-email');
+  btn.textContent='Sending...';btn.disabled=true;
+  try{
+    const res=await fetch('https://main.market-insight-eht.pages.dev/api/send-weekly-email',{method:'POST'});
+    const data=await res.json();
+    btn.textContent=data.ok?'✓ Sent':'✗ Failed';
+    setTimeout(()=>{btn.textContent=t('btn-send-email');},3000);
+  }catch{
+    btn.textContent='✗ Error';
+    setTimeout(()=>{btn.textContent=t('btn-send-email');},3000);
+  }finally{btn.disabled=false;}
+}
+
+// ── boot ──────────────────────────────────────────────────────────────────
+applyTranslations(currentLang);
+
+document.getElementById('app').classList.add('ready');
+loadMarketCharts();
+</script>
+</body>
+</html>
