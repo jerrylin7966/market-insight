@@ -20,6 +20,7 @@ import urllib.request, urllib.parse, urllib.error
 ANTHROPIC_API_KEY      = os.environ.get("ANTHROPIC_API_KEY", "")
 ELEVENLABS_API_KEY     = os.environ.get("ELEVENLABS_API_KEY", "")
 PEXELS_API_KEY         = os.environ.get("PEXELS_API_KEY", "")
+PIXABAY_API_KEY        = os.environ.get("PIXABAY_API_KEY", "")
 YOUTUBE_CLIENT_ID      = os.environ.get("YOUTUBE_CLIENT_ID", "")
 YOUTUBE_CLIENT_SECRET  = os.environ.get("YOUTUBE_CLIENT_SECRET", "")
 YOUTUBE_REFRESH_TOKEN  = os.environ.get("YOUTUBE_REFRESH_TOKEN", "")
@@ -92,13 +93,16 @@ Output a JSON object with exactly these two keys:
    {{
      "title": "SHORT SLIDE TITLE IN CAPS",
      "bullets": ["Bullet point 1", "Bullet point 2", "Bullet point 3"],
-     "pexels_keyword": "specific search term for background image"
+     "pexels_keyword": "specific search term for background image",
+     "narration_text": "The exact spoken words from the narration that play while this slide is shown"
    }}
    Rules for slides:
    - bullets: max 3 per slide, each max 10 words, key facts only — NO full sentences
    - pexels_keyword: be specific and visual (e.g. "federal reserve building", "gold bars vault", "wall street trading floor", "inflation grocery prices", "stock market crash red screen")
+   - narration_text: copy the exact portion of the narration script that belongs to this slide — this is used to time the slide duration precisely to the spoken audio
    - First slide: hook/title card
    - Last slide: outro with MarketPhase branding
+   - IMPORTANT: every word from the narration must appear in exactly one slide's narration_text — no gaps, no overlaps
 
 Return ONLY valid JSON. No markdown, no explanation."""
 
@@ -195,32 +199,55 @@ def tts_elevenlabs(text: str, out_path: Path) -> Path:
 # ── Pexels image fetch ────────────────────────────────────────────────────────
 
 def fetch_pexels_image(keyword: str, idx: int, tmp_dir: Path) -> Path | None:
-    if not PEXELS_API_KEY:
-        return None
-    try:
-        query = urllib.parse.quote(keyword)
-        req = urllib.request.Request(
-            f"https://api.pexels.com/v1/search?query={query}&per_page=8&orientation=landscape",
-            headers={
-                "Authorization": PEXELS_API_KEY,
-                "User-Agent": "MarketPhase/1.0 (https://market-phase.com)",
-            },
-        )
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read())
-        photos = data.get("photos", [])
-        if not photos:
-            print(f"  No Pexels results for '{keyword}'", file=sys.stderr)
-            return None
-        photo = random.choice(photos)
-        img_url = photo["src"]["large2x"]
-        img_path = tmp_dir / f"bg_{idx:03d}.jpg"
-        print(f"  Fetching image for '{keyword}'…", file=sys.stderr)
-        urllib.request.urlretrieve(img_url, str(img_path))
-        return img_path
-    except Exception as e:
-        print(f"  Pexels fetch failed for '{keyword}': {e}", file=sys.stderr)
-        return None
+    """Try Pexels first, fall back to Pixabay."""
+    img_path = tmp_dir / f"bg_{idx:03d}.jpg"
+
+    # ── Try Pexels ──
+    if PEXELS_API_KEY:
+        try:
+            query = urllib.parse.quote(keyword)
+            req = urllib.request.Request(
+                f"https://api.pexels.com/v1/search?query={query}&per_page=8&orientation=landscape",
+                headers={
+                    "Authorization": PEXELS_API_KEY,
+                    "User-Agent": "MarketPhase/1.0 (https://market-phase.com)",
+                },
+            )
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = json.loads(resp.read())
+            photos = data.get("photos", [])
+            if photos:
+                photo = random.choice(photos)
+                img_url = photo["src"]["large2x"]
+                print(f"  [Pexels] '{keyword}'", file=sys.stderr)
+                urllib.request.urlretrieve(img_url, str(img_path))
+                return img_path
+        except Exception as e:
+            print(f"  Pexels failed ('{keyword}'): {e}", file=sys.stderr)
+
+    # ── Fall back to Pixabay ──
+    if PIXABAY_API_KEY:
+        try:
+            query = urllib.parse.quote(keyword)
+            req = urllib.request.Request(
+                f"https://pixabay.com/api/?key={PIXABAY_API_KEY}"
+                f"&q={query}&image_type=photo&orientation=horizontal"
+                f"&per_page=8&safesearch=true&min_width=1280",
+                headers={"User-Agent": "MarketPhase/1.0"},
+            )
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = json.loads(resp.read())
+            hits = data.get("hits", [])
+            if hits:
+                hit = random.choice(hits)
+                img_url = hit.get("largeImageURL") or hit.get("webformatURL")
+                print(f"  [Pixabay] '{keyword}'", file=sys.stderr)
+                urllib.request.urlretrieve(img_url, str(img_path))
+                return img_path
+        except Exception as e:
+            print(f"  Pixabay failed ('{keyword}'): {e}", file=sys.stderr)
+
+    return None
 
 
 # ── Slide rendering ───────────────────────────────────────────────────────────
@@ -362,20 +389,41 @@ def get_audio_duration(audio_path: Path) -> float:
     return float(info["format"]["duration"])
 
 
-def build_video(slide_paths: list[Path], audio_path: Path, out_path: Path):
+def calc_slide_durations(slides_data: list[dict], audio_duration: float) -> list[float]:
+    """Allocate slide duration proportionally by word count in each slide's narration_text."""
+    word_counts = []
+    for slide in slides_data:
+        text = slide.get("narration_text", slide.get("title", "placeholder"))
+        word_counts.append(max(1, len(text.split())))
+    total_words = sum(word_counts)
+    durations = [(wc / total_words) * audio_duration for wc in word_counts]
+    # Ensure minimum 3 seconds per slide
+    durations = [max(3.0, d) for d in durations]
+    # Re-scale to match total audio duration
+    scale = audio_duration / sum(durations)
+    return [d * scale for d in durations]
+
+
+def build_video(slide_paths: list[Path], audio_path: Path, out_path: Path,
+                slides_data: list[dict] = None):
     audio_duration = get_audio_duration(audio_path)
     num_slides = len(slide_paths)
-    secs_per_slide = audio_duration / num_slides
+
+    if slides_data:
+        durations = calc_slide_durations(slides_data, audio_duration)
+    else:
+        durations = [audio_duration / num_slides] * num_slides
 
     concat_file = out_path.parent / "slides_concat.txt"
     with concat_file.open("w") as f:
-        for slide in slide_paths:
+        for slide, dur in zip(slide_paths, durations):
             f.write(f"file '{slide.resolve()}'\n")
-            f.write(f"duration {secs_per_slide:.3f}\n")
+            f.write(f"duration {dur:.3f}\n")
         f.write(f"file '{slide_paths[-1].resolve()}'\n")
 
+    avg = audio_duration / num_slides
     print(f"  Building video ({audio_duration:.0f}s, {num_slides} slides, "
-          f"{secs_per_slide:.1f}s/slide)…", file=sys.stderr)
+          f"~{avg:.1f}s avg/slide)…", file=sys.stderr)
     subprocess.run([
         "ffmpeg", "-y",
         "-f", "concat", "-safe", "0", "-i", str(concat_file),
@@ -651,7 +699,7 @@ def main():
     # 5. Build MP4
     print("Building video…", file=sys.stderr)
     video_path = TMP_DIR / f"marketphase_{today.isoformat()}.mp4"
-    build_video(slide_paths, audio_path, video_path)
+    build_video(slide_paths, audio_path, video_path, slides_data)
 
     # 6. Generate thumbnail (host photo + Pexels bg + title text)
     print("Generating thumbnail…", file=sys.stderr)
