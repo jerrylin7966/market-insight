@@ -201,7 +201,10 @@ def fetch_pexels_image(keyword: str, idx: int, tmp_dir: Path) -> Path | None:
         query = urllib.parse.quote(keyword)
         req = urllib.request.Request(
             f"https://api.pexels.com/v1/search?query={query}&per_page=8&orientation=landscape",
-            headers={"Authorization": PEXELS_API_KEY},
+            headers={
+                "Authorization": PEXELS_API_KEY,
+                "User-Agent": "MarketPhase/1.0 (https://market-phase.com)",
+            },
         )
         with urllib.request.urlopen(req, timeout=15) as resp:
             data = json.loads(resp.read())
@@ -409,6 +412,7 @@ def get_youtube_access_token() -> str:
 def remove_green_screen(img):
     """Chroma-key remove the solid green background."""
     import numpy as np
+    from PIL import Image
     arr = np.array(img.convert("RGBA")).astype(float)
     r, g, b = arr[:,:,0], arr[:,:,1], arr[:,:,2]
     # Green screen: G channel dominant, well above R and B
