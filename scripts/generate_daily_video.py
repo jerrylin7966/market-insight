@@ -108,7 +108,7 @@ Return ONLY valid JSON. No markdown, no explanation."""
 
     payload = json.dumps({
         "model": "claude-haiku-4-5-20251001",
-        "max_tokens": 4000,
+        "max_tokens": 8000,
         "messages": [{"role": "user", "content": prompt}],
     }).encode()
 
