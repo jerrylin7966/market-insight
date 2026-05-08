@@ -76,9 +76,16 @@ Today is {today_display}. Today's market summary:
 
 {digest_summary}
 
-Output a JSON object with exactly these two keys:
+Output a JSON object with exactly these three keys:
 
-1. "narration": The full ~10-minute spoken script following ALL these rules:
+1. "title": A single catchy YouTube video title (max 90 characters) specific to today's top story. Rules:
+   - Must reflect the actual news, not a generic placeholder
+   - Hook-driven — make viewers feel they MUST click (fear of missing out, shocking revelation, hidden truth)
+   - Examples of good style: "The Fed Just Admitted They Have No Plan", "Why Your 401k Is About To Get Crushed", "This Hidden Signal Predicted Every Crash — It Just Fired Again", "Markets Are Lying To You Right Now"
+   - Do NOT use "They're Not Telling You This" — write something fresh and news-specific every day
+   - No hashtags, no emojis in the title
+
+2. "narration": The full ~10-minute spoken script following ALL these rules:
    - INTRO: Start with a massive high-stakes hook (0:00-1:00). After the hook, say "Welcome back to Tech Me Home, Market Phase daily news!"
    - TONE: Urgent, cinematic, educational. Slightly cynical about the Federal Reserve and fiat currency. Calm but dramatic.
    - SENTENCES: Short, punchy, conversational. Write how a person speaks.
@@ -89,7 +96,7 @@ Output a JSON object with exactly these two keys:
    - OUTRO: Slightly optimistic. End with fast disclaimer: "None of this is financial advice, purely for entertainment, always do your own research..."
    - LENGTH: ~900 words (6 minutes at 150 words/minute) — be concise, cut any filler
 
-2. "slides": Array of 8-10 slide objects. Each slide covers one section of the video. Format:
+3. "slides": Array of 8-10 slide objects. Each slide covers one section of the video. Format:
    {{
      "title": "SHORT SLIDE TITLE IN CAPS",
      "bullets": ["Bullet point 1", "Bullet point 2", "Bullet point 3"],
@@ -710,6 +717,9 @@ def main():
     data = call_claude(digest_summary, today_display)
     narration_script = data["narration"]
     slides_data      = data["slides"]
+    # Dynamic title from Claude — news-specific and hook-driven
+    video_title = data.get("title", f"Market Update {today.strftime('%b %d, %Y')}").strip()
+    print(f"  Title: {video_title}", file=sys.stderr)
     print(f"  Script: {len(narration_script.split())} words, "
           f"{len(slides_data)} slides", file=sys.stderr)
 
@@ -730,16 +740,15 @@ def main():
 
     # 6. Generate thumbnail (host photo + Pexels bg + title text)
     print("Generating thumbnail…", file=sys.stderr)
-    title = f"They're Not Telling You This | Market Update {today.strftime('%b %d, %Y')}"
     thumb_keyword = slides_data[0].get("pexels_keyword", "stock market finance") if slides_data else "stock market"
-    thumbnail_path = generate_thumbnail(title, thumb_keyword, TMP_DIR)
+    thumbnail_path = generate_thumbnail(video_title, thumb_keyword, TMP_DIR)
 
     # 7. Upload to YouTube
     print("Uploading to YouTube…", file=sys.stderr)
     hook_lines = [l.strip() for l in narration_script.split('\n')
                   if l.strip() and not l.strip().startswith('[')][:3]
     hook_text = " ".join(hook_lines)[:300]
-    url = upload_to_youtube(video_path, title, hook_text, thumbnail_path)
+    url = upload_to_youtube(video_path, video_title, hook_text, thumbnail_path)
 
     print(f"\n✅ Done! Watch at: {url}", file=sys.stderr)
 
