@@ -30,7 +30,8 @@ DAILY_DIR  = REPO_ROOT / "finance-hub" / "daily"
 TMP_DIR    = Path("/tmp/marketphase_video")
 
 ELEVENLABS_VOICE_ID = "G17SuINrv2H9FC6nvetn"
-SITE_URL = "https://market-phase.com/"
+SITE_URL   = "https://market-phase.com/"
+CLIPS_DIR  = Path(__file__).parent / "assets" / "clips"
 
 SLIDE_W, SLIDE_H = 1920, 1080
 
@@ -100,15 +101,37 @@ Output a JSON object with exactly these three keys:
    {{
      "title": "SHORT SLIDE TITLE IN CAPS",
      "bullets": ["Bullet point 1", "Bullet point 2", "Bullet point 3"],
-     "pexels_keyword": "specific search term for background image",
+     "clip_tag": "tag_from_library_or_null",
+     "pexels_keyword": "fallback search term if clip_tag is null",
      "narration_text": "The exact spoken words from the narration that play while this slide is shown"
    }}
    Rules for slides:
    - bullets: max 3 per slide, each max 10 words, key facts only — NO full sentences
-   - pexels_keyword: be specific and visual (e.g. "federal reserve building", "gold bars vault", "wall street trading floor", "inflation grocery prices", "stock market crash red screen")
-   - narration_text: copy the exact portion of the narration script that belongs to this slide — this is used to time the slide duration precisely to the spoken audio
-   - First slide: hook/title card
-   - Last slide: outro with MarketPhase branding
+   - clip_tag: pick the BEST matching tag from this library (or null if none fit well):
+       stock_bull    → market rally, stocks rising, bullish sentiment
+       stock_crash   → market drop, sell-off, fear, red day
+       federal_reserve → Fed news, interest rate decisions, Powell
+       wall_street   → trading floor, market open, brokers, equities
+       inflation     → CPI, prices rising, cost of living, groceries
+       gold          → safe haven, gold prices, commodities, precious metals
+       crypto        → Bitcoin, Ethereum, digital assets, blockchain
+       oil_energy    → oil prices, OPEC, energy sector, crude
+       recession     → economic slowdown, GDP contraction, layoffs
+       interest_rates → yield curve, bond yields, rate hike/cut
+       global_economy → trade war, tariffs, international markets, GDP
+       tech_stocks   → Nasdaq, semiconductors, AI stocks, big tech
+       jobs          → unemployment, jobs report, payrolls, hiring
+       bonds         → treasuries, bond market, fixed income, yields
+       consumer      → retail sales, spending, credit cards, consumers
+       earnings      → company earnings, profit, revenue, guidance
+       nyse_open     → market open, NYSE, stock exchange, morning
+       dollar        → USD, dollar index, currency, DXY
+       bear_market   → prolonged decline, bear trend, capitulation
+       data_screens  → data, analytics, charts, economic indicators
+   - pexels_keyword: only needed when clip_tag is null — be specific and visual
+   - narration_text: copy the exact portion of the narration script that belongs to this slide
+   - First slide: hook/title card — use the most dramatic clip matching the story
+   - Last slide: outro with MarketPhase branding — use nyse_open or data_screens
    - IMPORTANT: every word from the narration must appear in exactly one slide's narration_text — no gaps, no overlaps
 
 Return ONLY valid JSON. No markdown, no explanation."""
@@ -284,6 +307,18 @@ def fetch_pexels_image(keyword: str, idx: int, tmp_dir: Path) -> Path | None:
     return None
 
 
+def get_clip_for_slide(tag: str):
+    """Return path to a pre-generated Seedance clip, or None if not available."""
+    if not tag:
+        return None
+    clip = CLIPS_DIR / f"{tag}.mp4"
+    if clip.exists():
+        print(f"  [Clip] using library clip: {tag}.mp4", file=sys.stderr)
+        return clip
+    print(f"  [Clip] '{tag}' not in library, falling back to image", file=sys.stderr)
+    return None
+
+
 # ── Slide rendering ───────────────────────────────────────────────────────────
 
 def get_font(size, bold=False):
@@ -304,112 +339,179 @@ def get_font(size, bold=False):
     return ImageFont.load_default()
 
 
-def create_slides(slides_data: list[dict], tmp_dir: Path) -> list[Path]:
-    from PIL import Image, ImageDraw, ImageFilter
+def render_overlay_png(slide: dict, idx: int, total: int, tmp_dir: Path) -> Path:
+    """Render text/branding as a transparent RGBA PNG — no background.
+    This gets composited on top of the clip/image by ffmpeg."""
+    from PIL import Image, ImageDraw
 
-    ACCENT  = (29, 78, 216)    # blue
-    WHITE   = (255, 255, 255)
-    YELLOW  = (251, 191, 36)
-    MUTED   = (148, 163, 184)
-    RED     = (239, 68, 68)
-    BG_DARK = (10, 15, 30)
+    ACCENT = (29, 78, 216)
+    WHITE  = (255, 255, 255)
+    YELLOW = (251, 191, 36)
+    MUTED  = (148, 163, 184)
+    RED    = (239, 68, 68)
 
-    slide_paths = []
+    title    = slide.get("title", "MARKET UPDATE")
+    bullets  = slide.get("bullets", [])
+    is_first = idx == 0
+    is_last  = idx == total - 1
     today_str = date.today().strftime("%B %d, %Y")
 
-    for idx, slide in enumerate(slides_data):
+    # Start fully transparent
+    img  = Image.new("RGBA", (SLIDE_W, SLIDE_H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # ── Dark gradient overlay so text pops over any background ──
+    gradient_top = int(SLIDE_H * 0.15)
+    for y in range(gradient_top, SLIDE_H):
+        alpha = int(210 * (y - gradient_top) / (SLIDE_H - gradient_top))
+        draw.rectangle([(0, y), (SLIDE_W, y + 1)], fill=(5, 10, 20, alpha))
+
+    # ── Top accent bar ──
+    draw.rectangle([(0, 0), (SLIDE_W, 6)], fill=ACCENT + (255,))
+
+    # ── MarketPhase logo top-left ──
+    brand_font = get_font(30, bold=True)
+    draw.text((50, 28), "MARKET", font=brand_font, fill=WHITE + (255,))
+    mw = draw.textlength("MARKET", font=brand_font)
+    draw.text((50 + mw, 28), "PHASE", font=brand_font, fill=(96, 165, 250, 255))
+
+    # ── Channel name top-right ──
+    ch_font = get_font(22)
+    draw.text((SLIDE_W - 350, 32), "Tech Me Home", font=ch_font, fill=MUTED + (200,))
+
+    # ── Date bottom-right ──
+    draw.text((SLIDE_W - 280, SLIDE_H - 50), today_str,
+              font=get_font(22), fill=MUTED + (200,))
+
+    # ── Slide counter bottom-left ──
+    draw.text((50, SLIDE_H - 50), f"{idx + 1} / {total}",
+              font=get_font(20), fill=MUTED + (180,))
+
+    # ── Bottom accent bar ──
+    draw.rectangle([(0, SLIDE_H - 5), (SLIDE_W, SLIDE_H)], fill=RED + (255,))
+
+    # ── Title ──
+    title_font  = get_font(90 if is_first else 72, bold=True)
+    title_color = YELLOW + (255,) if is_first else WHITE + (255,)
+    title_wrapped = textwrap.fill(title, width=30)
+    title_lines   = title_wrapped.split('\n')
+    title_h = len(title_lines) * 82
+    title_y = SLIDE_H // 2 - title_h // 2 - (80 if bullets else 0)
+    for li, line in enumerate(title_lines):
+        # Soft shadow
+        draw.text((82, title_y + li * 82 + 2), line, font=title_font, fill=(0, 0, 0, 140))
+        draw.text((80, title_y + li * 82),     line, font=title_font, fill=title_color)
+
+    # ── Bullet points ──
+    if bullets:
+        bullet_font = get_font(46)
+        bullet_y    = title_y + title_h + 40
+        for bi, bullet in enumerate(bullets[:3]):
+            dot_x = 80
+            dot_y = bullet_y + bi * 65 + 20
+            draw.ellipse([(dot_x, dot_y), (dot_x + 14, dot_y + 14)],
+                         fill=YELLOW + (255,))
+            draw.text((dot_x + 30, bullet_y + bi * 65), bullet,
+                      font=bullet_font, fill=WHITE + (255,))
+
+    # ── Last slide: site URL ──
+    if is_last:
+        draw.text((80, SLIDE_H - 130), f"Learn more: {SITE_URL}",
+                  font=get_font(36, bold=True), fill=(96, 165, 250, 255))
+
+    out = tmp_dir / f"overlay_{idx:03d}.png"
+    img.save(out, "PNG")
+    return out
+
+
+def composite_slide_video(bg_source: Path, overlay_png: Path,
+                          duration: float, out_path: Path, is_video_bg: bool):
+    """
+    Composite overlay PNG on top of bg_source (clip or image) for `duration` seconds.
+    - is_video_bg=True  → loop the clip video
+    - is_video_bg=False → freeze the static image
+    """
+    if is_video_bg:
+        # Loop clip to fill duration, then overlay text PNG
+        cmd = [
+            "ffmpeg", "-y",
+            "-stream_loop", "-1", "-t", str(duration), "-i", str(bg_source),
+            "-i", str(overlay_png),
+            "-filter_complex",
+            f"[0:v]scale={SLIDE_W}:{SLIDE_H},setsar=1[bg];"
+            f"[bg][1:v]overlay=0:0[out]",
+            "-map", "[out]",
+            "-t", str(duration),
+            "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+            "-pix_fmt", "yuv420p", "-an",
+            str(out_path),
+        ]
+    else:
+        # Static image looped then overlay
+        cmd = [
+            "ffmpeg", "-y",
+            "-loop", "1", "-t", str(duration), "-i", str(bg_source),
+            "-i", str(overlay_png),
+            "-filter_complex",
+            f"[0:v]scale={SLIDE_W}:{SLIDE_H},setsar=1[bg];"
+            f"[bg][1:v]overlay=0:0[out]",
+            "-map", "[out]",
+            "-t", str(duration),
+            "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+            "-pix_fmt", "yuv420p", "-an",
+            str(out_path),
+        ]
+    subprocess.run(cmd, check=True, capture_output=True)
+
+
+def create_slides(slides_data: list[dict], durations: list[float],
+                  tmp_dir: Path) -> list[Path]:
+    """
+    For each slide:
+      1. Pick background: Seedance clip → Pexels/Pixabay image → solid colour
+      2. Render transparent text overlay PNG
+      3. ffmpeg composite → slide_NNN.mp4
+    Returns list of .mp4 slide segment paths.
+    """
+    from PIL import Image
+
+    BG_DARK = (10, 15, 30)
+    total   = len(slides_data)
+    segment_paths = []
+
+    for idx, (slide, dur) in enumerate(zip(slides_data, durations)):
         title   = slide.get("title", "MARKET UPDATE")
-        bullets = slide.get("bullets", [])
+        tag     = slide.get("clip_tag")
         keyword = slide.get("pexels_keyword", "finance stock market")
-        is_first = idx == 0
-        is_last  = idx == len(slides_data) - 1
 
-        # ── Background ──
-        bg_path = fetch_pexels_image(keyword, idx, tmp_dir)
-        if bg_path and bg_path.exists():
-            img = Image.open(bg_path).convert("RGB")
-            img = img.resize((SLIDE_W, SLIDE_H), Image.LANCZOS)
-            # Slight blur so text pops
-            img = img.filter(ImageFilter.GaussianBlur(radius=2))
+        print(f"  Slide {idx+1}/{total}: {title}", file=sys.stderr)
+
+        # ── 1. Choose background ──
+        clip_path = get_clip_for_slide(tag)
+        is_video_bg = clip_path is not None
+
+        if not is_video_bg:
+            # Try Pexels/Pixabay still image
+            img_path = fetch_pexels_image(keyword, idx, tmp_dir)
+            if img_path and img_path.exists():
+                bg_source = img_path
+            else:
+                # Solid dark fallback
+                fb = tmp_dir / f"bg_solid_{idx:03d}.png"
+                Image.new("RGB", (SLIDE_W, SLIDE_H), BG_DARK).save(fb, "PNG")
+                bg_source = fb
         else:
-            img = Image.new("RGB", (SLIDE_W, SLIDE_H), BG_DARK)
+            bg_source = clip_path
 
-        draw = ImageDraw.Draw(img)
+        # ── 2. Render text overlay PNG ──
+        overlay_png = render_overlay_png(slide, idx, total, tmp_dir)
 
-        # ── Dark gradient overlay (bottom 70% of image) ──
-        overlay = Image.new("RGBA", (SLIDE_W, SLIDE_H), (0, 0, 0, 0))
-        ov_draw = ImageDraw.Draw(overlay)
-        gradient_top = int(SLIDE_H * 0.2)
-        for y in range(gradient_top, SLIDE_H):
-            alpha = int(200 * (y - gradient_top) / (SLIDE_H - gradient_top))
-            ov_draw.rectangle([(0, y), (SLIDE_W, y + 1)], fill=(5, 10, 20, alpha))
-        img = Image.alpha_composite(img.convert("RGBA"), overlay).convert("RGB")
-        draw = ImageDraw.Draw(img)
+        # ── 3. Composite → slide video segment ──
+        seg_out = tmp_dir / f"slide_{idx:03d}.mp4"
+        composite_slide_video(bg_source, overlay_png, dur, seg_out, is_video_bg)
+        segment_paths.append(seg_out)
 
-        # ── Top bar ──
-        draw.rectangle([(0, 0), (SLIDE_W, 6)], fill=ACCENT)
-
-        # ── MarketPhase logo top-left ──
-        brand_font = get_font(30, bold=True)
-        draw.text((50, 28), "MARKETPHASE", font=brand_font, fill=WHITE)
-        draw.text((50, 28), "MARKET", font=brand_font, fill=WHITE)
-        # "PHASE" in blue accent colour
-        mw = draw.textlength("MARKET", font=brand_font)
-        draw.text((50 + mw, 28), "PHASE", font=brand_font, fill=(96, 165, 250))
-
-        # ── Channel name top-right ──
-        ch_font = get_font(22)
-        draw.text((SLIDE_W - 350, 32), "Tech Me Home", font=ch_font, fill=MUTED)
-
-        # ── Date bottom-right ──
-        date_font = get_font(22)
-        draw.text((SLIDE_W - 280, SLIDE_H - 50), today_str, font=date_font, fill=MUTED)
-
-        # ── Slide number bottom-left ──
-        num_font = get_font(20)
-        draw.text((50, SLIDE_H - 50), f"{idx + 1} / {len(slides_data)}",
-                  font=num_font, fill=MUTED)
-
-        # ── Bottom accent bar ──
-        draw.rectangle([(0, SLIDE_H - 5), (SLIDE_W, SLIDE_H)], fill=RED)
-
-        # ── Title ──
-        title_font = get_font(72 if not is_first else 90, bold=True)
-        title_color = YELLOW if is_first else WHITE
-        # Word-wrap title
-        title_wrapped = textwrap.fill(title, width=30)
-        title_lines = title_wrapped.split('\n')
-        title_h = len(title_lines) * 82
-        title_y = SLIDE_H // 2 - title_h // 2 - (80 if bullets else 0)
-
-        for li, line in enumerate(title_lines):
-            draw.text((80, title_y + li * 82), line, font=title_font, fill=title_color)
-
-        # ── Bullet points ──
-        if bullets:
-            bullet_font = get_font(46)
-            bullet_y = title_y + title_h + 40
-            for bi, bullet in enumerate(bullets[:3]):
-                # Bullet dot
-                dot_x = 80
-                dot_y = bullet_y + bi * 65 + 20
-                draw.ellipse([(dot_x, dot_y), (dot_x + 14, dot_y + 14)], fill=YELLOW)
-                # Bullet text
-                draw.text((dot_x + 30, bullet_y + bi * 65), bullet,
-                          font=bullet_font, fill=WHITE)
-
-        # ── Last slide: add site URL ──
-        if is_last:
-            url_font = get_font(36, bold=True)
-            draw.text((80, SLIDE_H - 130), f"Learn more: {SITE_URL}",
-                      font=url_font, fill=(96, 165, 250))
-
-        out = tmp_dir / f"slide_{idx:03d}.png"
-        img.save(out, "PNG")
-        slide_paths.append(out)
-        print(f"  Slide {idx+1}/{len(slides_data)}: {title}", file=sys.stderr)
-
-    return slide_paths
+    return segment_paths
 
 
 # ── Video assembly ────────────────────────────────────────────────────────────
@@ -438,26 +540,21 @@ def calc_slide_durations(slides_data: list[dict], audio_duration: float) -> list
     return [d * scale for d in durations]
 
 
-def build_video(slide_paths: list[Path], audio_path: Path, out_path: Path,
-                slides_data: list[dict] = None):
+def build_video(segment_paths: list[Path], audio_path: Path, out_path: Path):
+    """Concat pre-composited slide .mp4 segments and mux with audio."""
     audio_duration = get_audio_duration(audio_path)
-    num_slides = len(slide_paths)
-
-    if slides_data:
-        durations = calc_slide_durations(slides_data, audio_duration)
-    else:
-        durations = [audio_duration / num_slides] * num_slides
-
-    concat_file = out_path.parent / "slides_concat.txt"
-    with concat_file.open("w") as f:
-        for slide, dur in zip(slide_paths, durations):
-            f.write(f"file '{slide.resolve()}'\n")
-            f.write(f"duration {dur:.3f}\n")
-        f.write(f"file '{slide_paths[-1].resolve()}'\n")
-
+    num_slides = len(segment_paths)
     avg = audio_duration / num_slides
+
     print(f"  Building video ({audio_duration:.0f}s, {num_slides} slides, "
           f"~{avg:.1f}s avg/slide)…", file=sys.stderr)
+
+    # Write concat list (segments already have correct durations)
+    concat_file = out_path.parent / "slides_concat.txt"
+    with concat_file.open("w") as f:
+        for seg in segment_paths:
+            f.write(f"file '{seg.resolve()}'\n")
+
     subprocess.run([
         "ffmpeg", "-y",
         "-f", "concat", "-safe", "0", "-i", str(concat_file),
@@ -466,7 +563,7 @@ def build_video(slide_paths: list[Path], audio_path: Path, out_path: Path,
         "-c:a", "aac", "-b:a", "192k",
         "-pix_fmt", "yuv420p",
         "-shortest",
-        str(out_path)
+        str(out_path),
     ], check=True, capture_output=True)
     print(f"  Video saved: {out_path}", file=sys.stderr)
 
@@ -544,11 +641,14 @@ def generate_thumbnail(title: str, pexels_keyword: str, tmp_dir: Path) -> Path:
         gd.rectangle([(x, 0), (x + 1, TH)], fill=(5, 10, 20, alpha))
     bg = Image.alpha_composite(bg, grad)
 
-    # ── Host photo (random pick, green screen removed) ──
+    # ── Host photo (sequential rotation through all host photos) ──
     assets_dir = Path(__file__).parent / "assets"
-    host_files = list(assets_dir.glob("host_*.jp*g"))
+    host_files = sorted(assets_dir.glob("host_*.jp*g"))  # host_1 … host_6 in order
     if host_files:
-        host_path = random.choice(host_files)
+        # Deterministic daily cycle — calibrated so host_3 is used on May 12 2026
+        idx = (date.today().toordinal()) % len(host_files)
+        host_path = host_files[idx]
+        print(f"  Using host photo: {host_path.name}", file=sys.stderr)
         host_img = Image.open(host_path)
         host_img = remove_green_screen(host_img)
 
@@ -729,18 +829,26 @@ def main():
     audio_path = TMP_DIR / "narration.mp3"
     tts_elevenlabs(narration_clean, audio_path)
 
-    # 4. Create slides with Pexels backgrounds
-    print("Creating slides…", file=sys.stderr)
-    slide_paths = create_slides(slides_data, TMP_DIR)
+    # 4. Calculate durations before creating slides (needed for compositing)
+    audio_duration = get_audio_duration(audio_path)
+    durations = calc_slide_durations(slides_data, audio_duration)
 
-    # 5. Build MP4
+    # 5. Create slide video segments (clip/image bg + text overlay composited)
+    print("Creating slides…", file=sys.stderr)
+    slide_paths = create_slides(slides_data, durations, TMP_DIR)
+
+    # 6. Build final MP4 (concat segments + mux audio)
     print("Building video…", file=sys.stderr)
     video_path = TMP_DIR / f"marketphase_{today.isoformat()}.mp4"
-    build_video(slide_paths, audio_path, video_path, slides_data)
+    build_video(slide_paths, audio_path, video_path)
 
-    # 6. Generate thumbnail (host photo + Pexels bg + title text)
+    # 7. Generate thumbnail (host photo + Pexels bg + title text)
     print("Generating thumbnail…", file=sys.stderr)
+    thumb_tag     = slides_data[0].get("clip_tag") if slides_data else None
     thumb_keyword = slides_data[0].get("pexels_keyword", "stock market finance") if slides_data else "stock market"
+    # Use clip tag's keyword for thumbnail bg if available
+    if thumb_tag:
+        thumb_keyword = thumb_tag.replace("_", " ")
     thumbnail_path = generate_thumbnail(video_title, thumb_keyword, TMP_DIR)
 
     # 7. Upload to YouTube
