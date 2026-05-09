@@ -11,6 +11,8 @@ Usage:
 
 import json
 import os
+import sys
+from pathlib import Path
 
 try:
     from google_auth_oauthlib.flow import InstalledAppFlow
@@ -19,7 +21,10 @@ except ImportError:
     os.system(f"{sys.executable} -m pip install google-auth-oauthlib")
     from google_auth_oauthlib.flow import InstalledAppFlow
 
-SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+SCOPES = [
+    "https://www.googleapis.com/auth/youtube.upload",
+    "https://www.googleapis.com/auth/yt-analytics.readonly",
+]
 
 
 def find_credentials_file():

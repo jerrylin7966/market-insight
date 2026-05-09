@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tech Me Home — YouTube Analytics</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #0f172a; font-size: 14px; }
+.header { background: #0f172a; color: #fff; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+.header h1 { font-size: 16px; font-weight: 700; }
+.header h1 span { color: #60a5fa; }
+.updated { font-size: 12px; color: rgba(255,255,255,0.5); }
+.container { padding: 16px; max-width: 900px; margin: 0 auto; }
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+.card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; }
+.card-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.card-value { font-size: 26px; font-weight: 700; color: #0f172a; }
+.card-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+.card.accent { border-left: 3px solid #1d4ed8; }
+.card.green  { border-left: 3px solid #059669; }
+.card.yellow { border-left: 3px solid #d97706; }
+.chart-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+.chart-box h2 { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 12px; }
+.table-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
+.table-box h2 { font-size: 13px; font-weight: 600; color: #374151; padding: 14px 16px 10px; border-bottom: 1px solid #f1f5f9; }
+table { width: 100%; border-collapse: collapse; }
+th { background: #f8fafc; text-align: left; padding: 8px 14px; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #e2e8f0; }
+td { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f8fafc; }
+.title-cell { max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.title-cell a { color: #1d4ed8; text-decoration: none; font-weight: 500; }
+.title-cell a:hover { text-decoration: underline; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.bar { display: inline-block; height: 6px; background: #1d4ed8; border-radius: 3px; opacity: 0.7; }
+.pill { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+.pill-green { background: #d1fae5; color: #065f46; }
+.pill-blue  { background: #dbeafe; color: #1e40af; }
+.empty { text-align: center; padding: 40px 20px; color: #94a3b8; }
+.empty h3 { font-size: 16px; margin-bottom: 8px; color: #64748b; }
+.empty p { font-size: 13px; line-height: 1.6; }
+.period-tag { font-size: 11px; background: #f1f5f9; color: #64748b; padding: 3px 8px; border-radius: 6px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Tech Me Home <span>|</span> YouTube Analytics</h1>
+  <span class="updated" id="updated">Loading…</span>
+</div>
+
+<div class="container">
+  <div id="content">
+    <div class="empty">
+      <h3>⏳ Waiting for data</h3>
+      <p>Analytics will appear here after the first GitHub Actions run completes.<br>
+         The workflow uploads the video then saves analytics to <code>finance-hub/analytics.json</code>.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+async function loadData() {
+  try {
+    const result = await window.cowork.callMcpTool('mcp__workspace__bash', {
+      command: 'cat /Users/jerryl/asset-hub/finance-hub/analytics.json 2>/dev/null || echo "NOT_FOUND"'
+    });
+
+    const text = (result?.content?.[0]?.text || result?.output || String(result)).trim();
+    if (!text || text === 'NOT_FOUND' || text.startsWith('cat:')) {
+      return; // leave the "waiting" state
+    }
+
+    const data = JSON.parse(text);
+    render(data);
+  } catch(e) {
+    console.error('Analytics load error:', e);
+  }
+}
+
+function fmt(n) { return Number(n).toLocaleString(); }
+function fmtDur(secs) {
+  const m = Math.floor(secs / 60), s = secs % 60;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+function render(data) {
+  const { videos = [], totals = {}, updated, period } = data;
+  document.getElementById('updated').textContent = `Updated: ${updated}  ·  Period: ${period}`;
+
+  const avgDur = videos.length
+    ? Math.round(videos.reduce((a,v) => a + v.avgViewDuration, 0) / videos.length)
+    : 0;
+
+  const html = `
+    <div class="cards">
+      <div class="card accent">
+        <div class="card-label">Total Views</div>
+        <div class="card-value">${fmt(totals.views || 0)}</div>
+        <div class="card-sub">Last 30 days · ${videos.length} videos</div>
+      </div>
+      <div class="card green">
+        <div class="card-label">Subscribers Gained</div>
+        <div class="card-value">+${fmt(totals.subscribersGained || 0)}</div>
+        <div class="card-sub">Last 30 days</div>
+      </div>
+      <div class="card yellow">
+        <div class="card-label">Avg View Duration</div>
+        <div class="card-value">${fmtDur(avgDur)}</div>
+        <div class="card-sub">Across all videos</div>
+      </div>
+    </div>
+
+    <div class="chart-box">
+      <h2>Views by Video (Top ${Math.min(videos.length, 10)})</h2>
+      <canvas id="viewsChart" height="160"></canvas>
+    </div>
+
+    <div class="table-box">
+      <h2>Video Performance</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Video</th>
+            <th class="num">Views</th>
+            <th class="num">Watch Time</th>
+            <th class="num">Avg Duration</th>
+            <th class="num">Subscribers</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${videos.map(v => {
+            const maxViews = Math.max(...videos.map(x => x.views));
+            const barW = Math.round((v.views / maxViews) * 80);
+            return `
+              <tr>
+                <td class="title-cell"><a href="${v.url}" target="_blank">${v.title}</a></td>
+                <td class="num">
+                  <span class="bar" style="width:${barW}px"></span>
+                  <span style="margin-left:6px">${fmt(v.views)}</span>
+                </td>
+                <td class="num">${fmt(v.watchMinutes)}m</td>
+                <td class="num">${fmtDur(v.avgViewDuration)}</td>
+                <td class="num">
+                  ${v.subscribersGained > 0
+                    ? `<span class="pill pill-green">+${v.subscribersGained}</span>`
+                    : `<span class="pill pill-blue">${v.subscribersGained}</span>`}
+                </td>
+              </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+
+  document.getElementById('content').innerHTML = html;
+
+  // Chart
+  const top10 = videos.slice(0, 10);
+  new Chart(document.getElementById('viewsChart'), {
+    type: 'bar',
+    data: {
+      labels: top10.map(v => v.title.length > 35 ? v.title.slice(0,35)+'…' : v.title),
+      datasets: [{
+        label: 'Views',
+        data: top10.map(v => v.views),
+        backgroundColor: 'rgba(29,78,216,0.75)',
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { font: { size: 11 }, maxRotation: 30 } },
+        y: { ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+loadData();
+</script>
+</body>
+</html>

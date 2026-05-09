@@ -77,7 +77,7 @@ Today is {today_display}. Today's market summary:
 
 {digest_summary}
 
-Output a JSON object with exactly these three keys:
+Output a JSON object with exactly these six keys:
 
 1. "title": A single catchy YouTube video title (max 90 characters) specific to today's top story. Rules:
    - Must reflect the actual news, not a generic placeholder
@@ -86,7 +86,22 @@ Output a JSON object with exactly these three keys:
    - Do NOT use "They're Not Telling You This" — write something fresh and news-specific every day
    - No hashtags, no emojis in the title
 
-2. "narration": The full ~10-minute spoken script following ALL these rules:
+2. "short_title": A YouTube Shorts title (max 60 characters). Punchy, curious, slightly alarming. No hashtags — those get added automatically.
+
+3. "short_hook": A 45-second spoken script (≈100 words) for a YouTube Short. Rules:
+   - Open with the single most shocking fact or number from today's story
+   - One clear ELI5 explanation in the middle
+   - End with "Follow for daily market breakdowns"
+   - No cues, no sponsor — pure spoken words only
+
+4. "chapters": Array of chapter objects for the video description timestamps. Format:
+   [{{"time": "0:00", "label": "The Hook"}}, {{"time": "0:45", "label": "Topic Name"}}, ...]
+   - 6-8 chapters covering the full video arc
+   - Labels are short (3-5 words), punchy, SEO-friendly
+
+5. "tags": Array of 8-10 topic-specific tags for today's story (single words or short phrases, no # prefix). Always include: "finance", "markets", "investing". Add tags specific to today's news.
+
+6. "narration": The full ~10-minute spoken script following ALL these rules:
    - INTRO: Start with a massive high-stakes hook (0:00-1:00). After the hook, say "Welcome back to Tech Me Home, Market Phase daily news!"
    - TONE: Urgent, cinematic, educational. Slightly cynical about the Federal Reserve and fiat currency. Calm but dramatic.
    - SENTENCES: Short, punchy, conversational. Write how a person speaks.
@@ -739,27 +754,40 @@ def set_youtube_thumbnail(video_id: str, thumbnail_path: Path, access_token: str
 
 
 def upload_to_youtube(video_path: Path, title: str, hook_text: str,
-                      thumbnail_path: Path | None = None) -> str:
+                      thumbnail_path=None, chapters=None, extra_tags=None) -> str:
     access_token = get_youtube_access_token()
     today_str = date.today().strftime("%B %d, %Y")
 
+    # ── Chapters block ──
+    chapters_block = ""
+    if chapters:
+        chapters_block = "⏱️ CHAPTERS\n"
+        chapters_block += "\n".join(f"{c['time']} {c['label']}" for c in chapters)
+        chapters_block += "\n\n"
+
     description = (
         f"{hook_text}\n\n"
-        f"Learn world-wide financial insights: {SITE_URL}\n\n"
-        f"Track live market signals, economic indicators, and daily market analysis at MarketPhase.\n\n"
-        f"📅 Published: {today_str}\n\n"
-        f"#markets #finance #investing #stocks #economy #MarketPhase #TechMeHome\n\n"
-        f"⚠️ None of this is financial advice. For entertainment and educational purposes only. "
-        f"Always do your own research."
+        f"👉 Full market analysis & signals: {SITE_URL}\n\n"
+        f"{chapters_block}"
+        f"Track live market signals, economic indicators, and daily market analysis "
+        f"at MarketPhase — free institutional-grade tools for everyday investors.\n\n"
+        f"📅 {today_str}  |  New video every weekday at 6:30 AM ET\n\n"
+        f"#markets #finance #investing #stocks #economy #MarketPhase #TechMeHome "
+        f"#stockmarket #financialnews #marketupdate\n\n"
+        f"⚠️ None of this is financial advice. For entertainment and educational "
+        f"purposes only. Always do your own research."
     )
+
+    base_tags = ["markets", "finance", "investing", "stocks", "economy",
+                 "MarketPhase", "TechMeHome", "market update", "daily news",
+                 "financial news", "stock market today"]
+    all_tags = list(dict.fromkeys(base_tags + (extra_tags or [])))
 
     metadata = json.dumps({
         "snippet": {
             "title": title[:100],
             "description": description[:5000],
-            "tags": ["markets", "finance", "investing", "stocks", "economy",
-                     "MarketPhase", "TechMeHome", "market update", "daily news",
-                     "financial news", "stock market today"],
+            "tags": all_tags[:30],
             "categoryId": "25",
         },
         "status": {
@@ -802,6 +830,268 @@ def upload_to_youtube(video_path: Path, title: str, hook_text: str,
     return url
 
 
+# ── YouTube Shorts pipeline ───────────────────────────────────────────────────
+
+SHORT_W, SHORT_H = 1080, 1920  # vertical 9:16
+
+def generate_short_video(short_hook: str, short_title: str,
+                         clip_tag: str, tmp_dir: Path) -> Path:
+    """Render a vertical YouTube Short: clip bg + bold hook text + host photo."""
+    from PIL import Image, ImageDraw, ImageFilter, ImageEnhance
+    import numpy as np
+
+    YELLOW = (251, 191, 36)
+    WHITE  = (255, 255, 255)
+    RED    = (239, 68, 68)
+    ACCENT = (29, 78, 216)
+
+    # ── Background clip or solid ──
+    clip_path = get_clip_for_slide(clip_tag) if clip_tag else None
+    if clip_path:
+        # Extract a frame from the clip as background image
+        frame_path = tmp_dir / "short_bg_frame.png"
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(clip_path),
+            "-vf", f"scale={SHORT_W}:{SHORT_H}:force_original_aspect_ratio=increase,"
+                   f"crop={SHORT_W}:{SHORT_H}",
+            "-frames:v", "1", "-q:v", "2", str(frame_path)
+        ], check=True, capture_output=True)
+        bg = Image.open(frame_path).convert("RGB")
+        bg = ImageEnhance.Brightness(bg).enhance(0.45)
+    else:
+        bg = Image.new("RGB", (SHORT_W, SHORT_H), (10, 15, 30))
+
+    bg = bg.convert("RGBA")
+
+    # ── Dark gradient overlay ──
+    grad = Image.new("RGBA", (SHORT_W, SHORT_H), (0, 0, 0, 0))
+    gd   = ImageDraw.Draw(grad)
+    for y in range(SHORT_H // 3, SHORT_H):
+        alpha = int(200 * (y - SHORT_H // 3) / (SHORT_H * 2 / 3))
+        gd.rectangle([(0, y), (SHORT_W, y + 1)], fill=(5, 10, 20, alpha))
+    bg = Image.alpha_composite(bg, grad)
+
+    draw = ImageDraw.Draw(bg)
+
+    # ── Top accent bar ──
+    draw.rectangle([(0, 0), (SHORT_W, 8)], fill=ACCENT + (255,))
+
+    # ── MARKETPHASE branding ──
+    brand_font = get_font(38, bold=True)
+    draw.text((40, 40), "MARKET", font=brand_font, fill=WHITE + (255,))
+    mw = draw.textlength("MARKET", font=brand_font)
+    draw.text((40 + mw, 40), "PHASE", font=brand_font, fill=(96, 165, 250, 255))
+
+    # ── Big bold title text (top third) ──
+    title_font = get_font(88, bold=True)
+    wrapped = textwrap.fill(short_title.upper(), width=14)
+    lines   = wrapped.split("\n")
+    y_start = 130
+    for i, line in enumerate(lines):
+        draw.text((42, y_start + i * 100 + 2), line, font=title_font,
+                  fill=(0, 0, 0, 160))
+        draw.text((40, y_start + i * 100), line, font=title_font,
+                  fill=YELLOW + (255,))
+
+    # ── Host photo bottom-left ──
+    assets_dir = Path(__file__).parent / "assets"
+    host_files = sorted(assets_dir.glob("host_*.jp*g"))
+    if host_files:
+        idx = date.today().toordinal() % len(host_files)
+        host_img = Image.open(host_files[idx])
+        host_img = remove_green_screen(host_img)
+        target_h = int(SHORT_H * 0.65)
+        scale    = target_h / host_img.height
+        target_w = int(host_img.width * scale)
+        host_img = host_img.resize((target_w, target_h), Image.LANCZOS)
+        x_pos = (SHORT_W // 2 - target_w) // 2
+        y_pos = SHORT_H - target_h + 30
+        bg.paste(host_img, (x_pos, y_pos), host_img)
+
+    # ── "Follow for daily market breakdowns" CTA ──
+    cta_font = get_font(44, bold=True)
+    cta = "Follow for daily market breakdowns"
+    cw  = draw.textlength(cta, font=cta_font)
+    draw.text(((SHORT_W - cw) // 2, SHORT_H - 120), cta,
+              font=cta_font, fill=YELLOW + (255,))
+
+    # ── Bottom bar ──
+    draw.rectangle([(0, SHORT_H - 8), (SHORT_W, SHORT_H)], fill=RED + (255,))
+
+    # ── Build video: use slowed clip or static frame ──
+    overlay_path = tmp_dir / "short_overlay.png"
+    bg.convert("RGBA").save(overlay_path, "PNG")
+
+    # TTS for the short
+    short_audio = tmp_dir / "short_narration.mp3"
+    tts_elevenlabs(short_hook, short_audio)
+    short_duration = get_audio_duration(short_audio)
+
+    # Composite: clip bg (slowed) + overlay + audio
+    short_video = tmp_dir / "short_silent.mp4"
+    if clip_path:
+        SLOW = 4.0
+        loops = max(0, int(short_duration / (5.0 * SLOW)) + 1)
+        subprocess.run([
+            "ffmpeg", "-y",
+            "-stream_loop", str(loops), "-i", str(clip_path),
+            "-i", str(overlay_path),
+            "-filter_complex",
+            f"[0:v]setpts={SLOW}*PTS,scale={SHORT_W}:{SHORT_H}:"
+            f"force_original_aspect_ratio=increase,crop={SHORT_W}:{SHORT_H},"
+            f"setsar=1[bg];[bg][1:v]overlay=0:0[out]",
+            "-map", "[out]", "-t", str(short_duration),
+            "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+            "-pix_fmt", "yuv420p", "-an", str(short_video),
+        ], check=True, capture_output=True)
+    else:
+        subprocess.run([
+            "ffmpeg", "-y",
+            "-loop", "1", "-i", str(overlay_path),
+            "-t", str(short_duration),
+            "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+            "-pix_fmt", "yuv420p", "-an", str(short_video),
+        ], check=True, capture_output=True)
+
+    # Mux audio
+    out_path = tmp_dir / "short_final.mp4"
+    subprocess.run([
+        "ffmpeg", "-y",
+        "-i", str(short_video), "-i", str(short_audio),
+        "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest",
+        str(out_path),
+    ], check=True, capture_output=True)
+
+    print(f"  Short video built ({short_duration:.0f}s)", file=sys.stderr)
+    return out_path
+
+
+def upload_short_to_youtube(short_path: Path, short_title: str,
+                            main_video_title: str) -> str:
+    """Upload a YouTube Short — vertical, under 60 sec, with #Shorts tag."""
+    access_token = get_youtube_access_token()
+    today_str    = date.today().strftime("%B %d, %Y")
+
+    description = (
+        f"💥 {main_video_title}\n\n"
+        f"Watch the full breakdown 👉 {SITE_URL}\n\n"
+        f"New market shorts every weekday. Follow for daily insights.\n\n"
+        f"📅 {today_str}\n\n"
+        f"#Shorts #finance #markets #investing #stocks #money #MarketPhase"
+    )
+
+    metadata = json.dumps({
+        "snippet": {
+            "title": f"{short_title} #Shorts",
+            "description": description[:5000],
+            "tags": ["Shorts", "finance", "markets", "investing", "stocks",
+                     "money", "MarketPhase", "financial news", "market update"],
+            "categoryId": "25",
+        },
+        "status": {
+            "privacyStatus": "public",
+            "selfDeclaredMadeForKids": False,
+        }
+    }).encode()
+
+    boundary   = "==marketphase_short_boundary=="
+    video_bytes = short_path.read_bytes()
+    body = (
+        f"--{boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"
+    ).encode() + metadata + (
+        f"\r\n--{boundary}\r\nContent-Type: video/mp4\r\n\r\n"
+    ).encode() + video_bytes + f"\r\n--{boundary}--".encode()
+
+    req = urllib.request.Request(
+        "https://www.googleapis.com/upload/youtube/v3/videos"
+        "?uploadType=multipart&part=snippet,status",
+        data=body,
+        headers={
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": f"multipart/related; boundary={boundary}",
+            "Content-Length": str(len(body)),
+        },
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=120) as resp:
+        result = json.loads(resp.read())
+
+    short_id  = result["id"]
+    short_url = f"https://www.youtube.com/shorts/{short_id}"
+    print(f"  Short uploaded: {short_url}", file=sys.stderr)
+    return short_url
+
+
+# ── YouTube Analytics ─────────────────────────────────────────────────────────
+
+def fetch_and_save_analytics(repo_root: Path):
+    """Fetch last 30 days of per-video analytics + titles, save to finance-hub/analytics.json."""
+    try:
+        access_token = get_youtube_access_token()
+        today = date.today().isoformat()
+        start = date.fromordinal(date.today().toordinal() - 30).isoformat()
+
+        # 1. Analytics metrics per video
+        req = urllib.request.Request(
+            f"https://youtubeanalytics.googleapis.com/v2/reports"
+            f"?ids=channel%3D%3DMINE&startDate={start}&endDate={today}"
+            f"&metrics=views,estimatedMinutesWatched,averageViewDuration,"
+            f"subscribersGained&dimensions=video&sort=-views&maxResults=20",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            analytics = json.loads(resp.read())
+
+        rows = analytics.get("rows", [])
+        if not rows:
+            print("  Analytics: no data yet", file=sys.stderr)
+            return
+
+        # 2. Fetch video titles for each video ID
+        video_ids = ",".join(r[0] for r in rows)
+        req2 = urllib.request.Request(
+            f"https://www.googleapis.com/youtube/v3/videos"
+            f"?part=snippet&id={video_ids}",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+        with urllib.request.urlopen(req2, timeout=30) as resp:
+            vdata = json.loads(resp.read())
+
+        titles = {item["id"]: item["snippet"]["title"]
+                  for item in vdata.get("items", [])}
+
+        # 3. Build enriched video list
+        videos = []
+        for r in rows:
+            vid_id = r[0]
+            videos.append({
+                "id":               vid_id,
+                "title":            titles.get(vid_id, vid_id),
+                "url":              f"https://www.youtube.com/watch?v={vid_id}",
+                "views":            r[1],
+                "watchMinutes":     r[2],
+                "avgViewDuration":  r[3],
+                "subscribersGained": r[4],
+            })
+
+        totals = {
+            "views":             sum(v["views"] for v in videos),
+            "watchMinutes":      sum(v["watchMinutes"] for v in videos),
+            "subscribersGained": sum(v["subscribersGained"] for v in videos),
+        }
+
+        out = repo_root / "finance-hub" / "analytics.json"
+        out.write_text(json.dumps({
+            "updated": today,
+            "period": f"{start} → {today}",
+            "videos": videos,
+            "totals": totals,
+        }, indent=2), encoding="utf-8")
+        print(f"  Analytics saved → {out.name} ({len(videos)} videos)", file=sys.stderr)
+    except Exception as e:
+        print(f"  Analytics fetch failed (non-fatal): {e}", file=sys.stderr)
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
@@ -821,9 +1111,13 @@ def main():
     data = call_claude(digest_summary, today_display)
     narration_script = data["narration"]
     slides_data      = data["slides"]
-    # Dynamic title from Claude — news-specific and hook-driven
-    video_title = data.get("title", f"Market Update {today.strftime('%b %d, %Y')}").strip()
+    video_title  = data.get("title",       f"Market Update {today.strftime('%b %d, %Y')}").strip()
+    short_title  = data.get("short_title", video_title[:60]).strip()
+    short_hook   = data.get("short_hook",  "")
+    chapters     = data.get("chapters",    [])
+    extra_tags   = data.get("tags",        [])
     print(f"  Title: {video_title}", file=sys.stderr)
+    print(f"  Short: {short_title}", file=sys.stderr)
     print(f"  Script: {len(narration_script.split())} words, "
           f"{len(slides_data)} slides", file=sys.stderr)
 
@@ -855,12 +1149,29 @@ def main():
         thumb_keyword = thumb_tag.replace("_", " ")
     thumbnail_path = generate_thumbnail(video_title, thumb_keyword, TMP_DIR)
 
-    # 7. Upload to YouTube
-    print("Uploading to YouTube…", file=sys.stderr)
+    # 8. Upload main video to YouTube
+    print("Uploading main video to YouTube…", file=sys.stderr)
     hook_lines = [l.strip() for l in narration_script.split('\n')
                   if l.strip() and not l.strip().startswith('[')][:3]
     hook_text = " ".join(hook_lines)[:300]
-    url = upload_to_youtube(video_path, video_title, hook_text, thumbnail_path)
+    url = upload_to_youtube(video_path, video_title, hook_text,
+                            thumbnail_path, chapters, extra_tags)
+
+    # 9. Generate and upload YouTube Short
+    if short_hook:
+        print("Generating YouTube Short…", file=sys.stderr)
+        short_clip_tag = slides_data[0].get("clip_tag") if slides_data else None
+        try:
+            short_path = generate_short_video(short_hook, short_title,
+                                              short_clip_tag, TMP_DIR)
+            short_url  = upload_short_to_youtube(short_path, short_title, video_title)
+            print(f"  Short: {short_url}", file=sys.stderr)
+        except Exception as e:
+            print(f"  Short failed (non-fatal): {e}", file=sys.stderr)
+
+    # 10. Fetch and save YouTube analytics
+    print("Fetching analytics…", file=sys.stderr)
+    fetch_and_save_analytics(REPO_ROOT)
 
     print(f"\n✅ Done! Watch at: {url}", file=sys.stderr)
 
