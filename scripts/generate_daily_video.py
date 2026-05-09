@@ -428,17 +428,21 @@ def composite_slide_video(bg_source: Path, overlay_png: Path,
                           duration: float, out_path: Path, is_video_bg: bool):
     """
     Composite overlay PNG on top of bg_source (clip or image) for `duration` seconds.
-    - is_video_bg=True  → loop the clip video
+    - is_video_bg=True  → slow clip to 0.25x speed (setpts=4*PTS), loop if needed
     - is_video_bg=False → freeze the static image
     """
     if is_video_bg:
-        # Loop clip to fill duration, then overlay text PNG
+        # Slow clip to 0.25x playback speed: 5-sec clip → 20 sec effective
+        # Calculate loops needed so slowed content covers full slide duration
+        SLOW = 4.0          # 0.25x speed = 4× PTS multiplier
+        CLIP_SEC = 5.0      # source clip duration
+        loops = max(0, int(duration / (CLIP_SEC * SLOW)) + 1)
         cmd = [
             "ffmpeg", "-y",
-            "-stream_loop", "-1", "-t", str(duration), "-i", str(bg_source),
+            "-stream_loop", str(loops), "-i", str(bg_source),
             "-i", str(overlay_png),
             "-filter_complex",
-            f"[0:v]scale={SLIDE_W}:{SLIDE_H},setsar=1[bg];"
+            f"[0:v]setpts={SLOW}*PTS,scale={SLIDE_W}:{SLIDE_H},setsar=1[bg];"
             f"[bg][1:v]overlay=0:0[out]",
             "-map", "[out]",
             "-t", str(duration),
