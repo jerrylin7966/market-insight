@@ -622,77 +622,110 @@ def remove_green_screen(img):
     return Image.fromarray(arr.astype('uint8'), 'RGBA')
 
 
+def draw_outlined_text(draw, pos, text, font, fill, outline=(0,0,0), thickness=4):
+    """Draw text with a thick outline for maximum contrast on any background."""
+    x, y = pos
+    for dx in range(-thickness, thickness + 1):
+        for dy in range(-thickness, thickness + 1):
+            if dx != 0 or dy != 0:
+                draw.text((x + dx, y + dy), text, font=font, fill=outline)
+    draw.text((x, y), text, font=font, fill=fill)
+
+
 def generate_thumbnail(title: str, pexels_keyword: str, tmp_dir: Path) -> Path:
     """
-    Composite thumbnail:
-    - Full Pexels image as background
-    - Host photo (green screen removed) on the LEFT
-    - Bold title text on the RIGHT
-    - MarketPhase branding bottom-left
+    High-impact YouTube thumbnail:
+    - Seedance clip frame (or Pexels) as background — vibrant, not too dark
+    - Strong vignette + right-side gradient for text area
+    - Host photo left — large, full-height
+    - Title right — BIG font, thick outline, yellow highlight bar on line 1
+    - MarketPhase branding + red bottom bar
     """
     import numpy as np
     from PIL import Image, ImageDraw, ImageFilter, ImageEnhance
 
-    TW, TH = 1280, 720  # YouTube recommended thumbnail size
-    YELLOW = (251, 191, 36)
-    WHITE  = (255, 255, 255)
-    BLACK  = (0, 0, 0)
-    RED    = (239, 68, 68)
-    ACCENT = (29, 78, 216)
+    TW, TH   = 1280, 720
+    YELLOW   = (251, 191, 36)
+    WHITE    = (255, 255, 255)
+    RED      = (220, 38, 38)
+    ACCENT   = (29, 78, 216)
+    DARK     = (5, 10, 20)
 
-    # ── Background: fetch relevant Pexels image ──
-    bg_path = fetch_pexels_image(pexels_keyword, 99, tmp_dir)
-    if bg_path and bg_path.exists():
-        bg = Image.open(bg_path).convert("RGB").resize((TW, TH), Image.LANCZOS)
-        # Slightly darken overall
-        bg = ImageEnhance.Brightness(bg).enhance(0.55)
-    else:
-        bg = Image.new("RGB", (TW, TH), (10, 15, 30))
+    # ── Background: prefer Seedance clip frame, fallback to Pexels ──
+    clip_path = get_clip_for_slide(pexels_keyword.replace(" ", "_"))
+    bg = None
+    if clip_path:
+        frame_path = tmp_dir / "thumb_bg_frame.png"
+        try:
+            subprocess.run([
+                "ffmpeg", "-y", "-i", str(clip_path),
+                "-vf", f"scale={TW}:{TH}:force_original_aspect_ratio=increase,"
+                       f"crop={TW}:{TH}",
+                "-frames:v", "1", "-q:v", "2", str(frame_path)
+            ], check=True, capture_output=True)
+            bg = Image.open(frame_path).convert("RGB")
+            # Keep it relatively bright — not too dark
+            bg = ImageEnhance.Brightness(bg).enhance(0.7)
+        except Exception:
+            bg = None
+
+    if bg is None:
+        img_path = fetch_pexels_image(pexels_keyword, 98, tmp_dir)
+        if img_path and img_path.exists():
+            bg = Image.open(img_path).convert("RGB").resize((TW, TH), Image.LANCZOS)
+            bg = ImageEnhance.Brightness(bg).enhance(0.7)
+        else:
+            bg = Image.new("RGB", (TW, TH), (15, 20, 40))
 
     bg = bg.convert("RGBA")
 
-    # ── Dark gradient on right half for text readability ──
+    # ── Vignette (darkens edges, keeps centre bright) ──
+    vig = Image.new("RGBA", (TW, TH), (0, 0, 0, 0))
+    vd  = ImageDraw.Draw(vig)
+    for i in range(80):
+        alpha = int(160 * (i / 80) ** 1.5)
+        vd.rectangle([(i, i), (TW - i, TH - i)], outline=(0, 0, 0, alpha))
+    bg = Image.alpha_composite(bg, vig)
+
+    # ── Dark gradient over right 55% for text legibility ──
     grad = Image.new("RGBA", (TW, TH), (0, 0, 0, 0))
-    gd = ImageDraw.Draw(grad)
-    split = TW // 2
+    gd   = ImageDraw.Draw(grad)
+    split = int(TW * 0.38)
     for x in range(split, TW):
-        alpha = int(180 * (x - split) / (TW - split))
-        gd.rectangle([(x, 0), (x + 1, TH)], fill=(5, 10, 20, alpha))
+        alpha = int(200 * ((x - split) / (TW - split)) ** 0.6)
+        gd.rectangle([(x, 0), (x + 1, TH)], fill=DARK + (alpha,))
     bg = Image.alpha_composite(bg, grad)
 
-    # ── Host photo (sequential rotation through all host photos) ──
+    # ── Host photo — large, left side ──
     assets_dir = Path(__file__).parent / "assets"
-    host_files = sorted(assets_dir.glob("host_*.jp*g"))  # host_1 … host_6 in order
+    host_files = sorted(assets_dir.glob("host_*.jp*g"))
     if host_files:
-        # Deterministic daily cycle — calibrated so host_3 is used on May 12 2026
-        idx = (date.today().toordinal()) % len(host_files)
+        idx       = date.today().toordinal() % len(host_files)
         host_path = host_files[idx]
-        print(f"  Using host photo: {host_path.name}", file=sys.stderr)
-        host_img = Image.open(host_path)
-        host_img = remove_green_screen(host_img)
-
-        # Scale host to fill ~55% of thumbnail height, keep aspect ratio
-        target_h = int(TH * 1.05)  # slightly taller than frame (crop bottom)
-        scale = target_h / host_img.height
-        target_w = int(host_img.width * scale)
-        host_img = host_img.resize((target_w, target_h), Image.LANCZOS)
-
-        # Position: bottom-left, centred in left half
-        x_pos = (TW // 2 - target_w) // 2 + 20
-        y_pos = TH - target_h + 20  # slight crop at bottom
+        print(f"  Thumbnail host: {host_path.name}", file=sys.stderr)
+        host_img  = Image.open(host_path)
+        host_img  = remove_green_screen(host_img)
+        target_h  = int(TH * 1.08)
+        scale     = target_h / host_img.height
+        target_w  = int(host_img.width * scale)
+        host_img  = host_img.resize((target_w, target_h), Image.LANCZOS)
+        x_pos     = int(TW * 0.02)
+        y_pos     = TH - target_h + 10
         bg.paste(host_img, (x_pos, y_pos), host_img)
 
-    # ── Draw title text on the right ──
-    draw = ImageDraw.Draw(bg)
-    title_font_lg = get_font(68, bold=True)
-    title_font_sm = get_font(52, bold=True)
+    draw   = ImageDraw.Draw(bg)
+    x_text = int(TW * 0.42)
+    x_max  = TW - 30
+    max_w  = x_max - x_text
 
-    # Word-wrap to fit right half (~600px wide)
-    words = title.split()
+    # ── Word-wrap title at large font size ──
+    font_size = 88
+    title_font = get_font(font_size, bold=True)
+    words = title.upper().split()
     lines, current = [], []
     for word in words:
         test = ' '.join(current + [word])
-        if draw.textlength(test, font=title_font_sm) < 540:
+        if draw.textlength(test, font=title_font) < max_w:
             current.append(word)
         else:
             if current:
@@ -701,30 +734,42 @@ def generate_thumbnail(title: str, pexels_keyword: str, tmp_dir: Path) -> Path:
     if current:
         lines.append(' '.join(current))
 
-    # Stack lines, vertically centred on right half
-    line_h = 64
+    line_h  = font_size + 14
     total_h = len(lines) * line_h
-    y_start = (TH - total_h) // 2 - 20
-    x_text = TW // 2 + 30
+    y_start = (TH - total_h) // 2 - 10
 
     for i, line in enumerate(lines):
         y = y_start + i * line_h
-        # Drop shadow
-        draw.text((x_text + 3, y + 3), line, font=title_font_sm, fill=(0, 0, 0, 180))
-        # Main text — first line yellow, rest white
-        color = YELLOW if i == 0 else WHITE
-        draw.text((x_text, y), line, font=title_font_sm, fill=color)
+        if i == 0:
+            # Yellow highlight bar behind first line
+            lw = draw.textlength(line, font=title_font)
+            draw.rectangle(
+                [(x_text - 8, y - 4), (x_text + lw + 8, y + font_size + 4)],
+                fill=(251, 191, 36, 230)
+            )
+            draw_outlined_text(draw, (x_text, y), line, title_font,
+                               fill=(10, 10, 10), outline=(0, 0, 0), thickness=2)
+        else:
+            draw_outlined_text(draw, (x_text, y), line, title_font,
+                               fill=WHITE, outline=(0, 0, 0), thickness=5)
 
-    # ── Red accent bar bottom ──
-    draw.rectangle([(0, TH - 6), (TW, TH)], fill=RED)
+    # ── LIVE badge top-right ──
+    badge_font = get_font(22, bold=True)
+    draw.rectangle([(TW - 130, 14), (TW - 14, 46)], fill=RED)
+    draw.text((TW - 118, 18), "DAILY NEWS", font=badge_font, fill=WHITE)
 
     # ── MarketPhase branding bottom-left ──
-    brand_font = get_font(26, bold=True)
-    draw.text((22, TH - 44), "MARKET", font=brand_font, fill=WHITE)
+    brand_font = get_font(28, bold=True)
+    draw.rectangle([(0, TH - 52), (220, TH)], fill=(0, 0, 0, 180))
+    draw_outlined_text(draw, (14, TH - 44), "MARKET", brand_font,
+                       fill=WHITE, outline=(0,0,0), thickness=1)
     mw = draw.textlength("MARKET", font=brand_font)
-    draw.text((22 + mw, TH - 44), "PHASE", font=brand_font, fill=(96, 165, 250))
+    draw_outlined_text(draw, (14 + mw, TH - 44), "PHASE", brand_font,
+                       fill=(96, 165, 250), outline=(0,0,0), thickness=1)
 
-    # Save as JPEG (YouTube thumbnail requirement)
+    # ── Red bottom bar ──
+    draw.rectangle([(0, TH - 6), (TW, TH)], fill=RED)
+
     out = tmp_dir / "thumbnail.jpg"
     bg.convert("RGB").save(out, "JPEG", quality=95)
     print(f"  Thumbnail saved: {out}", file=sys.stderr)
