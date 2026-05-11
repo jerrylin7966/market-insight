@@ -1,78 +1,61 @@
 #!/usr/bin/env python3
 """
-Fetch FRED data (IC4WSA + CFNAI) once daily via GitHub Actions
-and save as static JSON files served by Cloudflare Pages.
-
-This sidesteps FRED blocking Cloudflare Worker IP ranges.
+Fetch FRED data (IC4WSA + CFNAI) via FRED's public CSV export (no API key needed).
+Run daily via GitHub Actions and commit as static JSON served by Cloudflare Pages.
 """
 
-import json, math, os, sys, urllib.request
-from datetime import date, datetime
+import csv, io, json, math, os, sys, urllib.request
+from datetime import datetime
 from pathlib import Path
 
-FRED_API_KEY = os.environ.get("FRED_API_KEY", "e2cb31396b55aa6b693a2e5d60c00faa")
 OUT_DIR = Path(__file__).parent.parent / "finance-hub" / "data"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-
-def fred_fetch(series_id: str, limit: int = 200, sort: str = "asc") -> list:
-    url = (
-        f"https://api.stlouisfed.org/fred/series/observations"
-        f"?series_id={series_id}&api_key={FRED_API_KEY}&file_type=json"
-        f"&sort_order={sort}&observation_start=2004-01-01&limit={limit}"
-    )
-    req = urllib.request.Request(
-        url,
-        headers={"User-Agent": "Mozilla/5.0 (compatible; MarketPhase/1.0)"},
-    )
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        body = json.loads(resp.read())
-    obs = body.get("observations", [])
-    return [
-        {"date": o["date"][:7] if len(o["date"]) > 7 else o["date"],
-         "value": float(o["value"])}
-        for o in obs
-        if o["value"] not in (".", "") and not math.isnan(float(o["value"] if o["value"] not in (".", "") else "nan") if o["value"] not in (".", "") else 0)
-    ]
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/124.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Referer": "https://fred.stlouisfed.org/",
+}
 
 
-def build_claims():
-    # IC4WSA: weekly, keep last 104 weeks — use full date (not month-truncated)
-    url = (
-        f"https://api.stlouisfed.org/fred/series/observations"
-        f"?series_id=IC4WSA&api_key={FRED_API_KEY}&file_type=json"
-        f"&sort_order=desc&limit=104"
-    )
-    req = urllib.request.Request(
-        url,
-        headers={"User-Agent": "Mozilla/5.0 (compatible; MarketPhase/1.0)"},
-    )
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        body = json.loads(resp.read())
+def fred_csv(series_id: str) -> list[dict]:
+    """Fetch FRED series as CSV — no API key required."""
+    url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
+    req = urllib.request.Request(url, headers=HEADERS)
+    with urllib.request.urlopen(req, timeout=25) as resp:
+        text = resp.read().decode("utf-8")
+    reader = csv.DictReader(io.StringIO(text))
+    rows = []
+    for row in reader:
+        try:
+            val = float(row["VALUE"])
+            if not math.isnan(val):
+                rows.append({"date": row["DATE"], "value": val})
+        except (ValueError, KeyError):
+            pass
+    return rows
 
-    data = [
-        {"date": o["date"], "value": float(o["value"])}
-        for o in body.get("observations", [])
-        if o["value"] not in (".", "")
-    ]
-    data.reverse()  # oldest first
 
+def build_claims() -> dict:
+    data = fred_csv("IC4WSA")
     if len(data) < 5:
-        raise ValueError("Insufficient claims data from FRED")
-
+        raise ValueError(f"Only {len(data)} IC4WSA rows — too few")
+    # Keep last 104 weeks
+    data = data[-104:]
     latest       = data[-1]["value"]
     previous     = data[-2]["value"]
     four_ago     = data[-5]["value"]
     is_improving = latest < four_ago
-
     return {
-        "data": data,
-        "latest": latest,
-        "previous": previous,
+        "data":         data,
+        "latest":       latest,
+        "previous":     previous,
         "fourWeeksAgo": four_ago,
-        "trend": "Improving" if is_improving else "Worsening",
-        "trendColor": "green" if is_improving else "red",
-        "floorStatus": (
+        "trend":        "Improving" if is_improving else "Worsening",
+        "trendColor":   "green"     if is_improving else "red",
+        "floorStatus":  (
             "Claims Decelerating — Floor Support ✅"
             if is_improving else
             "Claims Rising — Macro Risk ⚠"
@@ -81,28 +64,26 @@ def build_claims():
     }
 
 
-def analyse_cfnai(ma3_series, raw_series):
-    if not ma3_series:
-        return None
+def analyse_cfnai(ma3_series, raw_series) -> dict:
     latest = ma3_series[-1]
     v = latest["value"]
     if v > 0.20:
         signal, color, bullish = "Strong Expansion ↑", "green", True
     elif v > 0:
-        signal, color, bullish = "Expanding ↑", "green", True
+        signal, color, bullish = "Expanding ↑",        "green", True
     elif v > -0.70:
-        signal, color, bullish = "Below Trend ↓", "amber", False
+        signal, color, bullish = "Below Trend ↓",      "amber", False
     else:
-        signal, color, bullish = "Recession Risk ↓", "red", False
+        signal, color, bullish = "Recession Risk ↓",   "red",   False
     return {
         "ma3Series":     ma3_series,
         "rawSeries":     raw_series or [],
         "ma3Latest":     v,
-        "ma3LatestDate": latest["date"],
+        "ma3LatestDate": latest["date"][:7],
         "rawLatest":     raw_series[-1]["value"] if raw_series else None,
-        "rawLatestDate": raw_series[-1]["date"]  if raw_series else None,
-        "signal":  signal,
-        "color":   color,
+        "rawLatestDate": raw_series[-1]["date"][:7] if raw_series else None,
+        "signal":    signal,
+        "color":     color,
         "isBullish": bullish,
         "scored":    bullish,
         "source":    "FRED (CFNAI)",
@@ -110,42 +91,45 @@ def analyse_cfnai(ma3_series, raw_series):
     }
 
 
-def build_cfnai():
-    ma3_series = fred_fetch("CFNAIMA3")
-    raw_series = fred_fetch("CFNAI")
-    result = analyse_cfnai(ma3_series, raw_series)
-    if not result:
-        raise ValueError("No CFNAI data from FRED")
-    return result
+def build_cfnai() -> dict:
+    # Truncate dates to YYYY-MM for monthly series
+    ma3 = [{"date": r["date"][:7], "value": r["value"]} for r in fred_csv("CFNAIMA3")]
+    raw = [{"date": r["date"][:7], "value": r["value"]} for r in fred_csv("CFNAI")]
+    if not ma3:
+        raise ValueError("No CFNAIMA3 data")
+    return analyse_cfnai(ma3, raw)
 
 
 def main():
     errors = []
 
-    print("Fetching IC4WSA (claims)…")
+    print("Fetching IC4WSA (4-week MA initial claims)…")
     try:
         claims = build_claims()
         path = OUT_DIR / "claims.json"
         path.write_text(json.dumps(claims, separators=(",", ":")))
-        print(f"  ✅ {len(claims['data'])} weeks → {path}")
+        latest_date = claims["data"][-1]["date"]
+        print(f"  ✅ {len(claims['data'])} weeks, latest {latest_date} "
+              f"= {claims['latest']:,.0f}  ({claims['trend']}) → {path.name}")
     except Exception as e:
-        print(f"  ❌ Claims failed: {e}", file=sys.stderr)
+        print(f"  ❌ Failed: {e}", file=sys.stderr)
         errors.append(str(e))
 
-    print("Fetching CFNAI…")
+    print("Fetching CFNAI-MA3…")
     try:
         cfnai = build_cfnai()
         path = OUT_DIR / "cfnai.json"
         path.write_text(json.dumps(cfnai, separators=(",", ":")))
-        print(f"  ✅ CFNAI {cfnai['ma3LatestDate']} = {cfnai['ma3Latest']:.3f} ({cfnai['signal']}) → {path}")
+        print(f"  ✅ {cfnai['ma3LatestDate']} = {cfnai['ma3Latest']:.3f} "
+              f"({cfnai['signal']}) → {path.name}")
     except Exception as e:
-        print(f"  ❌ CFNAI failed: {e}", file=sys.stderr)
+        print(f"  ❌ Failed: {e}", file=sys.stderr)
         errors.append(str(e))
 
     if errors:
-        print(f"\n{len(errors)} error(s) — FRED data may be stale.", file=sys.stderr)
+        print(f"\n{len(errors)} error(s). FRED data unchanged.", file=sys.stderr)
         sys.exit(1)
-    print("\nDone.")
+    print("\nDone ✅")
 
 
 if __name__ == "__main__":
