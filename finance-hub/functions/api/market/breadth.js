@@ -1,7 +1,7 @@
 import { toMap, rolling200Array, rollingArray, withCache, yf, yfetch } from './_shared.js';
 
 export const onRequestGet = async (ctx) => {
-  return withCache(ctx, 'breadth-v2', 21600, async () => {
+  return withCache(ctx, 'breadth-v3', 21600, async () => {
     const [spyData, rspData] = await Promise.all([
       yfetch(yf('SPY', '1d', '2y')),
       yfetch(yf('RSP', '1d', '2y')),
