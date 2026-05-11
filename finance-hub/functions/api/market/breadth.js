@@ -1,6 +1,8 @@
 import { toMap, rolling200Array, rollingArray, withCache, yf, yfetch } from './_shared.js';
 
 export const onRequestGet = async (ctx) => {
+  // DIAGNOSTIC — remove after confirming new code executes
+  return new Response(JSON.stringify({version:'breadth-v3-diag',ok:true}),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
   return withCache(ctx, 'breadth-v3', 21600, async () => {
     const [spyData, rspData] = await Promise.all([
       yfetch(yf('SPY', '1d', '2y')),
