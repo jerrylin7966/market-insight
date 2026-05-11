@@ -20,19 +20,49 @@ HEADERS = {
 }
 
 
+FRED_API_KEY = os.environ.get("FRED_API_KEY", "e2cb31396b55aa6b693a2e5d60c00faa")
+
+
 def fred_csv(series_id: str) -> list[dict]:
-    """Fetch FRED series as CSV — no API key required."""
-    url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
-    req = urllib.request.Request(url, headers=HEADERS)
+    """Fetch FRED series — tries CSV endpoint first, falls back to JSON API."""
+    # Try 1: public CSV (no API key)
+    csv_url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
+    try:
+        req = urllib.request.Request(csv_url, headers=HEADERS)
+        with urllib.request.urlopen(req, timeout=25) as resp:
+            text = resp.read().decode("utf-8")
+        print(f"    [{series_id}] CSV ok ({len(text)} bytes)", file=sys.stderr)
+        reader = csv.DictReader(io.StringIO(text))
+        rows = []
+        for row in reader:
+            try:
+                val = float(row["VALUE"])
+                if not math.isnan(val):
+                    rows.append({"date": row["DATE"], "value": val})
+            except (ValueError, KeyError):
+                pass
+        if rows:
+            return rows
+        print(f"    [{series_id}] CSV returned 0 rows, trying API…", file=sys.stderr)
+    except Exception as e:
+        print(f"    [{series_id}] CSV failed ({e}), trying JSON API…", file=sys.stderr)
+
+    # Try 2: JSON API with API key
+    api_url = (
+        f"https://api.stlouisfed.org/fred/series/observations"
+        f"?series_id={series_id}&api_key={FRED_API_KEY}&file_type=json"
+        f"&sort_order=asc&observation_start=2004-01-01"
+    )
+    req = urllib.request.Request(api_url, headers=HEADERS)
     with urllib.request.urlopen(req, timeout=25) as resp:
-        text = resp.read().decode("utf-8")
-    reader = csv.DictReader(io.StringIO(text))
+        body = json.loads(resp.read())
+    print(f"    [{series_id}] JSON API ok", file=sys.stderr)
     rows = []
-    for row in reader:
+    for o in body.get("observations", []):
         try:
-            val = float(row["VALUE"])
+            val = float(o["value"])
             if not math.isnan(val):
-                rows.append({"date": row["DATE"], "value": val})
+                rows.append({"date": o["date"], "value": val})
         except (ValueError, KeyError):
             pass
     return rows

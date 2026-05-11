@@ -26,6 +26,7 @@ jobs:
           python-version: '3.11'
 
       - name: Refresh FRED data (claims + CFNAI)
+        continue-on-error: true
         run: python scripts/refresh_fred_data.py
 
       - name: Run digest generator
