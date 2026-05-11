@@ -67,4 +67,5 @@ jobs:
           git add finance-hub/daily/ finance-hub/data/
           # Only commit if there are actual changes
           git diff --cached --quiet || git commit -m "chore: daily market digest + FRED data $(date +%Y-%m-%d)"
+          git pull --rebase origin main
           git push

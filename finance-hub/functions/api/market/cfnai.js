@@ -52,8 +52,6 @@ function computeMA3(rawSeries) {
 }
 
 export const onRequestGet = async (ctx) => {
-  // DIAGNOSTIC v6 — remove after confirming new code executes
-  return new Response(JSON.stringify({version:'cfnai-v6-diagnostic',ok:true}),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
   return withCache(ctx, 'cfnai-v6', 21600, async () => {
     // Fetch raw CFNAI (always needed). Try CFNAIMA3 too — fall back to computing MA3 manually.
     const rawText = await fetchCSV('CFNAI');
