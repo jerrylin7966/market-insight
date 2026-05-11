@@ -678,8 +678,8 @@ async function loadMarketCharts(){
     fetch('/api/market/vix').then(r=>r.json()),
     fetch('/api/market/heatmap').then(r=>r.json()),
     fetch('/api/market/breadth').then(r=>r.json()),
-    fetch('/api/market/claims').then(r=>r.json()),
-    fetch('/api/market/cfnai').then(r=>r.json()),
+    fetch('/data/claims.json').then(r=>r.json()),
+    fetch('/data/cfnai.json').then(r=>r.json()),
   ]);
 
   if(signalsRes.status==='fulfilled'&&signalsRes.value?.scoreBreakdown){
