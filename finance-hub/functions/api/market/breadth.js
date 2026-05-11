@@ -1,7 +1,7 @@
-import { toMap, rolling200Array, withCache, yf, yfetch } from './_shared.js';
+import { toMap, rolling200Array, rollingArray, withCache, yf, yfetch } from './_shared.js';
 
 export const onRequestGet = async (ctx) => {
-  return withCache(ctx, 'breadth', 21600, async () => {
+  return withCache(ctx, 'breadth-v2', 21600, async () => {
     const [spyData, rspData] = await Promise.all([
       yfetch(yf('SPY', '1d', '2y')),
       yfetch(yf('RSP', '1d', '2y')),
@@ -16,12 +16,14 @@ export const onRequestGet = async (ctx) => {
 
     const priceValues = dates.map(d => spyMap.get(d));
     const priceSma    = rolling200Array(priceValues);
+    const priceSma50  = rollingArray(priceValues, 50);
     const currentPrice    = priceValues[priceValues.length - 1];
     const currentPriceSma = priceSma[priceSma.length - 1];
     const priceHealth = currentPriceSma != null && currentPrice > currentPriceSma ? 'Bullish' : 'Bearish';
 
     const ratioValues = dates.map(d => rspMap.get(d) / spyMap.get(d));
     const ratioSma    = rolling200Array(ratioValues);
+    const ratioSma50  = rollingArray(ratioValues, 50);
     const currentAdValue = ratioValues[ratioValues.length - 1];
     const currentAdSma   = ratioSma[ratioSma.length - 1];
     const internalHealth = currentAdSma != null && currentAdValue > currentAdSma ? 'Strong' : 'Weak';
@@ -38,7 +40,9 @@ export const onRequestGet = async (ctx) => {
       adLine:       dates.map((d, i) => ({ date: d, value: Math.round(ratioValues[i] * 100000) / 100000 })),
       prices:       dates.map((d, i) => ({ date: d, value: priceValues[i] })),
       adLineSma200: dates.map((d, i) => ({ date: d, value: ratioSma[i] })),
+      adLineSma50:  dates.map((d, i) => ({ date: d, value: ratioSma50[i] })),
       priceSma200:  dates.map((d, i) => ({ date: d, value: priceSma[i] })),
+      priceSma50:   dates.map((d, i) => ({ date: d, value: priceSma50[i] })),
       currentPrice, currentAdValue,
       metrics: { lastPrice: currentPrice, lastAD: currentAdValue },
     };

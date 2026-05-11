@@ -15,16 +15,18 @@ export function rolling200(vals) {
   return vals.slice(-200).reduce((a, b) => a + b, 0) / 200;
 }
 
-export function rolling200Array(vals) {
+export function rollingArray(vals, period) {
   const sma = [];
   const win = [];
   for (const v of vals) {
     win.push(v);
-    if (win.length > 200) win.shift();
-    sma.push(win.length === 200 ? Math.round(win.reduce((a, b) => a + b, 0) / 200 * 10000) / 10000 : null);
+    if (win.length > period) win.shift();
+    sma.push(win.length === period ? Math.round(win.reduce((a, b) => a + b, 0) / period * 10000) / 10000 : null);
   }
   return sma;
 }
+
+export function rolling200Array(vals) { return rollingArray(vals, 200); }
 
 export function jsonResponse(data, ttlSeconds = 21600) {
   return new Response(JSON.stringify(data), {

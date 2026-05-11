@@ -721,12 +721,14 @@ async function loadMarketCharts(){
     if(breadthPriceChart)breadthPriceChart.destroy();
     breadthPriceChart=new Chart(ctxP,{type:'line',data:{labels:b.prices.map(r=>r.date),datasets:[
       {label:'SPY',        data:b.prices.map(r=>r.value),borderColor:'#5b9fe8',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(91,159,232,0.05)',tension:0.3,spanGaps:true},
+      {label:'50-day SMA', data:(b.priceSma50||[]).map(r=>r.value),borderColor:'#a78bfa',borderWidth:1.5,borderDash:[3,3],pointRadius:0,tension:0.3,spanGaps:false},
       {label:'200-day SMA',data:b.priceSma200.map(r=>r.value),borderColor:'#e8a84a',borderWidth:1.5,borderDash:[6,3],pointRadius:0,tension:0.3,spanGaps:false},
     ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{..._bt,mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': $'+Number(c.parsed.y).toFixed(2)}}},scales:{..._bs,y:{..._bs.y,ticks:{..._bs.y.ticks,callback:v=>'$'+Number(v).toFixed(0)}}}}});
     const ctxA=document.getElementById('breadth-ad-chart').getContext('2d');
     if(breadthAdChart)breadthAdChart.destroy();
     breadthAdChart=new Chart(ctxA,{type:'line',data:{labels:b.adLine.map(r=>r.date),datasets:[
       {label:'RSP/SPY Ratio',data:b.adLine.map(r=>r.value),borderColor:'#4eca8b',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(78,202,139,0.05)',tension:0.3,spanGaps:true},
+      {label:'50-day SMA',  data:(b.adLineSma50||[]).map(r=>r.value),borderColor:'#a78bfa',borderWidth:1.5,borderDash:[3,3],pointRadius:0,tension:0.3,spanGaps:false},
       {label:'200-day SMA', data:b.adLineSma200.map(r=>r.value),borderColor:'#e8a84a',borderWidth:1.5,borderDash:[6,3],pointRadius:0,tension:0.3,spanGaps:false},
     ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{..._bt,mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': '+Number(c.parsed.y).toFixed(4)}}},scales:{..._bs,y:{..._bs.y,ticks:{..._bs.y.ticks,callback:v=>Number(v).toFixed(3)}}}}});
   }
