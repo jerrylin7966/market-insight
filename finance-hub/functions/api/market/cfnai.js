@@ -1,8 +1,22 @@
 import { withCache, jsonResponse } from './_shared.js';
 
-// Replaced OECD CLI (blocked by IP) with Chicago Fed CFNAI
-// CFNAI-MA3 > 0    = above-trend growth → bullish (+1 score)
-// CFNAI-MA3 < -0.70 = historical recession threshold → risk-off
+const HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'Referer': 'https://fred.stlouisfed.org/',
+};
+
+function parseCSV(text, truncateToMonth = false) {
+  const lines = text.trim().split('\n');
+  return lines.slice(1)
+    .map(line => {
+      const [date, val] = line.split(',');
+      const value = parseFloat(val);
+      if (!date || isNaN(value)) return null;
+      return { date: truncateToMonth ? date.trim().slice(0, 7) : date.trim(), value };
+    })
+    .filter(Boolean);
+}
 
 function analyseCfnai(ma3Series, rawSeries) {
   if (!ma3Series?.length) return null;
@@ -22,35 +36,24 @@ function analyseCfnai(ma3Series, rawSeries) {
   };
 }
 
-async function fredFetch(url) {
-  // Try twice — transient FRED failures are common
-  for (let attempt = 0; attempt < 2; attempt++) {
-    try {
-      const r = await fetch(url, { signal: AbortSignal.timeout(12000) });
-      if (r.ok) return r.json();
-    } catch { /* retry */ }
-  }
-  return null;
+async function fetchCSV(seriesId) {
+  const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${seriesId}`;
+  const r = await fetch(url, { headers: HEADERS, signal: AbortSignal.timeout(15000) });
+  if (!r.ok) throw new Error(`FRED CSV ${seriesId} ${r.status}`);
+  return r.text();
 }
 
 export const onRequestGet = async (ctx) => {
-  return withCache(ctx, 'cfnai-v3', 21600, async () => {
-    const fredKey = ctx.env.FRED_API_KEY;
-    if (!fredKey) return { error: 'No FRED API key', isBullish: false, scored: false };
-
-    const base = `https://api.stlouisfed.org/fred/series/observations?api_key=${fredKey}&file_type=json&sort_order=asc&observation_start=2004-01-01`;
-    const [ma3Body, rawBody] = await Promise.all([
-      fredFetch(`${base}&series_id=CFNAIMA3`),
-      fredFetch(`${base}&series_id=CFNAI`),
+  return withCache(ctx, 'cfnai-v4', 21600, async () => {
+    const [ma3Text, rawText] = await Promise.all([
+      fetchCSV('CFNAIMA3'),
+      fetchCSV('CFNAI'),
     ]);
 
-    const parseSeries = body => (body?.observations ?? [])
-      .map(o => ({ date: o.date.slice(0, 7), value: parseFloat(o.value) }))
-      .filter(p => !isNaN(p.value));
+    const ma3Series = parseCSV(ma3Text, true);
+    const rawSeries = parseCSV(rawText, true);
 
-    const ma3Series = parseSeries(ma3Body);
-    const rawSeries = parseSeries(rawBody);
-    if (!ma3Series.length) return { error: 'No CFNAI data from FRED', isBullish: false, scored: false };
+    if (!ma3Series.length) throw new Error('No CFNAI data from FRED CSV');
 
     const result = analyseCfnai(ma3Series, rawSeries);
     return { ...result, scored: result.isBullish, source: 'FRED (CFNAI)', fetchedAt: new Date().toISOString() };
