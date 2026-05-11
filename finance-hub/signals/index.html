@@ -673,13 +673,13 @@ const _bt={backgroundColor:'#1b1e1b',borderColor:'rgba(255,255,255,0.1)',borderW
 // ── main data load ────────────────────────────────────────────────────────
 async function loadMarketCharts(){
   const [signalsRes,ratioRes,vixRes,heatmapRes,breadthRes,claimsRes,cliRes]=await Promise.allSettled([
-    fetch('https://main.market-insight-eht.pages.dev/api/market/signals').then(r=>r.json()),
-    fetch('https://main.market-insight-eht.pages.dev/api/market/ratio').then(r=>r.json()),
-    fetch('https://main.market-insight-eht.pages.dev/api/market/vix').then(r=>r.json()),
-    fetch('https://main.market-insight-eht.pages.dev/api/market/heatmap').then(r=>r.json()),
-    fetch('https://main.market-insight-eht.pages.dev/api/market/breadth').then(r=>r.json()),
-    fetch('https://main.market-insight-eht.pages.dev/api/market/claims').then(r=>r.json()),
-    fetch('https://main.market-insight-eht.pages.dev/api/market/cfnai').then(r=>r.json()),
+    fetch('/api/market/signals').then(r=>r.json()),
+    fetch('/api/market/ratio').then(r=>r.json()),
+    fetch('/api/market/vix').then(r=>r.json()),
+    fetch('/api/market/heatmap').then(r=>r.json()),
+    fetch('/api/market/breadth').then(r=>r.json()),
+    fetch('/api/market/claims').then(r=>r.json()),
+    fetch('/api/market/cfnai').then(r=>r.json()),
   ]);
 
   if(signalsRes.status==='fulfilled'&&signalsRes.value?.scoreBreakdown){
@@ -847,11 +847,11 @@ async function initRatioChart(){
 
 async function loadRatioData(mode){
   if(mode==='hourly'&&!hourlyRatioData){
-    const res=await fetch('https://main.market-insight-eht.pages.dev/api/market/ratio-hourly');
+    const res=await fetch('/api/market/ratio-hourly');
     hourlyRatioData=await res.json();
   }
   if(mode==='daily'&&!dailyRatioData){
-    const res=await fetch('https://main.market-insight-eht.pages.dev/api/market/ratio');
+    const res=await fetch('/api/market/ratio');
     dailyRatioData=await res.json();
   }
   return mode==='hourly'?hourlyRatioData:dailyRatioData;
@@ -894,7 +894,7 @@ async function triggerWeeklyEmail(){
   const btn=document.getElementById('btn-send-email');
   btn.textContent='Sending...';btn.disabled=true;
   try{
-    const res=await fetch('https://main.market-insight-eht.pages.dev/api/send-weekly-email',{method:'POST'});
+    const res=await fetch('/api/send-weekly-email',{method:'POST'});
     const data=await res.json();
     btn.textContent=data.ok?'✓ Sent':'✗ Failed';
     setTimeout(()=>{btn.textContent=t('btn-send-email');},3000);
