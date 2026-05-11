@@ -43,17 +43,31 @@ async function fetchCSV(seriesId) {
   return r.text();
 }
 
+function computeMA3(rawSeries) {
+  // Compute 3-month moving average from raw CFNAI when CFNAIMA3 series unavailable
+  return rawSeries.slice(2).map((_, i) => ({
+    date:  rawSeries[i + 2].date,
+    value: +((rawSeries[i].value + rawSeries[i+1].value + rawSeries[i+2].value) / 3).toFixed(4),
+  }));
+}
+
 export const onRequestGet = async (ctx) => {
-  return withCache(ctx, 'cfnai-v4', 21600, async () => {
-    const [ma3Text, rawText] = await Promise.all([
-      fetchCSV('CFNAIMA3'),
-      fetchCSV('CFNAI'),
-    ]);
-
-    const ma3Series = parseCSV(ma3Text, true);
+  return withCache(ctx, 'cfnai-v5', 21600, async () => {
+    // Fetch raw CFNAI (always needed). Try CFNAIMA3 too — fall back to computing MA3 manually.
+    const rawText = await fetchCSV('CFNAI');
     const rawSeries = parseCSV(rawText, true);
+    if (!rawSeries.length) throw new Error('No CFNAI raw data from FRED CSV v5');
 
-    if (!ma3Series.length) throw new Error('No CFNAI data from FRED CSV');
+    let ma3Series;
+    try {
+      const ma3Text = await fetchCSV('CFNAIMA3');
+      const parsed = parseCSV(ma3Text, true);
+      ma3Series = parsed.length ? parsed : computeMA3(rawSeries);
+    } catch {
+      ma3Series = computeMA3(rawSeries);
+    }
+
+    if (!ma3Series.length) throw new Error('Could not build CFNAI MA3 series');
 
     const result = analyseCfnai(ma3Series, rawSeries);
     return { ...result, scored: result.isBullish, source: 'FRED (CFNAI)', fetchedAt: new Date().toISOString() };
