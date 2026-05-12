@@ -95,7 +95,7 @@ Output a JSON object with exactly these six keys:
    - No cues, no sponsor — pure spoken words only
 
 4. "chapters": Array of chapter objects for the video description timestamps. Format:
-   [{{"time": "0:00", "label": "The Hook"}}, {{"time": "0:45", "label": "Topic Name"}}, ...]
+   [{{"time": "0:00", "label": "Intro"}}, {{"time": "0:45", "label": "Topic Name"}}, ...]
    - 6-8 chapters covering the full video arc
    - Labels are short (3-5 words), punchy, SEO-friendly
 
