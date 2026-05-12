@@ -15,12 +15,19 @@
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans)}
 #app{opacity:0;transition:opacity 0.3s}
 #app.ready{opacity:1}
-header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;border-bottom:0.5px solid var(--border)}
-.logo{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--accent);letter-spacing:0.08em}
-.header-right{display:flex;align-items:center;gap:10px}
-.btn-nav{background:var(--bg3);border:0.5px solid var(--border2);color:var(--muted);border-radius:8px;font-size:12px;padding:7px 14px;cursor:pointer;font-family:var(--sans);transition:all 0.15s}
-.btn-nav:hover{border-color:var(--accent);color:var(--accent)}
+header{background:#0f172a;box-shadow:0 1px 3px rgba(0,0,0,0.4)}
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;max-width:1280px;margin:0 auto;height:60px}
+.site-logo{font-size:20px;font-weight:700;color:#fff;text-decoration:none;letter-spacing:-0.5px;font-family:var(--sans)}
+.site-logo span{color:#60a5fa}
+.site-nav-links{display:flex;gap:1.5rem;align-items:center}
+.site-nav-links a{color:rgba(255,255,255,0.75);font-size:14px;font-weight:500;text-decoration:none;font-family:var(--sans);transition:color 0.15s}
+.site-nav-links a:hover{color:#fff}
+.site-nav-links a.nav-cta{background:#1d4ed8;color:#fff!important;padding:7px 16px;border-radius:6px;font-size:13px}
+.nav-right{display:flex;align-items:center;gap:10px}
+.btn-nav{background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);border-radius:8px;font-size:12px;padding:7px 14px;cursor:pointer;font-family:var(--sans);transition:all 0.15s}
+.btn-nav:hover{border-color:#60a5fa;color:#60a5fa}
 .btn-nav:disabled{opacity:0.4;cursor:default}
+@media(max-width:768px){.site-nav-links{display:none}}
 main{padding:2rem;max-width:1280px;margin:0 auto}
 .chart-range{display:flex;gap:4px}
 .range-btn{background:none;border:0.5px solid transparent;color:var(--muted);border-radius:6px;font-size:11px;padding:4px 8px;cursor:pointer;font-family:var(--mono)}
@@ -74,10 +81,21 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
     &nbsp;·&nbsp; <a href="/privacy.html" style="color:#92400e">Privacy</a>
   </div>
   <header>
-    <div class="logo">MARKET TIMING</div>
-    <div class="header-right">
-      <button class="btn-nav" id="lang-btn" onclick="toggleLang()">繁中</button>
-    </div>
+    <nav class="site-nav">
+      <a href="/" class="site-logo">Market<span>Phase</span></a>
+      <div class="site-nav-links">
+        <a href="/">Home</a>
+        <a href="/signals/">Live Dashboard</a>
+        <a href="/guides/">Guides</a>
+        <a href="/daily/">Daily Digest</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+      </div>
+      <div class="nav-right">
+        <button class="btn-nav" id="lang-btn" onclick="toggleLang()">繁中</button>
+        <a href="/signals/" class="btn-nav nav-cta" style="text-decoration:none">→ Live Signals</a>
+      </div>
+    </nav>
   </header>
   <main>
 
