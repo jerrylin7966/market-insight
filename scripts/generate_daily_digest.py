@@ -143,11 +143,20 @@ Be direct and informative. No fluff. Focus on what moves markets."""
         result = json.loads(resp.read())
 
     raw_text = result["content"][0]["text"].strip()
-    # Extract JSON block if wrapped in markdown
+    # Strip markdown code fences if present
     json_match = re.search(r"```(?:json)?\s*([\s\S]+?)```", raw_text)
     if json_match:
         raw_text = json_match.group(1).strip()
-    return json.loads(raw_text)
+    # Fallback: extract first { ... } block in case of extra surrounding text
+    brace_match = re.search(r'(\{[\s\S]+\})', raw_text)
+    if brace_match:
+        raw_text = brace_match.group(1).strip()
+    try:
+        return json.loads(raw_text)
+    except json.JSONDecodeError:
+        # Last resort: remove trailing commas before } or ] (common Claude quirk)
+        cleaned = re.sub(r',\s*([}\]])', r'\1', raw_text)
+        return json.loads(cleaned)
 
 
 def render_html(digest: dict, today: date, headlines: list[dict]) -> str:
