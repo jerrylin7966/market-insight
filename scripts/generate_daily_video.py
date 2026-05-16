@@ -67,6 +67,95 @@ def read_today_digest() -> str:
 
 # ── Claude: generate script + slide data ─────────────────────────────────────
 
+def call_claude_topic(topic: str, today_display: str) -> dict:
+    """Generate a video script on a specific topic (on-demand, not from digest)."""
+    if not ANTHROPIC_API_KEY:
+        raise ValueError("ANTHROPIC_API_KEY not set")
+
+    prompt = f"""You are a YouTube scriptwriter for "Tech Me Home", a financial education channel by MarketPhase.
+Today is {today_display}. The requested video topic is: {topic}
+
+Output a JSON object with exactly these six keys:
+
+1. "title": A catchy YouTube title (max 90 characters) specific to this topic.
+   Hook-driven — make viewers feel they MUST click.
+   Examples: "The Hidden Truth About {topic}", "Why {topic} Changes Everything"
+   No hashtags, no emojis.
+
+2. "short_title": A YouTube Shorts title (max 60 characters). Punchy, no hashtags.
+
+3. "short_hook": A 45-second spoken script (≈100 words) for a YouTube Short.
+   Open with the single most shocking fact about this topic.
+   One clear ELI5 explanation in the middle.
+   End with "Follow for daily market breakdowns". Pure spoken words only.
+
+4. "chapters": Array of chapter objects.
+   [{{"time": "0:00", "label": "Intro"}}, {{"time": "0:45", "label": "Topic Name"}}, ...]
+   6-8 chapters, labels are 3-5 words, SEO-friendly.
+
+5. "tags": Array of 8-10 tags (no # prefix). Always include "finance", "markets", "investing". Add topic-specific tags.
+
+6. "narration": A full ~8-10 minute spoken script. Rules:
+   - INTRO: High-stakes hook (0:00-1:00). After hook: "Welcome back to Tech Me Home, Market Phase daily news!"
+   - TONE: Urgent, cinematic, educational. Slightly cynical about the Federal Reserve.
+   - SENTENCES: Short, punchy, conversational.
+   - CUES: Include [Visual:], [B-Roll:], [Sound effect:], [Graphic:] cues throughout.
+   - ELI5: Explain one complex concept with a simple analogy.
+   - SPONSOR: At ~2 min, 30-sec [SPONSOR] pitch framed as "protect yourself".
+   - OUTRO: Slightly optimistic. End with: "None of this is financial advice, purely for entertainment, always do your own research..."
+   - LENGTH: ~900 words.
+
+7. "slides": Array of 8-10 slide objects:
+   {{
+     "title": "SHORT SLIDE TITLE IN CAPS",
+     "bullets": ["Bullet 1", "Bullet 2", "Bullet 3"],
+     "clip_tag": "tag_from_library_or_null",
+     "pexels_keyword": "fallback image search term",
+     "narration_text": "Exact spoken words for this slide"
+   }}
+   clip_tag options: stock_bull, stock_crash, federal_reserve, wall_street, inflation, gold,
+   crypto, oil_energy, recession, interest_rates, global_economy, tech_stocks, jobs, bonds,
+   consumer, earnings, nyse_open, dollar, bear_market, data_screens, housing_market, banking,
+   china_trade, us_debt, ai_stocks, commodities, retail_earnings, ipo, supply_chain, mergers,
+   election_market, healthcare_costs.
+   Use null if none fit — pexels_keyword will fetch a royalty-free image instead.
+   Every word from narration must appear in exactly one slide's narration_text.
+
+Return ONLY valid JSON. No markdown, no explanation."""
+
+    payload = json.dumps({{
+        "model": "claude-haiku-4-5-20251001",
+        "max_tokens": 8000,
+        "messages": [{{"role": "user", "content": prompt}}],
+    }}).encode()
+
+    req = urllib.request.Request(
+        "https://api.anthropic.com/v1/messages",
+        data=payload,
+        headers={{
+            "x-api-key": ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+        }},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=60) as resp:
+        result = json.loads(resp.read())
+
+    raw = result["content"][0]["text"].strip()
+    raw = re.sub(r'^```(?:json)?\s*', '', raw)
+    raw = re.sub(r'\s*```$', '', raw)
+    # Fallback: extract first {{ ... }} block
+    brace_match = re.search(r'(\{{[\s\S]+\}})', raw)
+    if brace_match:
+        raw = brace_match.group(1).strip()
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        cleaned = re.sub(r',\s*([}}\]])', r'\1', raw)
+        return json.loads(cleaned)
+
+
 def call_claude(digest_summary: str, today_display: str) -> dict:
     """Returns dict with 'narration' (full script) and 'slides' (list of slide dicts)."""
     if not ANTHROPIC_API_KEY:
@@ -1142,18 +1231,28 @@ def fetch_and_save_analytics(repo_root: Path):
 def main():
     today = date.today()
     today_display = today.strftime("%A, %B %-d, %Y")
-    print(f"=== Daily Video Generator — {today_display} ===", file=sys.stderr)
+
+    # On-demand topic mode: if TOPIC env var is set, generate a topic video
+    TOPIC = os.environ.get("TOPIC", "").strip()
+
+    if TOPIC:
+        print(f"=== On-Demand Topic Video — {today_display} ===", file=sys.stderr)
+        print(f"    Topic: {TOPIC}", file=sys.stderr)
+    else:
+        print(f"=== Daily Video Generator — {today_display} ===", file=sys.stderr)
 
     ensure_deps()
     TMP_DIR.mkdir(parents=True, exist_ok=True)
 
-    # 1. Read digest
-    print("Reading digest…", file=sys.stderr)
-    digest_summary = read_today_digest()
-
     # 2. Generate script + slide data
     print("Generating script + slides with Claude…", file=sys.stderr)
-    data = call_claude(digest_summary, today_display)
+    if TOPIC:
+        data = call_claude_topic(TOPIC, today_display)
+    else:
+        # 1. Read digest
+        print("Reading digest…", file=sys.stderr)
+        digest_summary = read_today_digest()
+        data = call_claude(digest_summary, today_display)
     narration_script = data["narration"]
     slides_data      = data["slides"]
     video_title  = data.get("title",       f"Market Update {today.strftime('%b %d, %Y')}").strip()
