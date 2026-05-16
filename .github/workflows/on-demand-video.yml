@@ -4,9 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       topic:
-        description: 'Video topic (e.g. "Trump tariffs impact on markets")'
-        required: true
+        description: 'Topic for Claude to write a script about (e.g. "Trump tariffs impact on markets"). Leave blank if using script_file.'
+        required: false
         type: string
+        default: ''
+      script_file:
+        description: 'Path to a pre-written script file in the repo (e.g. "scripts/custom_narration.txt"). Takes priority over topic.'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   generate:
@@ -26,6 +32,7 @@ jobs:
       - name: Run on-demand video generator
         env:
           TOPIC: ${{ github.event.inputs.topic }}
+          SCRIPT_FILE: ${{ github.event.inputs.script_file }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}

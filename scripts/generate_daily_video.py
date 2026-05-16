@@ -156,6 +156,86 @@ Return ONLY valid JSON. No markdown, no explanation."""
         return json.loads(cleaned)
 
 
+def call_claude_from_script(narration: str, today_display: str) -> dict:
+    """Generate metadata + slides from a pre-written narration script (verbatim)."""
+    if not ANTHROPIC_API_KEY:
+        raise ValueError("ANTHROPIC_API_KEY not set")
+
+    prompt = f"""You are a YouTube producer for "Tech Me Home", a financial education channel by MarketPhase.
+Today is {today_display}. A pre-written narration script has been provided below.
+Your job is to generate the video metadata and slide breakdown — do NOT rewrite the narration.
+
+PRE-WRITTEN NARRATION SCRIPT:
+\"\"\"
+{narration}
+\"\"\"
+
+Output a JSON object with exactly these keys:
+
+1. "title": A catchy YouTube title (max 90 characters) derived from this script. Hook-driven. No hashtags, no emojis.
+
+2. "short_title": A YouTube Shorts title (max 60 characters). Punchy, no hashtags.
+
+3. "short_hook": A 45-second spoken script (≈100 words) for a YouTube Short. Summarize the single most shocking point from the script. End with "Follow for daily market breakdowns". Pure spoken words only.
+
+4. "chapters": Array of chapter objects matching the script's structure.
+   [{{"time": "0:00", "label": "Intro"}}, {{"time": "0:45", "label": "Label Here"}}, ...]
+   6-8 chapters, labels are 3-5 words, SEO-friendly.
+
+5. "tags": Array of 8-10 tags (no # prefix). Always include "finance", "markets", "investing". Add topic-specific tags from the script.
+
+6. "narration": Copy the ENTIRE pre-written narration script here VERBATIM — do not change a single word.
+
+7. "slides": Array of 8-10 slide objects aligned to sections of the narration:
+   {{
+     "title": "SHORT SLIDE TITLE IN CAPS",
+     "bullets": ["Bullet 1", "Bullet 2", "Bullet 3"],
+     "clip_tag": "tag_from_library_or_null",
+     "pexels_keyword": "fallback image search term",
+     "narration_text": "Exact portion of the narration for this slide"
+   }}
+   clip_tag options: stock_bull, stock_crash, federal_reserve, wall_street, inflation, gold,
+   crypto, oil_energy, recession, interest_rates, global_economy, tech_stocks, jobs, bonds,
+   consumer, earnings, nyse_open, dollar, bear_market, data_screens, housing_market, banking,
+   china_trade, us_debt, ai_stocks, commodities, retail_earnings, ipo, supply_chain, mergers,
+   election_market, healthcare_costs.
+   Use null if none fit — pexels_keyword will fetch a royalty-free image.
+   Every word from the narration must appear in exactly one slide's narration_text.
+
+Return ONLY valid JSON. No markdown, no explanation."""
+
+    payload = json.dumps({
+        "model": "claude-haiku-4-5-20251001",
+        "max_tokens": 8000,
+        "messages": [{"role": "user", "content": prompt}],
+    }).encode()
+
+    req = urllib.request.Request(
+        "https://api.anthropic.com/v1/messages",
+        data=payload,
+        headers={
+            "x-api-key": ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+        },
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=90) as resp:
+        result = json.loads(resp.read())
+
+    raw = result["content"][0]["text"].strip()
+    raw = re.sub(r'^```(?:json)?\s*', '', raw)
+    raw = re.sub(r'\s*```$', '', raw)
+    brace_match = re.search(r'(\{[\s\S]+\})', raw)
+    if brace_match:
+        raw = brace_match.group(1).strip()
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        cleaned = re.sub(r',\s*([}\]])', r'\1', raw)
+        return json.loads(cleaned)
+
+
 def call_claude(digest_summary: str, today_display: str) -> dict:
     """Returns dict with 'narration' (full script) and 'slides' (list of slide dicts)."""
     if not ANTHROPIC_API_KEY:
@@ -1232,10 +1312,14 @@ def main():
     today = date.today()
     today_display = today.strftime("%A, %B %-d, %Y")
 
-    # On-demand topic mode: if TOPIC env var is set, generate a topic video
+    # Mode detection: SCRIPT_FILE > TOPIC > daily digest
+    SCRIPT_FILE = os.environ.get("SCRIPT_FILE", "").strip()
     TOPIC = os.environ.get("TOPIC", "").strip()
 
-    if TOPIC:
+    if SCRIPT_FILE:
+        print(f"=== Custom Script Video — {today_display} ===", file=sys.stderr)
+        print(f"    Script: {SCRIPT_FILE}", file=sys.stderr)
+    elif TOPIC:
         print(f"=== On-Demand Topic Video — {today_display} ===", file=sys.stderr)
         print(f"    Topic: {TOPIC}", file=sys.stderr)
     else:
@@ -1244,12 +1328,20 @@ def main():
     ensure_deps()
     TMP_DIR.mkdir(parents=True, exist_ok=True)
 
-    # 2. Generate script + slide data
+    # Generate script + slide data
     print("Generating script + slides with Claude…", file=sys.stderr)
-    if TOPIC:
+    if SCRIPT_FILE:
+        script_path = Path(SCRIPT_FILE)
+        if not script_path.exists():
+            print(f"ERROR: Script file not found: {SCRIPT_FILE}", file=sys.stderr)
+            sys.exit(1)
+        custom_narration = script_path.read_text(encoding="utf-8").strip()
+        print(f"  Loaded {len(custom_narration.split())} words from {SCRIPT_FILE}", file=sys.stderr)
+        data = call_claude_from_script(custom_narration, today_display)
+    elif TOPIC:
         data = call_claude_topic(TOPIC, today_display)
     else:
-        # 1. Read digest
+        # Daily digest mode
         print("Reading digest…", file=sys.stderr)
         digest_summary = read_today_digest()
         data = call_claude(digest_summary, today_display)
