@@ -4,12 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       topic:
-        description: 'Topic for Claude to write a script about (e.g. "Trump tariffs impact on markets"). Leave blank if using script_file.'
+        description: 'Topic for Claude to write (e.g. "Trump tariffs"). Leave blank if using script_file.'
         required: false
         type: string
         default: ''
       script_file:
-        description: 'Path to a pre-written script file in the repo (e.g. "scripts/custom_narration.txt"). Takes priority over topic.'
+        description: 'File path (e.g. scripts/custom_narration.txt) OR paste your full script here directly. Takes priority over topic.'
         required: false
         type: string
         default: ''

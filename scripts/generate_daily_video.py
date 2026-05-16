@@ -1331,12 +1331,20 @@ def main():
     # Generate script + slide data
     print("Generating script + slides with Claude…", file=sys.stderr)
     if SCRIPT_FILE:
-        script_path = Path(SCRIPT_FILE)
-        if not script_path.exists():
-            print(f"ERROR: Script file not found: {SCRIPT_FILE}", file=sys.stderr)
-            sys.exit(1)
-        custom_narration = script_path.read_text(encoding="utf-8").strip()
-        print(f"  Loaded {len(custom_narration.split())} words from {SCRIPT_FILE}", file=sys.stderr)
+        # If SCRIPT_FILE looks like a path (short, no newlines), read the file.
+        # Otherwise treat it as the raw narration content pasted directly.
+        is_path = len(SCRIPT_FILE) < 500 and "\n" not in SCRIPT_FILE
+        if is_path:
+            script_path = Path(SCRIPT_FILE)
+            if not script_path.exists():
+                print(f"ERROR: Script file not found: {SCRIPT_FILE}", file=sys.stderr)
+                sys.exit(1)
+            custom_narration = script_path.read_text(encoding="utf-8").strip()
+            print(f"  Loaded {len(custom_narration.split())} words from {SCRIPT_FILE}", file=sys.stderr)
+        else:
+            # Full script was pasted directly into the field
+            custom_narration = SCRIPT_FILE.strip()
+            print(f"  Using inline script ({len(custom_narration.split())} words)", file=sys.stderr)
         data = call_claude_from_script(custom_narration, today_display)
     elif TOPIC:
         data = call_claude_topic(TOPIC, today_display)
