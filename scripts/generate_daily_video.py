@@ -48,6 +48,14 @@ def ensure_deps():
         import PIL
     except ImportError:
         install("Pillow")
+    try:
+        import numpy
+    except ImportError:
+        install("numpy")
+    try:
+        import requests
+    except ImportError:
+        install("requests")
 
 
 def read_today_digest() -> str:
