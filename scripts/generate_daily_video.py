@@ -93,9 +93,14 @@ Output a JSON object with exactly these six keys:
 2. "short_title": A YouTube Shorts title (max 60 characters). Punchy, no hashtags.
 
 3. "short_hook": A 45-second spoken script (≈100 words) for a YouTube Short.
-   Open with the single most shocking fact about this topic.
-   One clear ELI5 explanation in the middle.
-   End with "Follow for daily market breakdowns". Pure spoken words only.
+   CRITICAL RULES — follow exactly:
+   - Word 1 must be a shocking statement or number. No intro, no name, no "hey". Start mid-thought.
+     Examples: "The Fed just lied to you." / "$39 trillion. That's the hole America is in." / "China just won."
+   - Second sentence must make the viewer feel stupid for not knowing this already.
+   - Middle: one punchy ELI5 analogy — explain the complex idea like the viewer is 12 years old.
+   - End with: "Watch the full breakdown — link in bio." (spoken, not written)
+   - Tone: urgent, slightly conspiratorial, like you're telling a secret.
+   - No cues, no sponsor, no filler. Pure spoken words only. Every word earns its place.
 
 4. "chapters": Array of chapter objects.
    [{{"time": "0:00", "label": "Intro"}}, {{"time": "0:45", "label": "Topic Name"}}, ...]
@@ -184,7 +189,15 @@ Output a JSON object with exactly these keys:
 
 2. "short_title": A YouTube Shorts title (max 60 characters). Punchy, no hashtags.
 
-3. "short_hook": A 45-second spoken script (≈100 words) for a YouTube Short. Summarize the single most shocking point from the script. End with "Follow for daily market breakdowns". Pure spoken words only.
+3. "short_hook": A 45-second spoken script (≈100 words) for a YouTube Short.
+   CRITICAL RULES — follow exactly:
+   - Word 1 must be a shocking statement or number from the script. No intro, no name, no "hey". Start mid-thought.
+     Examples: "The Fed just lied to you." / "$39 trillion. That's the hole America is in." / "China just won."
+   - Second sentence must make the viewer feel stupid for not knowing this already.
+   - Middle: one punchy ELI5 analogy — explain the complex idea like the viewer is 12 years old.
+   - End with: "Watch the full breakdown — link in bio." (spoken, not written)
+   - Tone: urgent, slightly conspiratorial, like you're telling a secret.
+   - No cues, no sponsor, no filler. Pure spoken words only. Every word earns its place.
 
 4. "chapters": Array of chapter objects matching the script's structure.
    [{{"time": "0:00", "label": "Intro"}}, {{"time": "0:45", "label": "Label Here"}}, ...]
@@ -265,11 +278,15 @@ Output a JSON object with exactly these six keys:
 
 2. "short_title": A YouTube Shorts title (max 60 characters). Punchy, curious, slightly alarming. No hashtags — those get added automatically.
 
-3. "short_hook": A 45-second spoken script (≈100 words) for a YouTube Short. Rules:
-   - Open with the single most shocking fact or number from today's story
-   - One clear ELI5 explanation in the middle
-   - End with "Follow for daily market breakdowns"
-   - No cues, no sponsor — pure spoken words only
+3. "short_hook": A 45-second spoken script (≈100 words) for a YouTube Short.
+   CRITICAL RULES — follow exactly:
+   - Word 1 must be a shocking statement or number from today's story. No intro, no name, no "hey". Start mid-thought.
+     Examples: "The Fed just lied to you." / "$39 trillion. That's the hole America is in." / "Wall Street just blinked."
+   - Second sentence must make the viewer feel stupid for not knowing this already.
+   - Middle: one punchy ELI5 analogy — explain the complex idea like the viewer is 12 years old.
+   - End with: "Watch the full breakdown — link in bio." (spoken, not written)
+   - Tone: urgent, slightly conspiratorial, like you're telling a secret.
+   - No cues, no sponsor, no filler. Pure spoken words only. Every word earns its place.
 
 4. "chapters": Array of chapter objects for the video description timestamps. Format:
    [{{"time": "0:00", "label": "Intro"}}, {{"time": "0:45", "label": "Topic Name"}}, ...]
@@ -1130,9 +1147,9 @@ def generate_short_video(short_hook: str, short_title: str,
         y_pos = SHORT_H - target_h + 30
         bg.paste(host_img, (x_pos, y_pos), host_img)
 
-    # ── "Follow for daily market breakdowns" CTA ──
+    # ── "Watch the full breakdown" CTA ──
     cta_font = get_font(44, bold=True)
-    cta = "Follow for daily market breakdowns"
+    cta = "Watch the full breakdown ↓"
     cw  = draw.textlength(cta, font=cta_font)
     draw.text(((SHORT_W - cw) // 2, SHORT_H - 120), cta,
               font=cta_font, fill=YELLOW + (255,))
