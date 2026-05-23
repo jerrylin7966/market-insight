@@ -1,0 +1,37 @@
+name: Auto-inject Ad Scripts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'finance-hub/**/*.html'   # only runs when HTML files change
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  inject:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          # Fetch the full commit so we can push back
+          fetch-depth: 0
+
+      - name: Inject ad scripts into any new/updated HTML
+        run: python scripts/inject_ads.py
+
+      - name: Commit if anything changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add finance-hub/**/*.html
+          git diff --cached --quiet && echo "Nothing to inject" || \
+            git commit -m "chore: auto-inject ad scripts [skip ci]"
+          git pull --rebase origin main
+          git push
