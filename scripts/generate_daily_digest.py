@@ -289,13 +289,7 @@ footer a{{color:rgba(255,255,255,.6)}}
 
 <div class="content">
 
-  <!-- Ad slot -->
-  <ins class="adsbygoogle" style="display:block;margin-bottom:2rem"
-       data-ad-client="ca-pub-5264064065432511"
-       data-ad-slot="XXXXXXXXXX"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-  <script>(adsbygoogle=window.adsbygoogle||[]).push({{}});</script>
+  <div class="mp-ad" data-ad-type="feed"></div>
 
   <div class="section-label">Market Summary</div>
   <div class="summary-box">{digest.get('market_summary', '')}</div>
@@ -339,13 +333,7 @@ footer a{{color:rgba(255,255,255,.6)}}
     <a href="/signals/">View Live Dashboard</a>
   </div>
 
-  <!-- Ad slot -->
-  <ins class="adsbygoogle" style="display:block;margin-bottom:2rem"
-       data-ad-client="ca-pub-5264064065432511"
-       data-ad-slot="XXXXXXXXXX"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-  <script>(adsbygoogle=window.adsbygoogle||[]).push({{}});</script>
+  <div class="mp-ad" data-ad-type="feed"></div>
 
   <div class="sources-section">
     <div class="section-label">Source Headlines</div>
@@ -362,6 +350,7 @@ footer a{{color:rgba(255,255,255,.6)}}
   <p style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.3)">For informational purposes only. Not financial advice. © 2025 MarketPhase.</p>
 </footer>
 
+<script src="/js/ads.js"></script>
 </body>
 </html>"""
 
@@ -449,6 +438,7 @@ footer a{{color:rgba(255,255,255,.6)}}
   <p><a href="/">MarketPhase</a> · <a href="/signals/">Live Signals</a> · <a href="/guides/">Guides</a> · <a href="/daily/">Daily Digest</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/privacy.html">Privacy Policy</a></p>
   <p style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.3)">For informational purposes only. Not financial advice. © 2025 MarketPhase.</p>
 </footer>
+<script src="/js/ads.js"></script>
 </body>
 </html>"""
 
