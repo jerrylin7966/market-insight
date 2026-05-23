@@ -109,23 +109,30 @@ Here are today's top financial news headlines:
 
 {headlines_text}
 
-Write a concise, professional daily market digest for investors. Structure your response as JSON with these keys:
+Write a comprehensive daily market digest for individual investors. Structure your response as JSON with these keys:
 
 {{
-  "market_summary": "2-3 sentence overview of today's key market themes",
+  "market_summary": "3-4 sentence overview of today's key market themes and what is driving price action",
   "key_stories": [
-    {{"headline": "short headline", "analysis": "1-2 sentence plain-English analysis of why this matters to investors"}},
-    ... (pick 4-6 most important stories)
+    {{"headline": "short headline", "analysis": "2-3 sentence plain-English explanation of what happened, why it matters, and what investors should watch next"}},
+    ... (pick 5-7 most important stories)
   ],
-  "sectors_watch": "1-2 sentences on which sectors are in focus today",
-  "macro_note": "1-2 sentences on any macro/economic angle (Fed, rates, jobs, inflation)"
+  "key_numbers": [
+    {{"label": "metric name", "value": "number or figure", "context": "one sentence explaining what this number means"}},
+    ... (3-4 specific data points from today: index moves, yields, commodity prices, economic figures)
+  ],
+  "sectors_watch": "3-4 sentences on which sectors are in focus today, which are outperforming and underperforming, and why",
+  "macro_note": "3-4 sentences on the macro/economic backdrop — Fed policy, interest rates, inflation, jobs, or global factors",
+  "investor_takeaway": "4-5 sentences of original analysis: what today's news means for a long-term individual investor, what risks to watch, and what to monitor in the coming days. Be specific and actionable.",
+  "marketphase_take": "3-4 sentences of MarketPhase's editorial perspective on today's market environment. Reference the broader market cycle context. Be direct and opinionated — this is original analysis, not a summary.",
+  "market_outlook": "2-3 sentences on the near-term outlook: key events or data releases coming up this week that could move markets"
 }}
 
-Be direct and informative. No fluff. Focus on what moves markets."""
+Write with authority and original insight. Each section must contain substantive analysis, not just summaries. Investors rely on this for genuine understanding of market conditions."""
 
     payload = json.dumps({
         "model": "claude-haiku-4-5-20251001",
-        "max_tokens": 1200,
+        "max_tokens": 2800,
         "messages": [{"role": "user", "content": prompt}],
     }).encode()
 
@@ -170,6 +177,15 @@ def render_html(digest: dict, today: date, headlines: list[dict]) -> str:
         <div class="story-card">
           <h3>{s['headline']}</h3>
           <p>{s['analysis']}</p>
+        </div>"""
+
+    numbers_html = ""
+    for n in digest.get("key_numbers", []):
+        numbers_html += f"""
+        <div class="number-card">
+          <div class="number-label">{n.get('label','')}</div>
+          <div class="number-value">{n.get('value','')}</div>
+          <div class="number-context">{n.get('context','')}</div>
         </div>"""
 
     sources_html = ""
@@ -218,6 +234,17 @@ header{{background:#0f172a;color:#fff}}
 .info-card{{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem}}
 .info-card h3{{font-size:.8rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem}}
 .info-card p{{font-size:.95rem;color:#1e293b;line-height:1.65}}
+.numbers-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.75rem;margin-bottom:2.5rem}}
+.number-card{{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;text-align:center}}
+.number-label{{font-size:.75rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}}
+.number-value{{font-size:1.6rem;font-weight:700;color:var(--accent);margin-bottom:.3rem}}
+.number-context{{font-size:.8rem;color:#64748b;line-height:1.5}}
+.analysis-box{{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:1.5rem;margin-bottom:1.5rem}}
+.analysis-box h3{{font-size:.8rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#065f46;margin-bottom:.75rem}}
+.analysis-box p{{font-size:.95rem;color:#1e293b;line-height:1.75}}
+.take-box{{background:#fefce8;border:1px solid #fde68a;border-radius:10px;padding:1.5rem;margin-bottom:2.5rem}}
+.take-box h3{{font-size:.8rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#92400e;margin-bottom:.75rem}}
+.take-box p{{font-size:.95rem;color:#1e293b;line-height:1.75;font-style:italic}}
 .sources-section{{margin-bottom:2.5rem}}
 .sources-section ul{{list-style:none;display:flex;flex-direction:column;gap:.5rem}}
 .sources-section li{{font-size:.9rem}}
@@ -273,6 +300,10 @@ footer a{{color:rgba(255,255,255,.6)}}
   <div class="section-label">Market Summary</div>
   <div class="summary-box">{digest.get('market_summary', '')}</div>
 
+  <div class="section-label">Key Numbers</div>
+  <div class="numbers-grid">{numbers_html}
+  </div>
+
   <div class="section-label">Key Stories</div>
   <div class="stories-grid">{stories_html}
   </div>
@@ -286,6 +317,21 @@ footer a{{color:rgba(255,255,255,.6)}}
       <h3>Macro Note</h3>
       <p>{digest.get('macro_note', '')}</p>
     </div>
+  </div>
+
+  <div class="analysis-box">
+    <h3>What This Means For You</h3>
+    <p>{digest.get('investor_takeaway', '')}</p>
+  </div>
+
+  <div class="take-box">
+    <h3>MarketPhase Take</h3>
+    <p>{digest.get('marketphase_take', '')}</p>
+  </div>
+
+  <div class="info-card" style="margin-bottom:2.5rem">
+    <h3>Market Outlook</h3>
+    <p>{digest.get('market_outlook', '')}</p>
   </div>
 
   <div class="cta-bar">
@@ -307,7 +353,7 @@ footer a{{color:rgba(255,255,255,.6)}}
     </ul>
   </div>
 
-  <p class="disclaimer">This digest is generated automatically for informational purposes only. It is not financial advice. Always do your own research before making investment decisions.</p>
+  <p class="disclaimer">MarketPhase digests are produced for informational and educational purposes only. Content reflects editorial analysis based on publicly available data and is not financial advice. Always conduct your own research and consult a qualified financial advisor before making investment decisions.</p>
 
 </div>
 
