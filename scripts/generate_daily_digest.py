@@ -16,6 +16,23 @@ from datetime import datetime, date
 from pathlib import Path
 import urllib.request
 import urllib.error
+import time
+
+
+def urlopen_with_retry(req, timeout=90, retries=3, backoff=15):
+    """urlopen with automatic retry on timeout or transient network errors."""
+    last_err = None
+    for attempt in range(1, retries + 1):
+        try:
+            return urllib.request.urlopen(req, timeout=timeout)
+        except (TimeoutError, urllib.error.URLError) as e:
+            last_err = e
+            if attempt < retries:
+                wait = backoff * attempt
+                print(f"  [warn] Request attempt {attempt} failed ({e}), retrying in {wait}s…", file=sys.stderr)
+                time.sleep(wait)
+    raise RuntimeError(f"Request failed after {retries} attempts: {last_err}")
+
 
 # ── Config ──────────────────────────────────────────────────────────────────
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
@@ -146,7 +163,7 @@ Write with authority and original insight. Each section must contain substantive
         },
         method="POST",
     )
-    with urllib.request.urlopen(req, timeout=30) as resp:
+    with urlopen_with_retry(req, timeout=90) as resp:
         result = json.loads(resp.read())
 
     raw_text = result["content"][0]["text"].strip()

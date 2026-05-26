@@ -16,6 +16,21 @@ from datetime import date
 from pathlib import Path
 import urllib.request, urllib.parse, urllib.error
 
+
+def urlopen_with_retry(req, timeout=90, retries=3, backoff=15):
+    """urlopen with automatic retry on timeout or transient network errors."""
+    last_err = None
+    for attempt in range(1, retries + 1):
+        try:
+            return urllib.request.urlopen(req, timeout=timeout)
+        except (TimeoutError, urllib.error.URLError) as e:
+            last_err = e
+            if attempt < retries:
+                wait = backoff * attempt
+                print(f"  [warn] Request attempt {attempt} failed ({e}), retrying in {wait}s…", file=sys.stderr)
+                time.sleep(wait)
+    raise RuntimeError(f"Request failed after {retries} attempts: {last_err}")
+
 # ── Config ───────────────────────────────────────────────────────────────────
 ANTHROPIC_API_KEY      = os.environ.get("ANTHROPIC_API_KEY", "")
 ELEVENLABS_API_KEY     = os.environ.get("ELEVENLABS_API_KEY", "")
@@ -152,7 +167,7 @@ Return ONLY valid JSON. No markdown, no explanation."""
         }},
         method="POST",
     )
-    with urllib.request.urlopen(req, timeout=60) as resp:
+    with urlopen_with_retry(req, timeout=90) as resp:
         result = json.loads(resp.read())
 
     raw = result["content"][0]["text"].strip()
@@ -361,7 +376,7 @@ Return ONLY valid JSON. No markdown, no explanation."""
         },
         method="POST",
     )
-    with urllib.request.urlopen(req, timeout=60) as resp:
+    with urlopen_with_retry(req, timeout=90) as resp:
         result = json.loads(resp.read())
 
     raw = result["content"][0]["text"].strip()
@@ -416,7 +431,7 @@ def tts_elevenlabs(text: str, out_path: Path) -> Path:
             },
             method="POST",
         )
-        with urllib.request.urlopen(req, timeout=60) as resp:
+        with urlopen_with_retry(req, timeout=90) as resp:
             chunk_path.write_bytes(resp.read())
         audio_parts.append(str(chunk_path))
         print(f"  Audio chunk {i+1}/{len(chunks)} done", file=sys.stderr)
@@ -451,7 +466,7 @@ def fetch_pexels_image(keyword: str, idx: int, tmp_dir: Path) -> Path | None:
                     "Accept": "image/jpeg,image/png,image/*",
                 },
             )
-            with urllib.request.urlopen(req, timeout=30) as resp:
+            with urlopen_with_retry(req, timeout=45, backoff=5) as resp:
                 data = resp.read()
             if len(data) < 1000:
                 print(f"  Download too small ({len(data)} bytes), skipping", file=sys.stderr)
@@ -473,7 +488,7 @@ def fetch_pexels_image(keyword: str, idx: int, tmp_dir: Path) -> Path | None:
                     "User-Agent": "MarketPhase/1.0 (https://market-phase.com)",
                 },
             )
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            with urlopen_with_retry(req, timeout=30, backoff=5) as resp:
                 data = json.loads(resp.read())
             photos = data.get("photos", [])
             if photos:
@@ -497,7 +512,7 @@ def fetch_pexels_image(keyword: str, idx: int, tmp_dir: Path) -> Path | None:
                 f"&per_page=8&safesearch=true",
                 headers={"User-Agent": "Mozilla/5.0 (compatible; MarketPhase/1.0)"},
             )
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            with urlopen_with_retry(req, timeout=30, backoff=5) as resp:
                 raw = resp.read()
             data = json.loads(raw)
             hits = data.get("hits", [])
@@ -796,7 +811,7 @@ def get_youtube_access_token() -> str:
         headers={"Content-Type": "application/x-www-form-urlencoded"},
         method="POST",
     )
-    with urllib.request.urlopen(req, timeout=30) as resp:
+    with urlopen_with_retry(req, timeout=60) as resp:
         result = json.loads(resp.read())
     return result["access_token"]
 
@@ -985,7 +1000,7 @@ def set_youtube_thumbnail(video_id: str, thumbnail_path: Path, access_token: str
             },
             method="POST",
         )
-        with urllib.request.urlopen(req, timeout=60) as resp:
+        with urlopen_with_retry(req, timeout=90) as resp:
             resp.read()
         print(f"  Thumbnail set ✅", file=sys.stderr)
     except Exception as e:
@@ -1278,7 +1293,7 @@ def fetch_and_save_analytics(repo_root: Path):
             f"subscribersGained&dimensions=video&sort=-views&maxResults=20",
             headers={"Authorization": f"Bearer {access_token}"},
         )
-        with urllib.request.urlopen(req, timeout=30) as resp:
+        with urlopen_with_retry(req, timeout=60) as resp:
             analytics = json.loads(resp.read())
 
         rows = analytics.get("rows", [])
@@ -1293,7 +1308,7 @@ def fetch_and_save_analytics(repo_root: Path):
             f"?part=snippet&id={video_ids}",
             headers={"Authorization": f"Bearer {access_token}"},
         )
-        with urllib.request.urlopen(req2, timeout=30) as resp:
+        with urlopen_with_retry(req2, timeout=60) as resp:
             vdata = json.loads(resp.read())
 
         titles = {item["id"]: item["snippet"]["title"]
