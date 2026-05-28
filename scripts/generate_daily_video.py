@@ -386,6 +386,78 @@ Return ONLY valid JSON. No markdown, no explanation."""
     return json.loads(raw)
 
 
+# ── Claude: Shorts-only (lean prompt, no full narration) ─────────────────────
+
+def call_claude_short(digest_summary: str, today_display: str) -> dict:
+    """Generate only what's needed for a YouTube Short — no long narration or slides."""
+    if not ANTHROPIC_API_KEY:
+        raise ValueError("ANTHROPIC_API_KEY not set")
+
+    prompt = f"""You are a YouTube Shorts scriptwriter for "MarketPhase", a financial education channel.
+Today is {today_display}. Here is a summary of today's market news:
+
+{digest_summary}
+
+Pick the single most compelling story and output a JSON object with exactly these 5 keys:
+
+1. "short_title": YouTube Shorts title, max 60 characters. Punchy, no hashtags.
+
+2. "short_hook": A 45-second spoken script (~100 words).
+   CRITICAL RULES — follow exactly:
+   - Open with a shocking statement or number. No "hey", no intro, no name. Start mid-thought.
+     Examples: "The Fed just lied to you." / "$39 trillion. That's the hole America is in."
+   - Second sentence: make the viewer feel stupid for not already knowing this.
+   - Middle: one ELI5 analogy — explain the idea like the viewer is 12 years old.
+   - End with exactly: "Watch the full breakdown — link in bio."
+   - Tone: urgent, slightly conspiratorial, like sharing a secret.
+   - No stage cues, no filler. Pure spoken words only.
+
+3. "clip_tag": One tag from this list that best matches the story (or null):
+   stock_bull, stock_crash, federal_reserve, wall_street, inflation, gold, crypto,
+   oil_energy, recession, interest_rates, global_economy, tech_stocks, jobs, bonds,
+   consumer, earnings, nyse_open, dollar, bear_market, data_screens, housing_market,
+   banking, china_trade, us_debt, ai_stocks, commodities, retail_earnings, ipo,
+   supply_chain, mergers, election_market, healthcare_costs
+
+4. "pexels_keyword": A 3-5 word image search term as fallback if clip_tag is null.
+
+5. "tags": Array of 8-10 tags (no # prefix). Always include "finance", "markets",
+   "investing", "Shorts". Add story-specific tags.
+
+Return ONLY valid JSON. No markdown, no explanation."""
+
+    payload = json.dumps({
+        "model": "claude-haiku-4-5-20251001",
+        "max_tokens": 800,
+        "messages": [{"role": "user", "content": prompt}],
+    }).encode()
+
+    req = urllib.request.Request(
+        "https://api.anthropic.com/v1/messages",
+        data=payload,
+        headers={
+            "x-api-key": ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+        },
+        method="POST",
+    )
+    with urlopen_with_retry(req, timeout=90) as resp:
+        result = json.loads(resp.read())
+
+    raw = result["content"][0]["text"].strip()
+    raw = re.sub(r'^```(?:json)?\s*', '', raw)
+    raw = re.sub(r'\s*```$', '', raw)
+    brace = re.search(r'(\{[\s\S]+\})', raw)
+    if brace:
+        raw = brace.group(1)
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        cleaned = re.sub(r',\s*([}\]])', r'\1', raw)
+        return json.loads(cleaned)
+
+
 # ── ElevenLabs TTS ────────────────────────────────────────────────────────────
 
 def strip_cues(script: str) -> str:
@@ -1352,10 +1424,50 @@ def main():
     today = date.today()
     today_display = today.strftime("%A, %B %-d, %Y")
 
-    # Mode detection: SCRIPT_FILE > TOPIC > daily digest
+    # Mode detection (priority order):
+    #   SHORTS_ONLY=true  → Short only, lean Claude prompt, skip long video entirely
+    #   SCRIPT_FILE=...   → Long video from pre-written script + Short
+    #   TOPIC=...         → Long video on specific topic + Short
+    #   (default)         → Long video from daily digest + Short
+    SHORTS_ONLY = os.environ.get("SHORTS_ONLY", "").strip().lower() in ("1", "true", "yes")
     SCRIPT_FILE = os.environ.get("SCRIPT_FILE", "").strip()
-    TOPIC = os.environ.get("TOPIC", "").strip()
+    TOPIC       = os.environ.get("TOPIC", "").strip()
 
+    ensure_deps()
+    TMP_DIR.mkdir(parents=True, exist_ok=True)
+
+    # ── SHORTS-ONLY path ──────────────────────────────────────────────────────
+    if SHORTS_ONLY:
+        print(f"=== Daily Short — {today_display} ===", file=sys.stderr)
+
+        print("Reading digest…", file=sys.stderr)
+        digest_summary = read_today_digest()
+
+        print("Generating Short script with Claude…", file=sys.stderr)
+        data       = call_claude_short(digest_summary, today_display)
+        short_hook = data.get("short_hook", "")
+        short_title = data.get("short_title", f"Market Update {today.strftime('%b %d')}").strip()
+        clip_tag   = data.get("clip_tag")
+        extra_tags = data.get("tags", [])
+
+        if not short_hook:
+            print("ERROR: Claude returned no short_hook", file=sys.stderr)
+            sys.exit(1)
+
+        print(f"  Title: {short_title}", file=sys.stderr)
+        print(f"  Hook:  {short_hook[:80]}…", file=sys.stderr)
+
+        print("Generating YouTube Short…", file=sys.stderr)
+        short_path = generate_short_video(short_hook, short_title, clip_tag, TMP_DIR)
+        short_url  = upload_short_to_youtube(short_path, short_title,
+                                             f"MarketPhase Daily — {today_display}")
+        print(f"\n✅ Short live: {short_url}", file=sys.stderr)
+
+        print("Fetching analytics…", file=sys.stderr)
+        fetch_and_save_analytics(REPO_ROOT)
+        return
+
+    # ── LONG VIDEO path (on-demand or manual trigger) ─────────────────────────
     if SCRIPT_FILE:
         print(f"=== Custom Script Video — {today_display} ===", file=sys.stderr)
         print(f"    Script: {SCRIPT_FILE}", file=sys.stderr)
@@ -1363,16 +1475,11 @@ def main():
         print(f"=== On-Demand Topic Video — {today_display} ===", file=sys.stderr)
         print(f"    Topic: {TOPIC}", file=sys.stderr)
     else:
-        print(f"=== Daily Video Generator — {today_display} ===", file=sys.stderr)
+        print(f"=== Daily Long Video — {today_display} ===", file=sys.stderr)
 
-    ensure_deps()
-    TMP_DIR.mkdir(parents=True, exist_ok=True)
-
-    # Generate script + slide data
+    # 1. Generate script + slide data
     print("Generating script + slides with Claude…", file=sys.stderr)
     if SCRIPT_FILE:
-        # If SCRIPT_FILE looks like a path (short, no newlines), read the file.
-        # Otherwise treat it as the raw narration content pasted directly.
         is_path = len(SCRIPT_FILE) < 500 and "\n" not in SCRIPT_FILE
         if is_path:
             script_path = Path(SCRIPT_FILE)
@@ -1382,17 +1489,16 @@ def main():
             custom_narration = script_path.read_text(encoding="utf-8").strip()
             print(f"  Loaded {len(custom_narration.split())} words from {SCRIPT_FILE}", file=sys.stderr)
         else:
-            # Full script was pasted directly into the field
             custom_narration = SCRIPT_FILE.strip()
             print(f"  Using inline script ({len(custom_narration.split())} words)", file=sys.stderr)
         data = call_claude_from_script(custom_narration, today_display)
     elif TOPIC:
         data = call_claude_topic(TOPIC, today_display)
     else:
-        # Daily digest mode
         print("Reading digest…", file=sys.stderr)
         digest_summary = read_today_digest()
         data = call_claude(digest_summary, today_display)
+
     narration_script = data["narration"]
     slides_data      = data["slides"]
     video_title  = data.get("title",       f"Market Update {today.strftime('%b %d, %Y')}").strip()
@@ -1400,40 +1506,36 @@ def main():
     short_hook   = data.get("short_hook",  "")
     chapters     = data.get("chapters",    [])
     extra_tags   = data.get("tags",        [])
-    print(f"  Title: {video_title}", file=sys.stderr)
-    print(f"  Short: {short_title}", file=sys.stderr)
-    print(f"  Script: {len(narration_script.split())} words, "
-          f"{len(slides_data)} slides", file=sys.stderr)
+    print(f"  Title:  {video_title}", file=sys.stderr)
+    print(f"  Short:  {short_title}", file=sys.stderr)
+    print(f"  Script: {len(narration_script.split())} words, {len(slides_data)} slides", file=sys.stderr)
 
-    # 3. TTS narration (strip visual cues first)
+    # 2. TTS narration
     print("Generating voiceover with ElevenLabs…", file=sys.stderr)
     narration_clean = strip_cues(narration_script)
     audio_path = TMP_DIR / "narration.mp3"
     tts_elevenlabs(narration_clean, audio_path)
 
-    # 4. Calculate durations before creating slides (needed for compositing)
+    # 3. Slide durations + rendering
     audio_duration = get_audio_duration(audio_path)
-    durations = calc_slide_durations(slides_data, audio_duration)
-
-    # 5. Create slide video segments (clip/image bg + text overlay composited)
+    durations   = calc_slide_durations(slides_data, audio_duration)
     print("Creating slides…", file=sys.stderr)
     slide_paths = create_slides(slides_data, durations, TMP_DIR)
 
-    # 6. Build final MP4 (concat segments + mux audio)
+    # 4. Build long MP4
     print("Building video…", file=sys.stderr)
     video_path = TMP_DIR / f"marketphase_{today.isoformat()}.mp4"
     build_video(slide_paths, audio_path, video_path)
 
-    # 7. Generate thumbnail (host photo + Pexels bg + title text)
+    # 5. Thumbnail
     print("Generating thumbnail…", file=sys.stderr)
     thumb_tag     = slides_data[0].get("clip_tag") if slides_data else None
     thumb_keyword = slides_data[0].get("pexels_keyword", "stock market finance") if slides_data else "stock market"
-    # Use clip tag's keyword for thumbnail bg if available
     if thumb_tag:
         thumb_keyword = thumb_tag.replace("_", " ")
     thumbnail_path = generate_thumbnail(video_title, thumb_keyword, TMP_DIR)
 
-    # 8. Upload main video to YouTube
+    # 6. Upload long video
     print("Uploading main video to YouTube…", file=sys.stderr)
     hook_lines = [l.strip() for l in narration_script.split('\n')
                   if l.strip() and not l.strip().startswith('[')][:3]
@@ -1441,7 +1543,7 @@ def main():
     url = upload_to_youtube(video_path, video_title, hook_text,
                             thumbnail_path, chapters, extra_tags)
 
-    # 9. Generate and upload YouTube Short
+    # 7. Short (derived from long video data)
     if short_hook:
         print("Generating YouTube Short…", file=sys.stderr)
         short_clip_tag = slides_data[0].get("clip_tag") if slides_data else None
@@ -1453,7 +1555,7 @@ def main():
         except Exception as e:
             print(f"  Short failed (non-fatal): {e}", file=sys.stderr)
 
-    # 10. Fetch and save YouTube analytics
+    # 8. Analytics
     print("Fetching analytics…", file=sys.stderr)
     fetch_and_save_analytics(REPO_ROOT)
 

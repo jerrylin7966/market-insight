@@ -35,22 +35,21 @@ jobs:
           sudo apt-get install -y ffmpeg
           pip install numpy Pillow --break-system-packages -q
 
-      - name: Download clip library
+      - name: Download clip library (single frame per clip for Shorts)
         run: |
           mkdir -p scripts/assets/clips
           BASE="https://github.com/jerrylin7966/market-insight/releases/download/clips-v1"
-          for clip in stock_bull stock_crash federal_reserve wall_street inflation gold \
-            crypto oil_energy recession interest_rates global_economy tech_stocks jobs \
-            bonds consumer earnings nyse_open dollar bear_market data_screens \
-            housing_market banking china_trade us_debt ai_stocks commodities \
-            retail_earnings ipo supply_chain mergers election_market healthcare_costs; do
+          # Download only a few key clips used most often in Shorts backgrounds
+          for clip in stock_bull stock_crash federal_reserve wall_street inflation \
+            tech_stocks earnings nyse_open data_screens global_economy; do
             wget -q "$BASE/${clip}.mp4" -O "scripts/assets/clips/${clip}.mp4" || \
               echo "Warning: could not download ${clip}.mp4, will use image fallback"
           done
           echo "Clips downloaded: $(ls scripts/assets/clips/*.mp4 2>/dev/null | wc -l)"
 
-      - name: Run video generator
+      - name: Run video generator (Shorts only)
         env:
+          SHORTS_ONLY: "true"
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
