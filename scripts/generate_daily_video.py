@@ -402,15 +402,18 @@ Pick the single most compelling story and output a JSON object with exactly thes
 
 1. "short_title": YouTube Shorts title, max 60 characters. Punchy, no hashtags.
 
-2. "short_hook": A 45-second spoken script (~100 words).
+2. "short_hook": A 55-60 second spoken script (150-180 words minimum — count carefully).
    CRITICAL RULES — follow exactly:
    - Open with a shocking statement or number. No "hey", no intro, no name. Start mid-thought.
      Examples: "The Fed just lied to you." / "$39 trillion. That's the hole America is in."
    - Second sentence: make the viewer feel stupid for not already knowing this.
-   - Middle: one ELI5 analogy — explain the idea like the viewer is 12 years old.
+   - Middle: two to three sentences of punchy ELI5 context — explain like the viewer is 12.
+     Build tension. Give one surprising data point or comparison.
+   - Near end: one sentence on what this means for regular people.
    - End with exactly: "Watch the full breakdown — link in bio."
    - Tone: urgent, slightly conspiratorial, like sharing a secret.
    - No stage cues, no filler. Pure spoken words only.
+   - MINIMUM 150 WORDS. Count before returning.
 
 3. "clip_tag": One tag from this list that best matches the story (or null):
    stock_bull, stock_crash, federal_reserve, wall_street, inflation, gold, crypto,
@@ -428,7 +431,7 @@ Return ONLY valid JSON. No markdown, no explanation."""
 
     payload = json.dumps({
         "model": "claude-haiku-4-5-20251001",
-        "max_tokens": 800,
+        "max_tokens": 1200,
         "messages": [{"role": "user", "content": prompt}],
     }).encode()
 
@@ -1252,6 +1255,21 @@ def generate_short_video(short_hook: str, short_title: str,
     short_audio = tmp_dir / "short_narration.mp3"
     tts_elevenlabs(short_hook, short_audio)
     short_duration = get_audio_duration(short_audio)
+
+    # Pad audio to at least 45 seconds so YouTube treats it as a proper Short
+    MIN_DURATION = 45.0
+    if short_duration < MIN_DURATION:
+        pad = MIN_DURATION - short_duration
+        padded_audio = tmp_dir / "short_narration_padded.mp3"
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(short_audio),
+            "-af", f"apad=pad_dur={pad:.1f}",
+            "-c:a", "libmp3lame", "-b:a", "192k",
+            str(padded_audio),
+        ], check=True, capture_output=True)
+        short_audio    = padded_audio
+        short_duration = MIN_DURATION
+        print(f"  Padded audio to {MIN_DURATION:.0f}s", file=sys.stderr)
 
     # Composite: clip bg (slowed) + overlay + audio
     short_video = tmp_dir / "short_silent.mp4"
