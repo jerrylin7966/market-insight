@@ -34,7 +34,7 @@ jobs:
         run: |
           # libcaca0 noble-updates package is broken on GitHub runners (404 mirror);
           # manually install the working base version before ffmpeg pulls it in
-          wget -q "http://archive.ubuntu.com/ubuntu/pool/main/libc/libcaca/libcaca0_0.99.beta20-4_amd64.deb"
+          wget -q "http://archive.ubuntu.com/ubuntu/pool/main/l/libcaca/libcaca0_0.99.beta20-4_amd64.deb"
           sudo dpkg -i libcaca0_0.99.beta20-4_amd64.deb
           sudo apt-get install -y ffmpeg
           pip install numpy Pillow --break-system-packages -q
