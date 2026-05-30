@@ -32,7 +32,11 @@ jobs:
 
       - name: Install ffmpeg and Python deps
         run: |
-          sudo apt-get install -y --fix-missing ffmpeg
+          # libcaca0 noble-updates package is broken on GitHub runners (404 mirror);
+          # manually install the working base version before ffmpeg pulls it in
+          wget -q "http://archive.ubuntu.com/ubuntu/pool/main/libc/libcaca/libcaca0_0.99.beta20-4_amd64.deb"
+          sudo dpkg -i libcaca0_0.99.beta20-4_amd64.deb
+          sudo apt-get install -y ffmpeg
           pip install numpy Pillow --break-system-packages -q
 
       - name: Download clip library (single frame per clip for Shorts)
