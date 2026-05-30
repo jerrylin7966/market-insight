@@ -171,16 +171,20 @@ Write with authority and original insight. Each section must contain substantive
     json_match = re.search(r"```(?:json)?\s*([\s\S]+?)```", raw_text)
     if json_match:
         raw_text = json_match.group(1).strip()
-    # Fallback: extract first { ... } block in case of extra surrounding text
-    brace_match = re.search(r'(\{[\s\S]+\})', raw_text)
-    if brace_match:
-        raw_text = brace_match.group(1).strip()
+    # Find the start of the JSON object
+    start = raw_text.find('{')
+    if start != -1:
+        raw_text = raw_text[start:]
+    # Use raw_decode: parses the first valid JSON object and ignores trailing text
+    decoder = json.JSONDecoder()
     try:
-        return json.loads(raw_text)
+        obj, _ = decoder.raw_decode(raw_text)
+        return obj
     except json.JSONDecodeError:
-        # Last resort: remove trailing commas before } or ] (common Claude quirk)
+        # Remove trailing commas before } or ] (common Claude quirk) then retry
         cleaned = re.sub(r',\s*([}\]])', r'\1', raw_text)
-        return json.loads(cleaned)
+        obj, _ = decoder.raw_decode(cleaned)
+        return obj
 
 
 def render_html(digest: dict, today: date, headlines: list[dict]) -> str:

@@ -173,15 +173,17 @@ Return ONLY valid JSON. No markdown, no explanation."""
     raw = result["content"][0]["text"].strip()
     raw = re.sub(r'^```(?:json)?\s*', '', raw)
     raw = re.sub(r'\s*```$', '', raw)
-    # Fallback: extract first {{ ... }} block
-    brace_match = re.search(r'(\{{[\s\S]+\}})', raw)
-    if brace_match:
-        raw = brace_match.group(1).strip()
+    start = raw.find('{')
+    if start != -1:
+        raw = raw[start:]
+    decoder = json.JSONDecoder()
     try:
-        return json.loads(raw)
+        obj, _ = decoder.raw_decode(raw)
+        return obj
     except json.JSONDecodeError:
-        cleaned = re.sub(r',\s*([}}\]])', r'\1', raw)
-        return json.loads(cleaned)
+        cleaned = re.sub(r',\s*([}\]])', r'\1', raw)
+        obj, _ = decoder.raw_decode(cleaned)
+        return obj
 
 
 def call_claude_from_script(narration: str, today_display: str) -> dict:
@@ -262,14 +264,17 @@ Return ONLY valid JSON. No markdown, no explanation."""
     raw = result["content"][0]["text"].strip()
     raw = re.sub(r'^```(?:json)?\s*', '', raw)
     raw = re.sub(r'\s*```$', '', raw)
-    brace_match = re.search(r'(\{[\s\S]+\})', raw)
-    if brace_match:
-        raw = brace_match.group(1).strip()
+    start = raw.find('{')
+    if start != -1:
+        raw = raw[start:]
+    decoder = json.JSONDecoder()
     try:
-        return json.loads(raw)
+        obj, _ = decoder.raw_decode(raw)
+        return obj
     except json.JSONDecodeError:
         cleaned = re.sub(r',\s*([}\]])', r'\1', raw)
-        return json.loads(cleaned)
+        obj, _ = decoder.raw_decode(cleaned)
+        return obj
 
 
 def call_claude(digest_summary: str, today_display: str) -> dict:
@@ -383,7 +388,17 @@ Return ONLY valid JSON. No markdown, no explanation."""
     # Strip markdown code fences if present
     raw = re.sub(r'^```(?:json)?\s*', '', raw)
     raw = re.sub(r'\s*```$', '', raw)
-    return json.loads(raw)
+    start = raw.find('{')
+    if start != -1:
+        raw = raw[start:]
+    decoder = json.JSONDecoder()
+    try:
+        obj, _ = decoder.raw_decode(raw)
+        return obj
+    except json.JSONDecodeError:
+        cleaned = re.sub(r',\s*([}\]])', r'\1', raw)
+        obj, _ = decoder.raw_decode(cleaned)
+        return obj
 
 
 # ── Claude: Shorts-only (lean prompt, no full narration) ─────────────────────
@@ -451,14 +466,17 @@ Return ONLY valid JSON. No markdown, no explanation."""
     raw = result["content"][0]["text"].strip()
     raw = re.sub(r'^```(?:json)?\s*', '', raw)
     raw = re.sub(r'\s*```$', '', raw)
-    brace = re.search(r'(\{[\s\S]+\})', raw)
-    if brace:
-        raw = brace.group(1)
+    start = raw.find('{')
+    if start != -1:
+        raw = raw[start:]
+    decoder = json.JSONDecoder()
     try:
-        return json.loads(raw)
+        obj, _ = decoder.raw_decode(raw)
+        return obj
     except json.JSONDecodeError:
         cleaned = re.sub(r',\s*([}\]])', r'\1', raw)
-        return json.loads(cleaned)
+        obj, _ = decoder.raw_decode(cleaned)
+        return obj
 
 
 # ── ElevenLabs TTS ────────────────────────────────────────────────────────────
