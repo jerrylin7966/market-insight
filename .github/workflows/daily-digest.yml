@@ -30,14 +30,11 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python scripts/generate_daily_digest.py
 
-      - name: Install ffmpeg and Python deps
-        run: |
-          # libcaca0 noble-updates package is broken on GitHub runners (404 mirror);
-          # manually install the working base version before ffmpeg pulls it in
-          wget -q "http://archive.ubuntu.com/ubuntu/pool/main/l/libcaca/libcaca0_0.99.beta20-4_amd64.deb"
-          sudo dpkg -i libcaca0_0.99.beta20-4_amd64.deb
-          sudo apt-get install -y ffmpeg
-          pip install numpy Pillow --break-system-packages -q
+      - name: Install ffmpeg
+        uses: FedericoCarboni/setup-ffmpeg@v3
+
+      - name: Install Python deps
+        run: pip install numpy Pillow --break-system-packages -q
 
       - name: Download clip library (single frame per clip for Shorts)
         run: |
