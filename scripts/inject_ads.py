@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-inject_ads.py — Auto-inject AdSense publisher script, ads.js, and mobile-nav.js
+inject_ads.py — Auto-inject AdSense, GA4, ads.js, and mobile-nav.js
 into every HTML page under finance-hub/ that doesn't already have them.
 
 Run automatically by GitHub Actions on every push that touches HTML files.
@@ -12,6 +12,19 @@ from pathlib import Path
 
 # ── Constants ──────────────────────────────────────────────────────────────
 BASE = Path(__file__).parent.parent / "finance-hub"
+
+GA_ID = "G-02WMHRBYWL"
+
+GA_TAG = (
+    '<!-- Google tag (gtag.js) -->\n'
+    f'<script async src="https://www.googletagmanager.com/gtag/js?id={GA_ID}"></script>\n'
+    '<script>\n'
+    '  window.dataLayer = window.dataLayer || [];\n'
+    '  function gtag(){dataLayer.push(arguments);}\n'
+    '  gtag(\'js\', new Date());\n'
+    f'  gtag(\'config\', \'{GA_ID}\');\n'
+    '</script>'
+)
 
 ADSENSE_SCRIPT = (
     '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'
@@ -31,6 +44,13 @@ NAV_EXCLUDE = set()   # currently all pages have the nav — leave empty
 
 # ── Helpers ────────────────────────────────────────────────────────────────
 
+def needs_ga(content: str) -> bool:
+    return GA_ID not in content
+
+def fix_placeholder_ga(content: str) -> str:
+    """Replace G-XXXXXXXXXX placeholder with real GA ID."""
+    return content.replace("G-XXXXXXXXXX", GA_ID)
+
 def needs_adsense(content: str) -> bool:
     return "ca-pub-5264064065432511" not in content
 
@@ -38,19 +58,19 @@ def needs_ads_js(content: str) -> bool:
     return ADS_JS_TAG not in content
 
 def needs_mobile_nav(content: str) -> bool:
-    # Only inject if the page actually has the nav markup
     return MOBILE_NAV_TAG not in content and ('class="nav"' in content or 'class="site-nav"' in content)
 
+def inject_ga(content: str) -> str:
+    """Insert GA4 tag right after <head>."""
+    return content.replace("<head>", f"<head>\n{GA_TAG}", 1)
+
 def inject_adsense(content: str) -> str:
-    """Insert AdSense publisher script just before </head>."""
     return content.replace("</head>", f"{ADSENSE_SCRIPT}\n</head>", 1)
 
 def inject_ads_js(content: str) -> str:
-    """Insert ads.js script just before </body>."""
     return content.replace("</body>", f"{ADS_JS_TAG}\n</body>", 1)
 
 def inject_mobile_nav(content: str) -> str:
-    """Insert mobile-nav.js just before </body> (after ads.js if present)."""
     return content.replace("</body>", f"{MOBILE_NAV_TAG}\n</body>", 1)
 
 # ── Main ───────────────────────────────────────────────────────────────────
@@ -66,6 +86,16 @@ def main():
         content = path.read_text(encoding="utf-8")
         original = content
         injected = []
+
+        # Replace placeholder GA IDs first
+        if "G-XXXXXXXXXX" in content:
+            content = fix_placeholder_ga(content)
+            injected.append("GA placeholder fix")
+
+        # Inject real GA tag if still missing
+        if needs_ga(content):
+            content = inject_ga(content)
+            injected.append("GA4 tag")
 
         # Ads (excluded for signals page)
         if rel not in ADS_EXCLUDE:
