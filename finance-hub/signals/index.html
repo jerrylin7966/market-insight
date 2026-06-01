@@ -65,6 +65,36 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
 .divergence-amber{background:rgba(232,168,74,0.08);border:0.5px solid rgba(232,168,74,0.35);color:#e8a84a}
 .divergence-green{background:rgba(78,202,139,0.08);border:0.5px solid rgba(78,202,139,0.35);color:#4eca8b}
 .divergence-ok{background:rgba(255,255,255,0.02);border:0.5px solid var(--border);color:var(--muted)}
+
+/* ── Mobile ─────────────────────────────────────────────────────────────── */
+@media(max-width:640px){
+  main{padding:0.75rem}
+  .mkt-section{padding:1rem;border-radius:10px;margin-bottom:0.875rem}
+  .site-nav{padding:0 1rem}
+  .btn-nav:not(.nav-cta){display:none}
+  .signal-header{flex-direction:column;align-items:flex-start;gap:8px}
+  .signal-heading{font-size:15px}
+  .signal-badge{font-size:11px!important;padding:5px 12px!important}
+  .status-table td{font-size:11px;padding:7px 6px}
+  .traffic-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .traffic-pct{font-size:22px}
+  #breadth-status-card{grid-template-columns:repeat(2,1fr)!important}
+  #cli-cards{grid-template-columns:1fr!important}
+  .chart-range{flex-wrap:wrap}
+  .range-btn{font-size:10px;padding:3px 6px}
+  .divergence-box{font-size:11px}
+  /* Stack chart + panel vertically */
+  .ratio-flex{flex-direction:column!important}
+  .ratio-flex>div{flex:none!important;width:100%!important}
+  /* All charts: cap height on mobile */
+  canvas{max-height:220px}
+  #ratio-chart-container{height:220px!important;min-height:220px!important}
+  /* Scrollable wide tables */
+  .mkt-section{overflow-x:auto}
+}
+@media(max-width:400px){
+  .traffic-grid{grid-template-columns:1fr}
+}
 </style>
 <!-- PostHog Analytics -->
 <script>!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]);t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+" (stub people)"},o="init bs ws ge fs capture De calculateEventProperties $s register unregister registerOnce $i opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug identify alias set_config reset people.set people.set_once".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);posthog.init('phc_Dn75vEUONtcBO3kEBaYw7w6xaoHJIHuzIWhEf4kbgpj',{api_host:'https://us.i.posthog.com',person_profiles:'always'});posthog.register({site:'market-phase.com',page_path:window.location.pathname,page_url:window.location.href});</script>
@@ -137,17 +167,17 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
         </thead>
         <tbody style="color:var(--text)">
           <tr>
-            <td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#4eca8b;white-space:nowrap">🟢 Phase 1 — Green</td>
+            <td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#4eca8b;white-space:normal">🟢 Phase 1 — Green</td>
             <td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Score ≥ 5/6 · SOX leading, breadth healthy, VIX calm, CFNAI above trend</td>
             <td style="padding:5px 8px;border-bottom:0.5px solid var(--border)" data-i18n="phase1-action">Hold longs · buy dips aggressively</td>
           </tr>
           <tr>
-            <td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#e8a84a;white-space:nowrap">🟡 Phase 2-3 — Watch</td>
+            <td style="padding:5px 8px;border-bottom:0.5px solid var(--border);color:#e8a84a;white-space:normal">🟡 Phase 2-3 — Watch</td>
             <td style="padding:5px 8px;border-bottom:0.5px solid var(--border)">Score 3–4/6 · mixed signals, SOX diverging</td>
             <td style="padding:5px 8px;border-bottom:0.5px solid var(--border)" data-i18n="phase2-action">Reduce risk · tighten stops · no new longs</td>
           </tr>
           <tr>
-            <td style="padding:5px 8px;color:#e05c5c;white-space:nowrap">🔴 Phase 4 — Red</td>
+            <td style="padding:5px 8px;color:#e05c5c;white-space:normal">🔴 Phase 4 — Red</td>
             <td style="padding:5px 8px">Score ≤ 2/6 · Nasdaq breakdown, SOX bear market</td>
             <td style="padding:5px 8px" data-i18n="phase3-action">Exit growth positions · move to cash</td>
           </tr>
@@ -159,7 +189,7 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
     <div class="mkt-section">
       <div class="mkt-label" data-i18n="early-warning">Early Warning (SOX / QQQ Ratio)</div>
       <div class="mkt-desc">SOXX / QQQ Daily Ratio with 200-Day SMA + Normalized Prices</div>
-      <div style="display:flex;gap:1.25rem;margin-top:1rem;align-items:flex-start">
+      <div class="ratio-flex" style="display:flex;gap:1.25rem;margin-top:1rem;align-items:flex-start">
         <!-- Chart (65%) -->
         <div style="flex:0 0 65%">
           <div class="chart-range" style="margin-bottom:8px">
@@ -937,5 +967,6 @@ applyTranslations(currentLang);
 document.getElementById('app').classList.add('ready');
 loadMarketCharts();
 </script>
+<script src="/js/mobile-nav.js"></script>
 </body>
 </html>

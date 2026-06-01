@@ -195,7 +195,35 @@ footer{background:var(--text);color:rgba(255,255,255,0.6);padding:48px 0 32px}
   .content-sidebar{grid-template-columns:1fr}
   .footer-grid{grid-template-columns:1fr 1fr}
   .grid-3{grid-template-columns:1fr}
+  .grid-2{grid-template-columns:1fr}
   .phase-inner{flex-direction:column;align-items:flex-start}
+  /* Hero */
+  .hero{padding:48px 0 40px}
+  .hero-buttons{flex-direction:column;align-items:center}
+  .btn-primary,.btn-outline{width:100%;max-width:320px;text-align:center}
+  /* Hide leaderboard ad on mobile (728px won't fit) */
+  .ad-leaderboard{display:none}
+  /* Score chips */
+  .score-chips{gap:6px}
+  .score-chip{font-size:11px;padding:3px 9px}
+  /* Sections */
+  section{padding:36px 0}
+  .container{padding:0 1rem}
+  /* Indicators table — horizontal scroll */
+  .indicators-section .container{padding:0}
+  .ind-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 1rem}
+  .ind-table{min-width:560px}
+  /* Footer */
+  .footer-grid{grid-template-columns:1fr}
+  .footer-bottom{flex-direction:column;align-items:flex-start;gap:8px}
+  /* Sidebar ad hidden on mobile */
+  .sidebar-sticky{display:none}
+  /* Nav */
+  .nav{padding:0 1rem}
+}
+@media(max-width:480px){
+  .footer-grid{grid-template-columns:1fr}
+  .score-chips{flex-wrap:wrap}
 }
 </style>
 <!-- PostHog Analytics -->
@@ -415,6 +443,7 @@ footer{background:var(--text);color:rgba(255,255,255,0.6);padding:48px 0 32px}
       <div class="section-eyebrow">The Six Indicators</div>
       <h2 class="section-title">What We Track and Why</h2>
     </div>
+    <div class="ind-table-wrap">
     <table class="ind-table">
       <thead>
         <tr>
@@ -463,6 +492,7 @@ footer{background:var(--text);color:rgba(255,255,255,0.6);padding:48px 0 32px}
         </tr>
       </tbody>
     </table>
+    </div><!-- /ind-table-wrap -->
   </div>
 </section>
 
@@ -589,5 +619,6 @@ loadSignals();
 </script>
 
 <script src="/js/ads.js"></script>
+<script src="/js/mobile-nav.js"></script>
 </body>
 </html>
