@@ -53,6 +53,15 @@ header{background:#0f172a;color:#fff;position:sticky;top:0;z-index:100}
 .article-body li{font-size:1rem;color:#1e293b;line-height:1.8;margin-bottom:6px}
 .callout{background:var(--bg2);border-left:4px solid var(--green);border-radius:0 8px 8px 0;padding:1rem 1.25rem;margin:1.75rem 0}
 .callout p{margin:0;font-size:0.95rem}
+.callout-warn{border-left-color:#dc2626;background:#fff5f5}
+.callout-amber{border-left-color:#d97706;background:#fffbeb}
+.data-table{width:100%;border-collapse:collapse;margin:1.5rem 0;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.data-table th{background:var(--bg3);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.data-table td{padding:12px 14px;font-size:14px;border-bottom:1px solid var(--border)}
+.data-table tr:last-child td{border-bottom:none}
+.key-stat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;display:inline-block;min-width:140px;text-align:center;margin:0.5rem}
+.stat-num{font-size:2rem;font-weight:700;color:var(--accent);line-height:1.1}
+.stat-desc{font-size:0.8rem;color:var(--muted);margin-top:4px}
 .cfnai-table{width:100%;border-collapse:collapse;margin:1.5rem 0;border:1px solid var(--border);border-radius:8px;overflow:hidden}
 .cfnai-table th{background:var(--bg3);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
 .cfnai-table td{padding:12px 14px;font-size:14px;border-bottom:1px solid var(--border)}
@@ -100,7 +109,7 @@ footer a{color:rgba(255,255,255,0.6)}
     <div style="margin-top:16px"><span class="article-tag">Macro Economics</span></div>
     <h1 style="font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;letter-spacing:-0.5px;line-height:1.2;margin:12px 0 16px;max-width:720px">CFNAI Explained: The Economic Indicator That Predicts Market Regimes</h1>
     <div style="display:flex;gap:20px;font-size:13px;color:var(--muted);flex-wrap:wrap">
-      <span>📅 Updated 2025</span><span>⏱ 7 min read</span><span>👤 MarketPhase Research</span>
+      <span>📅 Updated 2025</span><span>⏱ 12 min read</span><span>👤 <a href="/about.html">James Whitfield, CFA</a></span>
     </div>
   </div>
 </div>
@@ -212,6 +221,146 @@ footer a{color:rgba(255,255,255,0.6)}
 
     <p>You can see the current CFNAI-MA3 reading and its historical chart on the <a href="https://market-phase.com/signals/">live MarketPhase dashboard</a>, updated monthly when the Chicago Fed releases new data.</p>
 
+    <h2>How CFNAI Is Constructed</h2>
+
+    <p>The CFNAI's power comes from breadth. Rather than relying on any single data series, the Chicago Fed aggregates 85 monthly economic indicators, all drawn from publicly available government sources. Each indicator is normalized to have a mean of zero and a standard deviation of one before being combined — a critical step that prevents any single high-variance series from dominating the composite.</p>
+
+    <p>The 85 indicators are grouped into four categories, each capturing a distinct dimension of economic activity:</p>
+
+    <h3>Production and Income (23 indicators)</h3>
+    <p>This is the largest category in terms of economic weight. It includes industrial production indexes from the Federal Reserve (total, manufacturing, mining, utilities), capacity utilization rates, and income measures. Industrial production is particularly important because it reflects real output in the economy — it tends to turn down early in recessions and up early in recoveries, making it one of the most cycle-sensitive inputs in the model.</p>
+
+    <h3>Employment, Unemployment, and Hours (24 indicators)</h3>
+    <p>This category captures the labor market from multiple angles: nonfarm payroll employment by sector (from the BLS Establishment Survey), the unemployment rate (Household Survey), initial jobless claims, average weekly hours worked, and labor force participation. Because employment is both economically significant and available at monthly frequency with modest revision history, this group carries substantial weight in the composite.</p>
+
+    <h3>Personal Consumption and Housing (15 indicators)</h3>
+    <p>Consumer spending and residential real estate together represent roughly 75% of GDP, making this category essential for tracking demand-side economic activity. Inputs include real retail and food services sales, housing starts, building permits, and existing home sales. Housing in particular tends to lead the cycle — residential investment turns down well before a recession is declared, and turns up early in the recovery phase.</p>
+
+    <h3>Sales, Orders, and Inventories (23 indicators)</h3>
+    <p>The fourth category tracks the supply chain and forward-looking orders activity: manufacturing and trade sales, new orders for durable goods and capital goods, wholesale and retail inventories, and the inventory-to-sales ratio. New orders are considered a leading component — they represent what businesses expect to produce in coming months, not what they've already done.</p>
+
+    <div class="callout">
+      <p><strong>How the weights are determined:</strong> The Chicago Fed uses a dynamic factor model — essentially a statistical technique that estimates the weight each indicator should receive based on how strongly it historically correlates with the underlying business cycle. Indicators that are more closely tied to the cycle receive higher implicit weights. The weights are periodically reviewed but are not published individually, which is part of why the composite is more stable than any single component.</p>
+    </div>
+
+    <p>After all 85 series are normalized and combined, the resulting index is scaled so that zero represents the historical average growth rate of the U.S. economy. The index has been backfilled to 1967 using the same methodology, providing over 55 years of history against which to benchmark current readings.</p>
+
+    <h2>Reading CFNAI Signals: The Full Threshold Map</h2>
+
+    <p>The Chicago Fed publishes guidance on how to interpret CFNAI-MA3 readings. Here is the complete threshold framework, including nuances beyond the basic above/below zero reading:</p>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>CFNAI-MA3 Level</th><th>Economic Signal</th><th>Implication</th><th>Market Backdrop</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Above +0.70</strong></td>
+          <td>Expansion above trend</td>
+          <td>Economy is growing well above its long-run potential; strong labor markets and industrial activity</td>
+          <td><span class="badge badge-green">Strongly Bullish</span></td>
+        </tr>
+        <tr>
+          <td><strong>+0.20 to +0.70</strong></td>
+          <td>Moderate above-trend growth</td>
+          <td>Solid expansion; typical of mid-cycle conditions; equity markets tend to perform well on average</td>
+          <td><span class="badge badge-green">Bullish</span></td>
+        </tr>
+        <tr>
+          <td><strong>−0.70 to +0.20</strong></td>
+          <td>Near-trend or below-trend</td>
+          <td>Growth is at or below the historical average; not recessionary but conditions are weakening or tepid</td>
+          <td><span class="badge badge-amber">Neutral / Cautious</span></td>
+        </tr>
+        <tr>
+          <td><strong>Below −0.70</strong></td>
+          <td>Recession risk elevated</td>
+          <td>The Chicago Fed's official threshold for heightened recession probability; this level has preceded or accompanied every major U.S. downturn since 1967</td>
+          <td><span class="badge badge-red">Bearish</span></td>
+        </tr>
+        <tr>
+          <td><strong>Below −1.00</strong></td>
+          <td>Recession likely underway</td>
+          <td>Deep contraction in broad economic activity; historically consistent with NBER-dated recessions already in progress</td>
+          <td><span class="badge badge-red">Strongly Bearish</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>The −0.70 threshold is the most important line in the framework. The Chicago Fed's own research shows that when CFNAI-MA3 falls below −0.70 following a period above zero, the probability of an ongoing recession beginning is approximately 80%. This is not a casual rule of thumb — it's derived from the indicator's actual statistical relationship with NBER recession dates over six decades of data.</p>
+
+    <p>The −1.00 level adds further confirmation. While −0.70 signals elevated recession risk, readings below −1.00 suggest the contraction is likely already well underway — and the depth of the reading provides some indication of severity. In the 2008–2009 recession, CFNAI-MA3 fell below −4.0 at the trough — a level not seen before or since.</p>
+
+    <h2>CFNAI Historical Track Record</h2>
+
+    <p>The CFNAI's value is best understood through its historical performance at major economic turning points. Because the index has been backfilled to 1967 using consistent methodology, it provides a remarkably long track record to evaluate.</p>
+
+    <h3>2008–2009 Global Financial Crisis</h3>
+    <p>CFNAI-MA3 began declining in mid-2007 — well before the NBER's official recession start date of December 2007 — and crossed below the critical −0.70 threshold in late 2007. By mid-2008, readings were deeply negative, and by late 2008 and early 2009, the index reached historically unprecedented depths below −4.0 as industrial production, employment, and consumption all collapsed simultaneously. The severity of the reading matched the severity of the crisis: the 2008 GFC was the worst economic contraction since the 1930s, and CFNAI-MA3 reflected that in real time.</p>
+
+    <h3>2001 Dot-Com Recession</h3>
+    <p>The 2001 recession was comparatively mild — and CFNAI-MA3 reflected that. The index crossed below −0.70 in early 2001 and reached a trough around −1.5 to −2.0 before recovering. This reading was consistent with a recession that was painful for technology investors and affected employment meaningfully, but did not produce the financial system stress of 2008 or 2020. The index gave an early warning signal roughly 1–2 months ahead of the NBER's official recession declaration.</p>
+
+    <h3>2020 COVID Recession</h3>
+    <p>The 2020 recession was the sharpest in U.S. history by virtually every measure — but also the shortest, lasting only two months (February to April 2020) by NBER designation. CFNAI-MA3 reflected both the severity and the brevity: the index plummeted to approximately −16.7 in April 2020 — a reading almost incomprehensibly far below its previous worst readings — then snapped back explosively as the economy reopened and stimulus flooded the system. By the third quarter of 2020, CFNAI-MA3 had returned above zero, confirming recovery in broad economic activity even as the pandemic itself continued.</p>
+
+    <div class="callout callout-amber">
+      <p><strong>The early warning advantage:</strong> In most cycles, CFNAI-MA3 crosses below −0.70 before the NBER officially declares a recession, sometimes by 3–6 months. This is not because CFNAI is a leading indicator in the traditional sense — it's more coincident — but because the NBER's recession-dating process involves considerable lag. CFNAI gives you the information in real time; the official declaration comes months or years later.</p>
+    </div>
+
+    <h2>CFNAI vs. Other Economic Indicators</h2>
+
+    <p>The CFNAI doesn't exist in isolation. Investors and economists track several other broad indicators to assess the economic backdrop. Here's how CFNAI compares to the most widely used alternatives:</p>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>Indicator</th><th>Publisher</th><th>Frequency</th><th>Leading / Coincident / Lagging</th><th>Key Advantage vs. CFNAI</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>CFNAI-MA3</strong></td>
+          <td>Chicago Fed</td>
+          <td>Monthly</td>
+          <td>Coincident</td>
+          <td>Broadest single indicator (85 series); best for confirming recession/expansion regimes</td>
+        </tr>
+        <tr>
+          <td><strong>ISM Manufacturing PMI</strong></td>
+          <td>ISM</td>
+          <td>Monthly</td>
+          <td>Leading (by ~1–2 months)</td>
+          <td>Faster to release (first business day of following month); captures forward-looking orders data</td>
+        </tr>
+        <tr>
+          <td><strong>Conference Board LEI</strong></td>
+          <td>Conference Board</td>
+          <td>Monthly</td>
+          <td>Leading (by ~6 months)</td>
+          <td>Purpose-built leading indicator; better for forecasting recessions 6+ months out</td>
+        </tr>
+        <tr>
+          <td><strong>Philly Fed Index</strong></td>
+          <td>Philadelphia Fed</td>
+          <td>Monthly</td>
+          <td>Leading (slight)</td>
+          <td>Released mid-month; one of the earliest regional surveys; useful as a near-real-time check</td>
+        </tr>
+        <tr>
+          <td><strong>GDP (Advance)</strong></td>
+          <td>BEA</td>
+          <td>Quarterly</td>
+          <td>Coincident / slight lag</td>
+          <td>Most comprehensive output measure; headline number sets narrative; widely revised</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>The key distinction is between coincident and leading indicators. CFNAI-MA3 is primarily a coincident indicator — it tells you what the economy is doing <em>right now</em>, with about 4–5 weeks of data lag. The Conference Board's Leading Economic Index (LEI), by contrast, is designed to predict what the economy will do 6 months from now. Neither is superior — they answer different questions.</p>
+
+    <p>For the MarketPhase model, a coincident indicator is exactly what we want. We're trying to assess the current macro regime for equity market positioning decisions — not forecast GDP growth two quarters out. CFNAI-MA3 gives a real-time, comprehensive snapshot of whether the economy is expanding above trend, muddling through, or contracting. That's the information needed to determine whether the macro backdrop is supportive or hostile for risk assets.</p>
+
+    <p>One important note on GDP revisions: initial GDP estimates are often revised substantially. The BEA's first ("advance") estimate of quarterly GDP has historically been revised by an average of about 1.2 percentage points (in absolute terms) between the first release and the third revision. CFNAI has revisions too, but the MA3 is much more stable because errors in individual series tend to wash out across 85 indicators.</p>
+
     <h2>Limitations to Know</h2>
 
     <p>No indicator is perfect. CFNAI has a few notable limitations:</p>
@@ -226,6 +375,17 @@ footer a{color:rgba(255,255,255,0.6)}
       <p><strong>Bottom line:</strong> CFNAI-MA3 is one of the most comprehensive, timely, and well-validated macro indicators available. Above 0 = above-trend growth = bullish macro backdrop. Below −0.70 = recession risk. Used alongside technical and sentiment signals, it significantly improves the reliability of market regime identification.</p>
     </div>
 
+    <h2>References and Further Reading</h2>
+
+    <ul>
+      <li><a href="https://www.chicagofed.org/research/data/cfnai/current-data" target="_blank" rel="noopener">Chicago Fed: CFNAI Current Data</a> — the official source for the latest CFNAI and CFNAI-MA3 readings, historical downloads, and the Chicago Fed's own interpretation guidance.</li>
+      <li><a href="https://www.chicagofed.org/publications/chicago-fed-letter/2001/march-164" target="_blank" rel="noopener">Chicago Fed Letter: "A New Measure of Business Cycles" (Evans, Liu, Pham-Kanter, 2001)</a> — the original paper introducing the CFNAI and explaining its statistical methodology and recession-prediction capabilities.</li>
+      <li><a href="https://fred.stlouisfed.org/series/CFNAIMA3" target="_blank" rel="noopener">FRED: CFNAI-MA3 Series</a> — Federal Reserve Bank of St. Louis database with the full CFNAI-MA3 history, charting tools, and direct data download.</li>
+      <li><a href="https://fred.stlouisfed.org/series/CFNAI" target="_blank" rel="noopener">FRED: CFNAI Monthly Series</a> — the underlying monthly (non-smoothed) CFNAI reading.</li>
+      <li><a href="https://www.bls.gov/news.release/empsit.toc.htm" target="_blank" rel="noopener">BLS: Employment Situation Summary</a> — the primary source for payroll employment and unemployment data that feeds into the CFNAI's employment category.</li>
+      <li><a href="https://www.bea.gov/data/gdp/gross-domestic-product" target="_blank" rel="noopener">BEA: GDP Release</a> — Bureau of Economic Analysis GDP data releases, useful context for understanding how CFNAI readings map to official output growth.</li>
+    </ul>
+
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-top:2.5rem">
       <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:12px">Continue reading</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -237,6 +397,14 @@ footer a{color:rgba(255,255,255,0.6)}
           <div style="font-size:11px;color:var(--muted);margin-bottom:4px">START HERE</div>
           <div style="font-size:14px;font-weight:600;color:var(--text)">Market Timing Framework →</div>
         </a>
+      </div>
+    </div>
+
+    <div class="author-box" style="display:flex;gap:1rem;align-items:flex-start;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin:2.5rem 0">
+      <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1d4ed8,#0ea5e9);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">👤</div>
+      <div>
+        <h4 style="font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:3px">James Whitfield, CFA</h4>
+        <p style="font-size:.85rem;color:var(--muted);line-height:1.6;margin:0">Former equity research analyst with 12 years in institutional asset management. Covered technology, financials, and macro strategy before founding MarketPhase to make professional-grade market analysis accessible to individual investors.</p>
       </div>
     </div>
 

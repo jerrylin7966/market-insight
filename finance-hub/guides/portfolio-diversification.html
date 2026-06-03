@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-02WMHRBYWL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-02WMHRBYWL');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Diversification: The Only Free Lunch in Investing | MarketPhase</title>
+<meta name="description" content="Why diversification works, the math of correlation, the efficient frontier, how many stocks eliminate idiosyncratic risk, and the rebalancing strategy that compounds wealth.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231d4ed8'/><text x='16' y='23' font-family='Inter,Arial,sans-serif' font-size='20' font-weight='700' text-anchor='middle' fill='white'>M</text></svg>">
+<link rel="canonical" href="https://www.market-phase.com/guides/portfolio-diversification.html">
+<meta property="og:title" content="Portfolio Diversification: The Only Free Lunch in Investing">
+<meta property="og:description" content="Why diversification works, the math of correlation, the efficient frontier, how many stocks eliminate idiosyncratic risk, and the rebalancing strategy that compounds wealth.">
+<meta property="og:type" content="article">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"Portfolio Diversification: The Only Free Lunch in Investing","author":{"@type":"Person","name":"James Whitfield","url":"https://www.market-phase.com/about.html"},"publisher":{"@type":"Organization","name":"MarketPhase","url":"https://www.market-phase.com"},"dateModified":"2026-06-01","description":"Why diversification works, the math of correlation, the efficient frontier, how many stocks eliminate idiosyncratic risk, and the rebalancing strategy that compounds wealth."}
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264064065432511" crossorigin="anonymous"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--bg2:#f8fafc;--bg3:#f1f5f9;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--accent:#1d4ed8;--font:'Inter',system-ui,sans-serif;--max:1200px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+header{background:#0f172a;color:#fff;position:sticky;top:0;z-index:100}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;max-width:var(--max);margin:0 auto;height:60px}
+.logo{font-size:20px;font-weight:700;color:#fff}.logo span{color:#60a5fa}
+.nav-links{display:flex;gap:1.75rem;align-items:center}
+.nav-links a{color:rgba(255,255,255,0.8);font-size:14px;font-weight:500}
+.nav-links a:hover{color:#fff;text-decoration:none}
+.nav-cta{background:#1d4ed8;color:#fff!important;padding:7px 18px;border-radius:6px;font-size:13px!important}
+.article-layout{display:grid;grid-template-columns:1fr 300px;gap:3rem;max-width:var(--max);margin:0 auto;padding:48px 1.5rem}
+@media(max-width:900px){.article-layout{grid-template-columns:1fr}.sidebar{display:none}}
+.article-tag{display:inline-block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;padding:4px 12px;border-radius:20px;margin-bottom:12px}
+.tag-green{background:#dcfce7;color:#166534}
+.article-body h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;line-height:1.2;margin-bottom:1rem;letter-spacing:-0.5px}
+.article-body .meta{font-size:13px;color:var(--muted);margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.article-body h2{font-size:1.35rem;font-weight:700;color:var(--text);margin:2.5rem 0 1rem}
+.article-body h3{font-size:1.1rem;font-weight:600;color:var(--text);margin:2rem 0 0.75rem}
+.article-body p{font-size:1rem;color:#1e293b;line-height:1.8;margin-bottom:1.25rem}
+.article-body ul,.article-body ol{margin:0 0 1.25rem 1.5rem}
+.article-body li{font-size:1rem;color:#1e293b;line-height:1.8;margin-bottom:6px}
+.callout{background:var(--bg2);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:1rem 1.25rem;margin:1.75rem 0}
+.callout p{margin:0;font-size:0.95rem;color:#1e293b;line-height:1.7}
+.callout-warn{border-left-color:#dc2626;background:#fff5f5}
+.callout-green{border-left-color:#059669;background:#f0fdf4}
+.callout-amber{border-left-color:#d97706;background:#fffbeb}
+.data-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:.9rem}
+.data-table th{background:var(--bg3);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.data-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:#1e293b;vertical-align:top}
+.data-table tr:last-child td{border-bottom:none}
+.key-stat{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:1rem 1.25rem;margin:1.5rem 0;display:flex;align-items:center;gap:1rem}
+.key-stat .stat-num{font-size:2rem;font-weight:700;color:var(--accent);flex-shrink:0}
+.key-stat .stat-desc{font-size:.9rem;color:#1e293b;line-height:1.6}
+.phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+@media(max-width:600px){.phase-grid{grid-template-columns:1fr}}
+.phase-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem}
+.phase-card h4{font-size:.85rem;font-weight:700;margin-bottom:.5rem;color:var(--text)}
+.phase-card p{font-size:.875rem;color:#334155;line-height:1.65;margin:0}
+.author-box{display:flex;gap:1rem;align-items:flex-start;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin:2.5rem 0}
+.author-avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1d4ed8,#0ea5e9);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.author-info h4{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.author-info p{font-size:.85rem;color:var(--muted);line-height:1.6;margin:0}
+.sidebar-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem}
+.sidebar-card h4{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.75rem}
+.sidebar-card p{font-size:.9rem;color:#1e293b;line-height:1.65;margin-bottom:.75rem}
+.sidebar-card a.btn{display:block;text-align:center;background:var(--accent);color:#fff;padding:.6rem 1rem;border-radius:8px;font-size:.9rem;font-weight:600;text-decoration:none;margin-top:.5rem}
+.cite{font-size:.8rem;color:var(--muted);margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+.cite h4{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.75rem;color:var(--muted)}
+.cite ol{margin-left:1.25rem}
+.cite li{font-size:.8rem;line-height:1.7;margin-bottom:4px;color:var(--muted)}
+.cite a{color:var(--accent)}
+footer{background:#0f172a;color:rgba(255,255,255,.5);padding:32px 0;margin-top:48px;text-align:center;font-size:13px}
+footer a{color:rgba(255,255,255,.6)}
+@media(max-width:640px){.nav-links{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <nav class="nav">
+    <a href="/" class="logo">Market<span>Phase</span></a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/signals/">Live Signals</a>
+      <a href="/guides/">Guides</a>
+      <a href="/daily/">Daily Digest</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/signals/" class="nav-cta">→ Live Signals</a>
+    </div>
+  </nav>
+</header>
+
+<div class="article-layout">
+<div class="article-body">
+
+<span class="article-tag tag-green">Portfolio</span>
+<h1>Portfolio Diversification: The Only Free Lunch in Investing</h1>
+<p class="meta">By James Whitfield, CFA &nbsp;·&nbsp; June 2026 &nbsp;·&nbsp; ~10 min read</p>
+
+<p>Harry Markowitz won the Nobel Prize in Economics in 1990 for an insight that is deceptively simple but mathematically profound: combining imperfectly correlated assets into a portfolio can reduce risk without necessarily reducing expected return. In other words, you can get something for nothing — reduced volatility at no cost to expected performance. This is what Markowitz famously called "diversification," and it is the only genuine free lunch that finance has ever produced.</p>
+
+<p>The problem is that most investors — including many professionals — understand diversification as a concept while misapplying it in practice. They confuse holding many assets with holding uncorrelated assets. They mistake sector breadth within equities for genuine asset class diversification. They neglect geographic diversification until a home-country bias has already cost them decades of compounding in international markets. And they underestimate how correlations shift dramatically during market crises, precisely when diversification is needed most.</p>
+
+<p>This guide covers the mathematics of why diversification works, the asset classes and their pairwise correlations, what geographic diversification actually adds to a portfolio, the concept of the efficient frontier, how many individual stocks are required to substantially eliminate company-specific risk, how to rebalance, and the most common mistakes that defeat the purpose of diversification entirely.</p>
+
+<h2>Why Diversification Works: The Math of Correlation</h2>
+
+<p>Portfolio volatility is not the simple average of the individual assets' volatilities. It is governed by the correlation between those assets. If you hold two assets, A and B, each with a standard deviation of 20%, the portfolio standard deviation depends critically on how they move together.</p>
+
+<ul>
+  <li>If A and B are perfectly correlated (+1.0): portfolio volatility = 20% (no benefit from combining them)</li>
+  <li>If A and B are uncorrelated (0.0): portfolio volatility ≈ 14.1% (meaningful risk reduction)</li>
+  <li>If A and B are perfectly negatively correlated (−1.0): portfolio volatility = 0% (theoretical perfect hedge)</li>
+</ul>
+
+<p>The real world sits between 0 and +1 for most asset pairs. The key insight is that any correlation below +1.0 provides some diversification benefit. Adding an asset with lower-than-average correlation to your existing portfolio reduces overall volatility — even if that asset itself is quite volatile — as long as it doesn't move in lockstep with everything else.</p>
+
+<div class="key-stat">
+  <div class="stat-num">0.67</div>
+  <div class="stat-desc">The average 10-year correlation between U.S. and international developed market equities (MSCI EAFE vs. S&P 500), based on data from 2000–2024. Enough difference to provide diversification benefit, but not so low that international equities are a perfect hedge — they still sell off when U.S. markets crash.</div>
+</div>
+
+<p>The formula for two-asset portfolio variance is: σ²_p = w²_A · σ²_A + w²_B · σ²_B + 2 · w_A · w_B · σ_A · σ_B · ρ_AB, where ρ is the correlation coefficient. The last term — containing ρ — is the crucial one. When ρ is low, this term is small, and the portfolio variance falls well below the weighted average of the individual variances.</p>
+
+<h2>Asset Classes and Their Correlations</h2>
+
+<p>Understanding which asset classes genuinely diversify a portfolio requires looking at their correlations over time — and recognizing that correlations are not constant. They change with economic conditions, and they often converge toward 1.0 during market crises, precisely when you want diversification most.</p>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Asset Pair</th>
+      <th>Typical Long-Run Correlation</th>
+      <th>2008–2009 Crisis Correlation</th>
+      <th>Diversification Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>U.S. Large Cap vs. U.S. Small Cap</td>
+      <td>~0.85</td>
+      <td>~0.92</td>
+      <td>Low — both are equities</td>
+    </tr>
+    <tr>
+      <td>U.S. Equities vs. Int'l Developed</td>
+      <td>~0.67</td>
+      <td>~0.88</td>
+      <td>Moderate; declines in crises</td>
+    </tr>
+    <tr>
+      <td>U.S. Equities vs. Emerging Markets</td>
+      <td>~0.60</td>
+      <td>~0.82</td>
+      <td>Moderate; structural growth exposure</td>
+    </tr>
+    <tr>
+      <td>U.S. Equities vs. U.S. Agg Bonds</td>
+      <td>~−0.20 to 0.10</td>
+      <td>~−0.40</td>
+      <td>High — negative in recessions (usually)</td>
+    </tr>
+    <tr>
+      <td>U.S. Equities vs. Gold</td>
+      <td>~0.02</td>
+      <td>~−0.05</td>
+      <td>Very high — near-zero correlation</td>
+    </tr>
+    <tr>
+      <td>U.S. Equities vs. REITs</td>
+      <td>~0.55</td>
+      <td>~0.78</td>
+      <td>Moderate; rises in financial crises</td>
+    </tr>
+    <tr>
+      <td>U.S. Equities vs. Commodities</td>
+      <td>~0.15</td>
+      <td>~0.30</td>
+      <td>High in normal times; moderate in crises</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The critical observation is that the bond-equity correlation is not stable. For most of the period from 2000 to 2021, bonds and stocks moved in opposite directions — falling rates boosted bond prices while equity corrections drove investors to safety. This "negative correlation" regime made the classic 60/40 portfolio one of the most risk-efficient allocations in financial history. In 2022, that correlation flipped positive as both bonds and stocks fell simultaneously — a reminder that diversification assumptions need revisiting, not just accepting as permanent.</p>
+
+<h2>The Efficient Frontier: Getting the Most Return per Unit of Risk</h2>
+
+<p>Markowitz's 1952 framework introduced the concept of the <strong>efficient frontier</strong> — the set of portfolios that maximize expected return for a given level of risk (or minimize risk for a given expected return). Portfolios on the frontier are "efficient" in the technical sense: you cannot improve on them without either accepting more risk or sacrificing expected return.</p>
+
+<p>Portfolios inside the frontier are "inefficient" — you could rearrange the same assets to get better performance. Portfolios outside the frontier are theoretically impossible given the available assets. The practical implication is that most individual investors hold inefficient portfolios — often overconcentrated in their home market, underweight asset classes with low equity correlation, and carrying more risk than their return expectations justify.</p>
+
+<div class="callout callout-green">
+<p><strong>The practical takeaway from modern portfolio theory:</strong> You don't need to optimize a portfolio to the third decimal place. The broad insight — hold multiple asset classes with low pairwise correlations, rebalance periodically, and avoid concentrating risk in any single position — captures most of the available benefit. Complexity beyond that often introduces execution costs and behavioral errors that eliminate theoretical gains.</p>
+</div>
+
+<h2>Geographic Diversification: Why Home Bias Is a Trap</h2>
+
+<p>U.S. investors hold approximately 80% of their equity portfolios in U.S. stocks, even though the United States represents roughly 60% of global market capitalization. This "home bias" is not unique to Americans — Japanese investors concentrate in Japan, UK investors in the UK — but it carries a real cost.</p>
+
+<p>From 2000 to 2010, the S&P 500 delivered roughly 0% total return in real terms. The MSCI Emerging Markets Index delivered approximately +180% over the same period. Investors with heavy U.S. concentration suffered a lost decade while global equity investors with broader exposure fared substantially better. From 2010 to 2020, the tables reversed — U.S. markets massively outperformed international. The historical record suggests that leadership rotates, and that holding only one region is a bet on that region continuing to lead — a bet with no historical basis for confidence.</p>
+
+<p>Geographic diversification also provides exposure to different economic cycles, currency dynamics, and sector concentrations. The MSCI Europe index is heavily weighted toward financials and consumer staples. The MSCI Emerging Markets index has high exposure to technology (particularly semiconductors), materials, and financial services. These structural differences mean international equities bring genuine exposure differences, not just superficially different names.</p>
+
+<h2>How Many Stocks Eliminate Idiosyncratic Risk?</h2>
+
+<p>When you own a single stock, your portfolio is exposed to two types of risk: systematic risk (market risk — the beta exposure to the overall market that cannot be diversified away) and idiosyncratic risk (company-specific risk — the risk that this particular company underperforms or fails). Diversification eliminates idiosyncratic risk but not systematic risk.</p>
+
+<p>Classic finance research — Evans and Archer (1968) and later Statman (1987) — showed that idiosyncratic risk falls rapidly as you add stocks, but with diminishing returns. A portfolio of 1 stock has the highest company-specific risk. A portfolio of 10 stocks has approximately 50% less idiosyncratic risk. A portfolio of 20–25 uncorrelated stocks has eliminated approximately 85–90% of idiosyncratic risk — at which point the remaining risk is overwhelmingly systematic (beta to the market).</p>
+
+<div class="key-stat">
+  <div class="stat-num">25</div>
+  <div class="stat-desc">The approximate number of diversely chosen individual stocks needed to eliminate roughly 85–90% of idiosyncratic (company-specific) risk in a U.S. equity portfolio. Beyond ~50 stocks, additional diversification from adding more individual names provides negligible risk reduction.</div>
+</div>
+
+<p>There is an important caveat: the 20–25 stock threshold assumes stocks are chosen from different industries and sectors. A portfolio of 25 bank stocks provides far less diversification than a portfolio of 25 stocks spread across technology, healthcare, energy, consumer staples, materials, and financials. Sector concentration remains a form of underdiversification even when the position count looks adequate.</p>
+
+<h2>Rebalancing: The Mechanical Return Enhancer</h2>
+
+<p>Diversification only works long-term if you rebalance. Without rebalancing, portfolio weights drift as asset prices diverge — a 60/40 equity/bond portfolio that is never rebalanced becomes an 80/20 portfolio after a long equity bull market, exposing the investor to far more risk than they intended just as valuations peak.</p>
+
+<p>Rebalancing serves two functions simultaneously. First, it enforces risk discipline — it keeps the portfolio aligned with the investor's intended risk tolerance. Second, it mechanically implements a "sell high, buy low" discipline by trimming outperforming assets and adding to underperformers. This "rebalancing bonus" — the incremental return generated by systematic rebalancing — has been estimated by academic research at approximately 0.3–0.5% per year in trending markets, and higher in mean-reverting markets.</p>
+
+<p>The two common approaches are calendar rebalancing (annual or semi-annual, regardless of drift) and threshold rebalancing (rebalance when any asset class deviates from target by more than 5 percentage points). Research by Vanguard and others suggests threshold rebalancing is modestly more efficient than calendar rebalancing because it responds to actual market conditions rather than an arbitrary time schedule.</p>
+
+<h2>Common Diversification Mistakes</h2>
+
+<p>Even investors who understand diversification theoretically often make errors in practice.</p>
+
+<h3>Mistake 1: Confusing Number of Holdings with Diversification</h3>
+<p>Owning 10 technology ETFs is not more diversified than owning 1. If all holdings track similar indices or sectors, they move together — the correlation between them is near 1.0, and diversification benefit is minimal. True diversification requires low correlation between holdings, not merely a large count of them.</p>
+
+<h3>Mistake 2: Neglecting Asset Class Diversification</h3>
+<p>An equity-only portfolio — even one with hundreds of stocks across dozens of countries — has no buffer against equity market risk. The 2000–2002 crash and the 2008–2009 crisis both produced 40–55% drawdowns in globally diversified equity portfolios. Adding bonds, gold, and real assets with low equity correlation reduces the severity of these drawdowns and enables compounding to resume faster after recovery.</p>
+
+<h3>Mistake 3: Underestimating Crisis Correlations</h3>
+<p>Correlations between asset classes rise substantially during market panics. In 2008, nearly everything fell together — international equities, REITs, high-yield bonds, and commodities all sold off alongside U.S. equities. The assets that held up were U.S. Treasuries, gold, and the U.S. dollar. Building a portfolio on normal-environment correlations without stress-testing crisis correlations leads to nasty surprises precisely when protection is most needed.</p>
+
+<div class="callout callout-warn">
+<p><strong>Diversification does not eliminate drawdowns.</strong> A well-diversified portfolio will still lose money during broad market corrections. The benefit is that it loses less than a concentrated portfolio, recovers faster, and avoids the permanent capital impairment that comes from a single major position going to zero. No amount of diversification protects against a 100% loss in an undiversified concentrated position — something that happens to individual stocks far more often than investors appreciate.</p>
+</div>
+
+<h3>Mistake 4: Over-Diversifying Into Irrelevance</h3>
+<p>There is also such a thing as too much diversification — sometimes called "diworsification" (coined by Peter Lynch). Adding a 50th ETF that is 95% correlated with existing holdings adds no meaningful risk reduction while increasing complexity, costs, and monitoring burden. The marginal benefit of the 51st position in a well-constructed portfolio approaches zero. Effective diversification is about strategic asset class coverage, not maximizing the number of positions.</p>
+
+<p>The free lunch Markowitz identified is real, but like all opportunities in markets, it requires discipline to capture. It demands holding assets that feel uncomfortable when your core holdings are outperforming (international equities, bonds, commodities), it requires rebalancing against the prevailing narrative, and it requires accepting that short-term tracking error against a concentrated benchmark is the price of long-run risk management. For investors who can maintain that discipline, the compounding benefit over a full market cycle — the avoided drawdown, the faster recovery, the smoother ride — is one of the most powerful tools available.</p>
+
+<div class="author-box">
+  <div class="author-avatar">👤</div>
+  <div class="author-info">
+    <h4>James Whitfield, CFA</h4>
+    <p>Former equity research analyst with 12 years in institutional asset management. Covered technology, financials, and macro strategy before founding MarketPhase to make professional-grade market analysis accessible to individual investors.</p>
+  </div>
+</div>
+
+<div class="cite">
+  <h4>Sources &amp; References</h4>
+  <ol>
+    <li>Markowitz, H. (1952). "Portfolio Selection." <em>Journal of Finance</em>, 7(1), 77–91.</li>
+    <li>Statman, M. (1987). "How Many Stocks Make a Diversified Portfolio?" <em>Journal of Financial and Quantitative Analysis</em>, 22(3), 353–363.</li>
+    <li>Vanguard Research. (2019). "Best Practices for Portfolio Rebalancing." <a href="https://www.vanguard.com/pdf/ISGPORE.pdf">vanguard.com</a></li>
+    <li>Dimson, E., Marsh, P., &amp; Staunton, M. (2023). <em>Credit Suisse Global Investment Returns Yearbook 2023.</em> Credit Suisse Research Institute.</li>
+    <li>Fama, E.F. &amp; French, K.R. (1992). "The Cross-Section of Expected Stock Returns." <em>Journal of Finance</em>, 47(2), 427–465.</li>
+  </ol>
+</div>
+
+</div>
+<aside class="sidebar">
+  <div class="sidebar-card">
+    <h4>Live Market Signals</h4>
+    <p>See where the market stands right now with our real-time phase indicator.</p>
+    <a href="/signals/" class="btn">→ View Dashboard</a>
+  </div>
+  <div class="sidebar-card">
+    <h4>More Guides</h4>
+    <p>Explore our full library of market education guides.</p>
+    <a href="/guides/" class="btn">Browse All Guides</a>
+  </div>
+</aside>
+</div>
+
+<footer>
+  <p><a href="/">MarketPhase</a> · <a href="/signals/">Live Signals</a> · <a href="/guides/">Guides</a> · <a href="/daily/">Daily Digest</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/privacy.html">Privacy Policy</a></p>
+  <p style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.3)">For informational purposes only. Not financial advice. © 2026 MarketPhase.</p>
+</footer>
+<script src="/js/ads.js"></script>
+<script src="/js/mobile-nav.js"></script>
+</body>
+</html>

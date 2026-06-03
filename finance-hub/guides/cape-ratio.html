@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-02WMHRBYWL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-02WMHRBYWL');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The CAPE Ratio (Shiller P/E): The Market Valuation Tool Wall Street Actually Uses | MarketPhase</title>
+<meta name="description" content="What the CAPE ratio measures, how Shiller's research works, historical data from the 1920s to today, and how to use it practically without falling for its limitations.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231d4ed8'/><text x='16' y='23' font-family='Inter,Arial,sans-serif' font-size='20' font-weight='700' text-anchor='middle' fill='white'>M</text></svg>">
+<link rel="canonical" href="https://www.market-phase.com/guides/cape-ratio.html">
+<meta property="og:title" content="The CAPE Ratio (Shiller P/E): The Market Valuation Tool Wall Street Actually Uses">
+<meta property="og:description" content="What the CAPE ratio measures, how Shiller's research works, historical data from the 1920s to today, and how to use it practically without falling for its limitations.">
+<meta property="og:type" content="article">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"The CAPE Ratio (Shiller P/E): The Market Valuation Tool Wall Street Actually Uses","author":{"@type":"Person","name":"James Whitfield","url":"https://www.market-phase.com/about.html"},"publisher":{"@type":"Organization","name":"MarketPhase","url":"https://www.market-phase.com"},"dateModified":"2026-06-01","description":"What the CAPE ratio measures, how Shiller's research works, historical data from the 1920s to today, and how to use it practically without falling for its limitations."}
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264064065432511" crossorigin="anonymous"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--bg2:#f8fafc;--bg3:#f1f5f9;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--accent:#1d4ed8;--font:'Inter',system-ui,sans-serif;--max:1200px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+header{background:#0f172a;color:#fff;position:sticky;top:0;z-index:100}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;max-width:var(--max);margin:0 auto;height:60px}
+.logo{font-size:20px;font-weight:700;color:#fff}.logo span{color:#60a5fa}
+.nav-links{display:flex;gap:1.75rem;align-items:center}
+.nav-links a{color:rgba(255,255,255,0.8);font-size:14px;font-weight:500}
+.nav-links a:hover{color:#fff;text-decoration:none}
+.nav-cta{background:#1d4ed8;color:#fff!important;padding:7px 18px;border-radius:6px;font-size:13px!important}
+.article-layout{display:grid;grid-template-columns:1fr 300px;gap:3rem;max-width:var(--max);margin:0 auto;padding:48px 1.5rem}
+@media(max-width:900px){.article-layout{grid-template-columns:1fr}.sidebar{display:none}}
+.article-tag{display:inline-block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;padding:4px 12px;border-radius:20px;margin-bottom:12px}
+.tag-blue{background:#dbeafe;color:#1e40af}
+.article-body h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;line-height:1.2;margin-bottom:1rem;letter-spacing:-0.5px}
+.article-body .meta{font-size:13px;color:var(--muted);margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.article-body h2{font-size:1.35rem;font-weight:700;color:var(--text);margin:2.5rem 0 1rem}
+.article-body h3{font-size:1.1rem;font-weight:600;color:var(--text);margin:2rem 0 0.75rem}
+.article-body p{font-size:1rem;color:#1e293b;line-height:1.8;margin-bottom:1.25rem}
+.article-body ul,.article-body ol{margin:0 0 1.25rem 1.5rem}
+.article-body li{font-size:1rem;color:#1e293b;line-height:1.8;margin-bottom:6px}
+.callout{background:var(--bg2);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:1rem 1.25rem;margin:1.75rem 0}
+.callout p{margin:0;font-size:0.95rem;color:#1e293b;line-height:1.7}
+.callout-warn{border-left-color:#dc2626;background:#fff5f5}
+.callout-green{border-left-color:#059669;background:#f0fdf4}
+.callout-amber{border-left-color:#d97706;background:#fffbeb}
+.data-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:.9rem}
+.data-table th{background:var(--bg3);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.data-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:#1e293b;vertical-align:top}
+.data-table tr:last-child td{border-bottom:none}
+.key-stat{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:1rem 1.25rem;margin:1.5rem 0;display:flex;align-items:center;gap:1rem}
+.key-stat .stat-num{font-size:2rem;font-weight:700;color:var(--accent);flex-shrink:0}
+.key-stat .stat-desc{font-size:.9rem;color:#1e293b;line-height:1.6}
+.phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+@media(max-width:600px){.phase-grid{grid-template-columns:1fr}}
+.phase-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem}
+.phase-card h4{font-size:.85rem;font-weight:700;margin-bottom:.5rem;color:var(--text)}
+.phase-card p{font-size:.875rem;color:#334155;line-height:1.65;margin:0}
+.author-box{display:flex;gap:1rem;align-items:flex-start;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin:2.5rem 0}
+.author-avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1d4ed8,#0ea5e9);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.author-info h4{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.author-info p{font-size:.85rem;color:var(--muted);line-height:1.6;margin:0}
+.sidebar-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem}
+.sidebar-card h4{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.75rem}
+.sidebar-card p{font-size:.9rem;color:#1e293b;line-height:1.65;margin-bottom:.75rem}
+.sidebar-card a.btn{display:block;text-align:center;background:var(--accent);color:#fff;padding:.6rem 1rem;border-radius:8px;font-size:.9rem;font-weight:600;text-decoration:none;margin-top:.5rem}
+.cite{font-size:.8rem;color:var(--muted);margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+.cite h4{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.75rem;color:var(--muted)}
+.cite ol{margin-left:1.25rem}
+.cite li{font-size:.8rem;line-height:1.7;margin-bottom:4px;color:var(--muted)}
+.cite a{color:var(--accent)}
+footer{background:#0f172a;color:rgba(255,255,255,.5);padding:32px 0;margin-top:48px;text-align:center;font-size:13px}
+footer a{color:rgba(255,255,255,.6)}
+@media(max-width:640px){.nav-links{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <nav class="nav">
+    <a href="/" class="logo">Market<span>Phase</span></a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/signals/">Live Signals</a>
+      <a href="/guides/">Guides</a>
+      <a href="/daily/">Daily Digest</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/signals/" class="nav-cta">→ Live Signals</a>
+    </div>
+  </nav>
+</header>
+
+<div class="article-layout">
+<div class="article-body">
+
+<span class="article-tag tag-blue">Valuation</span>
+<h1>The CAPE Ratio (Shiller P/E): The Market Valuation Tool Wall Street Actually Uses</h1>
+<p class="meta">By James Whitfield, CFA &nbsp;·&nbsp; June 2026 &nbsp;·&nbsp; ~9 min read</p>
+
+<p>In January 2000, the S&P 500 Cyclically Adjusted Price-to-Earnings ratio — the CAPE — stood at 44. The long-run historical average was roughly 16. Robert Shiller, the Yale economist who developed the measure, had been publicly warning about irrational exuberance for years. He was ignored by most of Wall Street. Then the dot-com bubble burst. The S&P 500 fell 49% peak-to-trough. Investors who used CAPE as a signal to reduce equity exposure in the late 1990s avoided devastating losses. Those who dismissed it as a relic from a less sophisticated era were reminded, painfully, why history matters in markets.</p>
+
+<p>The CAPE ratio is one of the most empirically grounded market valuation tools available to individual investors. It is not a short-term trading signal. But as a predictor of long-run expected returns, it has a track record that is difficult to argue with. This guide explains how CAPE is constructed, what the historical data shows, how professional investors use it, and — critically — what its real limitations are.</p>
+
+<h2>What CAPE Measures (and How It Differs from Regular P/E)</h2>
+
+<p>The ordinary price-to-earnings ratio divides the current price of the S&P 500 by the most recent 12 months of reported earnings. The problem is that earnings are cyclical. They surge during economic booms and collapse during recessions. If you buy a stock when earnings are temporarily depressed — say, in 2009 at the bottom of the financial crisis — the trailing P/E will look artificially high even though the market is actually cheap on any longer-term earnings basis.</p>
+
+<p>Robert Shiller and John Campbell's 1988 paper, later refined into Shiller's 2000 book <em>Irrational Exuberance</em>, addressed this by smoothing earnings over a full economic cycle. The CAPE ratio divides the current real (inflation-adjusted) S&P 500 price by the average of the previous 10 years of real earnings. Using a decade of earnings smooths out recessions and booms, providing a more stable denominator that reflects the true earning power of the index through a full business cycle.</p>
+
+<p>The formula: <strong>CAPE = Real S&P 500 Price / 10-Year Average Real Earnings</strong></p>
+
+<div class="key-stat">
+  <div class="stat-num">17.0</div>
+  <div class="stat-desc">The long-run historical average CAPE ratio for the U.S. market (1881–2025), based on Shiller's data. Every time CAPE has exceeded 30 for a sustained period, subsequent 10-year real returns have been below average — often significantly.</div>
+</div>
+
+<p>The power of CAPE over regular P/E is that it doesn't make the current year's earnings the sole arbiter of value. A company or market can look "cheap" on a 1-year P/E during an earnings boom and simultaneously look expensive on CAPE — signaling that current earnings are cyclically elevated and may not persist. Conversely, during recessions, CAPE prevents the appearance of extreme "expensiveness" that trailing P/E can falsely show.</p>
+
+<h2>Historical CAPE Data: A Century of Market Cycles</h2>
+
+<p>Shiller's dataset, freely available on his website, extends back to 1881 — giving us nearly 145 years of U.S. market valuation data. The long-run average CAPE is approximately 17, but the metric's range has been enormous.</p>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Period / Event</th>
+      <th>CAPE Level</th>
+      <th>Subsequent 10-Year Real Return (S&P 500)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1929 Peak (pre-crash)</td>
+      <td>~32</td>
+      <td>−0.4% annualized</td>
+    </tr>
+    <tr>
+      <td>1932 Depression Trough</td>
+      <td>~6</td>
+      <td>+12.9% annualized</td>
+    </tr>
+    <tr>
+      <td>1966 Market Top</td>
+      <td>~24</td>
+      <td>+0.2% annualized (lost decade)</td>
+    </tr>
+    <tr>
+      <td>1982 Bear Market Trough</td>
+      <td>~7</td>
+      <td>+15.2% annualized (great bull market)</td>
+    </tr>
+    <tr>
+      <td>January 2000 (tech peak)</td>
+      <td>44</td>
+      <td>−3.4% annualized</td>
+    </tr>
+    <tr>
+      <td>March 2009 (GFC trough)</td>
+      <td>~13</td>
+      <td>+15.5% annualized</td>
+    </tr>
+    <tr>
+      <td>January 2022</td>
+      <td>~39</td>
+      <td>TBD — market declined ~25% in 2022</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The pattern is not subtle. Every period when CAPE was below 10 was followed by exceptional long-run returns. Every period when CAPE exceeded 30 was followed by below-average or negative real returns over the subsequent decade. The relationship is not perfect, and the timing is impossible to pinpoint, but the directional signal has been remarkably consistent across 145 years of data.</p>
+
+<p>The academic research formalizes this. Shiller and Campbell's original work found that CAPE explains approximately 40% of the variance in 10-year real equity returns — a striking result for any single financial variable predicting a decade-long outcome.</p>
+
+<h2>How High CAPE Predicts Lower Future Returns: The Mechanism</h2>
+
+<p>Why does high CAPE predict low future returns? Three mechanisms are at work.</p>
+
+<p><strong>Mean reversion of valuations.</strong> Valuation multiples oscillate around a long-run average. When CAPE is elevated, it eventually reverts toward the mean — either through falling prices, rising earnings, or both. Paying 40x smoothed earnings means you are paying a premium that must be "worked off" by future earnings growth before returns normalize. The higher the entry multiple, the lower the expected return from multiple compression alone.</p>
+
+<p><strong>Earnings mean-reversion.</strong> When earnings have been strong for 10 years — pushing the trailing earnings up and the CAPE denominator higher — there is often a reversion risk: the next decade may see slower earnings growth, reducing the numerator of the CAPE and weighing on future returns.</p>
+
+<p><strong>Dividend yield compression.</strong> When prices rise faster than earnings (as they do during valuation expansion), the dividend yield falls. A lower starting dividend yield mathematically reduces the long-run total return, since dividends are a substantial component of total equity returns historically (accounting for roughly 40% of real returns over the past century, according to Dimson, Marsh, and Staunton).</p>
+
+<div class="callout">
+<p><strong>The CAPE earnings yield as a return estimate:</strong> A practical shorthand for estimating expected real equity returns is the inverse of CAPE — the CAPE earnings yield. At CAPE = 30, the CAPE yield is 1/30 = 3.3%. At CAPE = 17 (historical average), it's 5.9%. This is not a precise forecast, but it provides a ballpark for what a "fair" decade of returns looks like at current valuations — and why high-CAPE entry points are challenging for long-term return expectations.</p>
+</div>
+
+<h2>Real Limitations You Should Not Ignore</h2>
+
+<p>CAPE is a valuable tool, but treating it as infallible is a mistake. Its most serious critics raise four substantive points.</p>
+
+<h3>Accounting Rule Changes</h3>
+
+<p>The denominator of CAPE — reported earnings — has been calculated under materially different accounting standards over the past century. Most significantly, the shift to SFAS 142 in 2001 changed how goodwill impairment is recorded, causing dramatically larger write-downs to flow through reported earnings during downturns. The result is that reported earnings in the 2001–2002 and 2008–2009 downturns appear lower than they would have under prior rules, inflating the apparent CAPE. Research by Jeremy Siegel suggests that using operating earnings (which exclude one-time write-offs) rather than reported earnings reduces the apparent CAPE by 15–30% in recent decades, making the market look less expensive than standard CAPE implies.</p>
+
+<h3>Survivorship Bias</h3>
+
+<p>Shiller's dataset is a U.S.-only dataset, and the U.S. has been among the most successful equity markets in history. Its "normal" CAPE of 17 may be higher than the global average because U.S. corporations have delivered exceptional earnings growth, strong property rights, and institutional stability over 145 years. The same CAPE of 17 may not represent "fair value" for a country with weaker institutional history. This is also why international markets consistently trade at lower CAPE levels than the U.S. — it may reflect genuine structural differences in expected returns, not simple cheapness.</p>
+
+<h3>Interest Rate Context</h3>
+
+<p>Valuation multiples do not exist in a vacuum — they are compared against the available returns on alternative assets. When 10-year Treasury yields are at 1%, paying a 30x CAPE multiple (3.3% real earnings yield) looks relatively attractive compared to a guaranteed 1% nominal bond yield. When 10-year yields rise to 5%, the same CAPE looks far less attractive. This "excess CAPE yield" framework — comparing the CAPE earnings yield to the 10-year real yield — adjusts CAPE for the interest rate environment and is increasingly used by institutional strategists who argue the "new normal" for CAPE should be above the pre-2000 historical average.</p>
+
+<h3>CAPE Is Not a Timing Tool</h3>
+
+<p>Perhaps the most important caveat: CAPE was elevated throughout much of the 1990s, reaching 30 by 1997. An investor who sold all equities in 1997 because CAPE exceeded its historical average would have missed three more years of extraordinary gains before the crash. CAPE can remain elevated for extended periods. As John Maynard Keynes observed about markets: they can stay irrational longer than you can stay solvent.</p>
+
+<div class="callout callout-warn">
+<p><strong>Never use CAPE as a market timing trigger.</strong> The academic evidence supports CAPE as a long-horizon expected return estimator, not as a signal for when to buy or sell. Investors who mechanically sell when CAPE crosses 25 have historically exited profitable markets too early and experienced the regret of missed gains. Use it to calibrate return expectations, not to time entries and exits.</p>
+</div>
+
+<h2>How Professional Investors Actually Use CAPE</h2>
+
+<p>Institutional asset allocators use CAPE in several distinct ways that are accessible to individual investors as well.</p>
+
+<h3>Setting Return Expectations</h3>
+
+<p>Large pension funds and endowments use CAPE-implied returns as one input into their long-run capital market assumptions. When CAPE is elevated, a pension may reduce its expected equity return assumption from 7% to 5% for modeling purposes — which may require higher contribution rates or lower projected benefit payouts. This is not a market call; it is a disciplined acknowledgment that high starting valuations reduce expected returns.</p>
+
+<h3>Global Tactical Asset Allocation (GTAA)</h3>
+
+<p>Many institutional funds compare CAPE ratios across global equity markets to identify relative value. As of 2025, the U.S. market's CAPE was near 35–38, while European markets traded around 15–18 and emerging markets around 12–14. The implication — supported by historical evidence from Mebane Faber and others — is that capital invested in lower-CAPE markets tends to generate higher subsequent returns, even after accounting for currency and structural risks.</p>
+
+<div class="phase-grid">
+  <div class="phase-card">
+    <h4>CAPE Below 15</h4>
+    <p>Historically associated with exceptional 10-year forward returns. Rare in U.S. markets. Common in international markets during crises or prolonged stagnation.</p>
+  </div>
+  <div class="phase-card">
+    <h4>CAPE 15–20</h4>
+    <p>Near historical average. Expected returns roughly in line with long-run equity averages of 5–7% real annually. Generally not a signal to under- or over-weight equities.</p>
+  </div>
+  <div class="phase-card">
+    <h4>CAPE 20–30</h4>
+    <p>Modestly elevated. Expected 10-year returns below average. Not extreme, but a reasonable prompt to ensure portfolio is not overconcentrated in equities.</p>
+  </div>
+  <div class="phase-card">
+    <h4>CAPE Above 30</h4>
+    <p>Historically associated with below-average or negative 10-year real returns. Has correctly identified every major 20th/21st century market peak in the U.S.</p>
+  </div>
+</div>
+
+<h3>Country Allocation and the "CAPE of the Globe"</h3>
+
+<p>Research by Faber (2012) and confirmed by numerous subsequent academic studies found that buying the cheapest-CAPE quintile of global markets and rotating out of the most expensive quintile produced meaningful excess returns over full cycles. This is not an easy strategy to implement for individuals, but ETFs tracking markets like India, Brazil, South Korea, Poland, or Turkey — which frequently trade at CAPE levels well below U.S. norms — make geographic CAPE arbitrage accessible at low cost.</p>
+
+<h2>CAPE Today and What It Implies</h2>
+
+<p>As of early 2026, the U.S. CAPE ratio sits in the mid-to-high 30s — well above the long-run average of 17, but below the all-time peak of 44 set in early 2000. Based on historical relationships, a CAPE in this range implies that long-run real equity returns over the next 10 years are likely to be below the historical average of approximately 6.5% annually — perhaps in the 3–5% range. This does not mean a crash is imminent. It means the starting conditions for compounding are less favorable than average, and that investors should calibrate expectations accordingly — especially those approaching retirement who have less time to wait for mean reversion.</p>
+
+<p>The CAPE ratio will not tell you when the next bear market starts, or when to buy. But it will tell you something crucial: what kind of decade you are likely buying into. In a world where most investors anchor on recent performance to set future expectations, having a tool rooted in a century of data that says "this era looks expensive relative to history" is genuinely valuable — provided you use it with appropriate humility about its limitations.</p>
+
+<div class="author-box">
+  <div class="author-avatar">👤</div>
+  <div class="author-info">
+    <h4>James Whitfield, CFA</h4>
+    <p>Former equity research analyst with 12 years in institutional asset management. Covered technology, financials, and macro strategy before founding MarketPhase to make professional-grade market analysis accessible to individual investors.</p>
+  </div>
+</div>
+
+<div class="cite">
+  <h4>Sources &amp; References</h4>
+  <ol>
+    <li>Shiller, R.J. (2000). <em>Irrational Exuberance.</em> Princeton University Press. Data available at <a href="http://www.econ.yale.edu/~shiller/data.htm">econ.yale.edu/~shiller/data.htm</a></li>
+    <li>Campbell, J.Y. &amp; Shiller, R.J. (1988). "Stock Prices, Earnings, and Expected Dividends." <em>Journal of Finance</em>, 43(3), 661–676.</li>
+    <li>Faber, M. (2012). "Global Value: Building Trading Models with the 10-Year CAPE." <em>SSRN Working Paper.</em> <a href="https://ssrn.com/abstract=2129474">ssrn.com</a></li>
+    <li>Siegel, J.J. (2016). "The Shiller CAPE Ratio: A New Look." <em>Financial Analysts Journal</em>, 72(3), 41–50.</li>
+    <li>Dimson, E., Marsh, P., &amp; Staunton, M. (2023). <em>Credit Suisse Global Investment Returns Yearbook 2023.</em> Credit Suisse Research Institute.</li>
+  </ol>
+</div>
+
+</div>
+<aside class="sidebar">
+  <div class="sidebar-card">
+    <h4>Live Market Signals</h4>
+    <p>See where the market stands right now with our real-time phase indicator.</p>
+    <a href="/signals/" class="btn">→ View Dashboard</a>
+  </div>
+  <div class="sidebar-card">
+    <h4>More Guides</h4>
+    <p>Explore our full library of market education guides.</p>
+    <a href="/guides/" class="btn">Browse All Guides</a>
+  </div>
+</aside>
+</div>
+
+<footer>
+  <p><a href="/">MarketPhase</a> · <a href="/signals/">Live Signals</a> · <a href="/guides/">Guides</a> · <a href="/daily/">Daily Digest</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/privacy.html">Privacy Policy</a></p>
+  <p style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.3)">For informational purposes only. Not financial advice. © 2026 MarketPhase.</p>
+</footer>
+<script src="/js/ads.js"></script>
+<script src="/js/mobile-nav.js"></script>
+</body>
+</html>

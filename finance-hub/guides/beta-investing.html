@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-02WMHRBYWL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-02WMHRBYWL');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Is Beta? How to Measure and Use Investment Risk Like a Pro | MarketPhase</title>
+<meta name="description" content="A complete guide to beta in investing — how it's calculated, what high and low beta means, beta's role in CAPM, its limitations, and how to use it in portfolio construction.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231d4ed8'/><text x='16' y='23' font-family='Inter,Arial,sans-serif' font-size='20' font-weight='700' text-anchor='middle' fill='white'>M</text></svg>">
+<link rel="canonical" href="https://www.market-phase.com/guides/beta-investing.html">
+<meta property="og:title" content="What Is Beta? How to Measure and Use Investment Risk Like a Pro">
+<meta property="og:description" content="A complete guide to beta in investing — how it's calculated, what high and low beta means, beta's role in CAPM, its limitations, and how to use it in portfolio construction.">
+<meta property="og:type" content="article">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"What Is Beta? How to Measure and Use Investment Risk Like a Pro","author":{"@type":"Person","name":"James Whitfield","url":"https://www.market-phase.com/about.html"},"publisher":{"@type":"Organization","name":"MarketPhase","url":"https://www.market-phase.com"},"dateModified":"2026-06-01","description":"A complete guide to beta in investing — how it's calculated, what high and low beta means, beta's role in CAPM, its limitations, and how to use it in portfolio construction."}
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264064065432511" crossorigin="anonymous"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--bg2:#f8fafc;--bg3:#f1f5f9;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--accent:#1d4ed8;--font:'Inter',system-ui,sans-serif;--max:1200px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+header{background:#0f172a;color:#fff;position:sticky;top:0;z-index:100}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;max-width:var(--max);margin:0 auto;height:60px}
+.logo{font-size:20px;font-weight:700;color:#fff}.logo span{color:#60a5fa}
+.nav-links{display:flex;gap:1.75rem;align-items:center}
+.nav-links a{color:rgba(255,255,255,0.8);font-size:14px;font-weight:500}
+.nav-links a:hover{color:#fff;text-decoration:none}
+.nav-cta{background:#1d4ed8;color:#fff!important;padding:7px 18px;border-radius:6px;font-size:13px!important}
+.article-layout{display:grid;grid-template-columns:1fr 300px;gap:3rem;max-width:var(--max);margin:0 auto;padding:48px 1.5rem}
+@media(max-width:900px){.article-layout{grid-template-columns:1fr}.sidebar{display:none}}
+.article-tag{display:inline-block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;padding:4px 12px;border-radius:20px;margin-bottom:12px}
+.tag-blue{background:#dbeafe;color:#1e40af}
+.tag-green{background:#dcfce7;color:#166534}
+.tag-red{background:#fee2e2;color:#991b1b}
+.tag-purple{background:#f3e8ff;color:#6b21a8}
+.tag-amber{background:#fef3c7;color:#92400e}
+.article-body h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;line-height:1.2;margin-bottom:1rem;letter-spacing:-0.5px}
+.article-body .meta{font-size:13px;color:var(--muted);margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.article-body h2{font-size:1.35rem;font-weight:700;color:var(--text);margin:2.5rem 0 1rem}
+.article-body h3{font-size:1.1rem;font-weight:600;color:var(--text);margin:2rem 0 0.75rem}
+.article-body p{font-size:1rem;color:#1e293b;line-height:1.8;margin-bottom:1.25rem}
+.article-body ul,.article-body ol{margin:0 0 1.25rem 1.5rem}
+.article-body li{font-size:1rem;color:#1e293b;line-height:1.8;margin-bottom:6px}
+.callout{background:var(--bg2);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:1rem 1.25rem;margin:1.75rem 0}
+.callout p{margin:0;font-size:0.95rem;color:#1e293b;line-height:1.7}
+.callout-warn{border-left-color:#dc2626;background:#fff5f5}
+.callout-green{border-left-color:#059669;background:#f0fdf4}
+.callout-amber{border-left-color:#d97706;background:#fffbeb}
+.data-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:.9rem}
+.data-table th{background:var(--bg3);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.data-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:#1e293b;vertical-align:top}
+.data-table tr:last-child td{border-bottom:none}
+.key-stat{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:1rem 1.25rem;margin:1.5rem 0;display:flex;align-items:center;gap:1rem}
+.key-stat .stat-num{font-size:2rem;font-weight:700;color:var(--accent);flex-shrink:0}
+.key-stat .stat-desc{font-size:.9rem;color:#1e293b;line-height:1.6}
+.phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+@media(max-width:600px){.phase-grid{grid-template-columns:1fr}}
+.phase-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem}
+.phase-card h4{font-size:.85rem;font-weight:700;margin-bottom:.5rem;color:var(--text)}
+.phase-card p{font-size:.875rem;color:#334155;line-height:1.65;margin:0}
+.author-box{display:flex;gap:1rem;align-items:flex-start;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin:2.5rem 0}
+.author-avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1d4ed8,#0ea5e9);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.author-info h4{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.author-info p{font-size:.85rem;color:var(--muted);line-height:1.6;margin:0}
+.sidebar-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem}
+.sidebar-card h4{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.75rem}
+.sidebar-card p{font-size:.9rem;color:#1e293b;line-height:1.65;margin-bottom:.75rem}
+.sidebar-card a.btn{display:block;text-align:center;background:var(--accent);color:#fff;padding:.6rem 1rem;border-radius:8px;font-size:.9rem;font-weight:600;text-decoration:none;margin-top:.5rem}
+.cite{font-size:.8rem;color:var(--muted);margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+.cite h4{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.75rem;color:var(--muted)}
+.cite ol{margin-left:1.25rem}
+.cite li{font-size:.8rem;line-height:1.7;margin-bottom:4px;color:var(--muted)}
+.cite a{color:var(--accent)}
+footer{background:#0f172a;color:rgba(255,255,255,.5);padding:32px 0;margin-top:48px;text-align:center;font-size:13px}
+footer a{color:rgba(255,255,255,.6)}
+@media(max-width:640px){.nav-links{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <nav class="nav">
+    <a href="/" class="logo">Market<span>Phase</span></a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/signals/">Live Signals</a>
+      <a href="/guides/">Guides</a>
+      <a href="/daily/">Daily Digest</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/signals/" class="nav-cta">→ Live Signals</a>
+    </div>
+  </nav>
+</header>
+
+<div class="article-layout">
+<div class="article-body">
+
+<span class="article-tag tag-purple">Risk</span>
+<h1>What Is Beta? How to Measure and Use Investment Risk Like a Pro</h1>
+<p class="meta">By James Whitfield, CFA &nbsp;·&nbsp; June 1, 2026 &nbsp;·&nbsp; 9 min read</p>
+
+<p>Every stock and portfolio carries risk — but not all risk is the same. Some risk is unique to a single company (it might face a lawsuit, lose a key contract, or report a surprise earnings miss). Other risk is shared by the entire market: recessions, interest rate spikes, geopolitical crises. Beta is the tool that quantifies a security's sensitivity to that second type of risk — the broad market risk that cannot be eliminated through diversification alone.</p>
+
+<p>Professional investors use beta constantly: portfolio managers target specific portfolio betas to match client risk mandates; equity analysts use beta as an input in valuation models; traders adjust beta to hedge positions or amplify market exposure. This guide explains what beta actually measures, how it is calculated, how to use it in portfolio construction, and — critically — where it falls short.</p>
+
+<h2>What Beta Measures and What It Does Not</h2>
+
+<p>Beta (denoted β) measures the <strong>systematic risk</strong> of a security relative to a market benchmark, typically the S&amp;P 500. More precisely, it measures how much the price of a security tends to move for every 1% move in the market index.</p>
+
+<ul>
+  <li><strong>Beta = 1.0:</strong> The security tends to move in line with the market. If the S&amp;P 500 rises 10%, a stock with beta of 1.0 is expected to rise approximately 10%.</li>
+  <li><strong>Beta &gt; 1.0:</strong> The security is more volatile than the market. A beta of 1.5 means the stock tends to move 1.5% for every 1% market move — it amplifies both gains and losses.</li>
+  <li><strong>Beta between 0 and 1.0:</strong> The security moves in the same direction as the market but with smaller magnitude. Beta of 0.6 means 0.6% movement per 1% market move — more stable but still positively correlated.</li>
+  <li><strong>Beta = 0:</strong> No correlation with market movements. Cash has a beta of zero.</li>
+  <li><strong>Beta &lt; 0:</strong> The security tends to move opposite to the market. Gold and inverse ETFs often exhibit negative or near-zero betas. A stock with beta of -0.5 rises roughly 0.5% when the market falls 1%, and vice versa.</li>
+</ul>
+
+<div class="callout">
+<p><strong>Beta vs. volatility:</strong> Beta and volatility (standard deviation) are related but distinct. Volatility measures total price variability; beta measures only the portion of that variability explained by market movements. A biotech company might be extremely volatile due to binary trial outcomes — but if those outcomes are uncorrelated with the S&amp;P 500, the stock might have a low beta despite high volatility. Beta captures market-correlated risk; volatility captures all risk.</p>
+</div>
+
+<h2>The Beta Formula and How It Is Calculated</h2>
+
+<p>Beta is calculated using linear regression of a security's returns against the market's returns over a historical period. The formula is:</p>
+
+<p><strong>β = Covariance(R<sub>stock</sub>, R<sub>market</sub>) / Variance(R<sub>market</sub>)</strong></p>
+
+<p>In plain English: beta equals the covariance of the stock's returns with the market's returns, divided by the variance of the market's returns. Covariance measures how the stock and market move together; dividing by market variance scales this into a standardized coefficient.</p>
+
+<p>Equivalently, beta can be expressed as:</p>
+
+<p><strong>β = Correlation(R<sub>stock</sub>, R<sub>market</sub>) × [Standard Deviation(R<sub>stock</sub>) / Standard Deviation(R<sub>market</sub>)]</strong></p>
+
+<p>This formulation clarifies that beta incorporates both the correlation between the stock and market (how often they move together) and the relative volatility of the stock versus the market (how large the stock's moves are compared to market moves). A perfectly correlated stock that is twice as volatile as the market will have a beta of 2.0.</p>
+
+<div class="key-stat">
+  <div class="stat-num">5 years</div>
+  <div class="stat-desc">The standard lookback period most financial data providers (Bloomberg, Yahoo Finance, Morningstar) use for calculating beta — typically using monthly returns over 60 months regressed against the S&amp;P 500. Some providers use 3 years of weekly data; the choice of period significantly affects the result.</div>
+</div>
+
+<p>Practically speaking, you almost never need to calculate beta yourself. Every major financial data provider reports it as a standard metric. Yahoo Finance shows it in the stock statistics panel, Bloomberg has it under DES (description) for any equity, and Morningstar reports it in portfolio analytics. What matters is understanding what the number means and where it comes from, not running the regression manually.</p>
+
+<h2>Beta in CAPM: The Capital Asset Pricing Model</h2>
+
+<p>Beta's theoretical home is the <strong>Capital Asset Pricing Model (CAPM)</strong>, developed by William Sharpe (who won the Nobel Prize in Economics in 1990 for this and related work) in 1964. CAPM provides a formula for calculating the expected return of any investment given its beta:</p>
+
+<p><strong>Expected Return = Risk-Free Rate + β × (Market Return − Risk-Free Rate)</strong></p>
+
+<p>The term (Market Return − Risk-Free Rate) is the <strong>equity risk premium (ERP)</strong> — the extra return investors demand for holding stocks rather than risk-free government bonds. If the 10-year Treasury yields 4.5% and the expected long-run equity return is 10%, the ERP is 5.5%.</p>
+
+<p>For a stock with beta = 1.5, CAPM says the expected return should be:</p>
+<p>4.5% + 1.5 × 5.5% = 4.5% + 8.25% = <strong>12.75%</strong></p>
+
+<p>The core insight: higher beta stocks must offer higher expected returns to compensate investors for taking on more market risk. If a stock is priced to return less than what CAPM says is appropriate for its beta, it is theoretically overvalued; if it is expected to return more, it is undervalued. This excess return above the CAPM prediction is called <strong>alpha</strong> — the holy grail of active management.</p>
+
+<div class="callout callout-amber">
+<p><strong>CAPM's practical limitations:</strong> While CAPM is foundational, it has well-documented empirical failures. The predicted linear relationship between beta and returns is weak in real-world data. High-beta stocks have historically underperformed what CAPM predicts, while low-beta stocks have outperformed — the basis of the "low volatility anomaly" or "defensive equity" strategy. The Fama-French models (three-factor, five-factor) extended CAPM by adding size and value factors precisely because beta alone did not explain observed returns.</p>
+</div>
+
+<h2>High Beta vs. Low Beta: Practical Implications</h2>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Beta Range</th>
+      <th>Typical Securities</th>
+      <th>Bull Market Behavior</th>
+      <th>Bear Market Behavior</th>
+      <th>Best For</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>β &gt; 1.5</td>
+      <td>High-growth tech, small caps, crypto-adjacent stocks, leveraged ETFs</td>
+      <td>Outperforms significantly</td>
+      <td>Underperforms significantly; large drawdowns</td>
+      <td>Aggressive investors with long horizons and high risk tolerance</td>
+    </tr>
+    <tr>
+      <td>β 1.0–1.5</td>
+      <td>Cyclical stocks, industrials, financials, consumer discretionary</td>
+      <td>Outperforms modestly</td>
+      <td>Falls more than market</td>
+      <td>Growth-oriented portfolios in expanding economy</td>
+    </tr>
+    <tr>
+      <td>β 0.5–1.0</td>
+      <td>Large-cap blue chips, healthcare, consumer staples</td>
+      <td>Slightly lags bull market</td>
+      <td>Falls less than market</td>
+      <td>Balanced portfolios seeking moderate risk</td>
+    </tr>
+    <tr>
+      <td>β 0–0.5</td>
+      <td>Utilities, REITs, dividend stocks, gold miners</td>
+      <td>Lags market meaningfully</td>
+      <td>Strong defensive characteristics</td>
+      <td>Conservative investors, retirement portfolios, recession hedges</td>
+    </tr>
+    <tr>
+      <td>β &lt; 0</td>
+      <td>Gold, inverse ETFs, some volatility products</td>
+      <td>May lose money as market rises</td>
+      <td>May gain as market falls</td>
+      <td>Portfolio hedges, not standalone investments</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>The Low Volatility Anomaly</h3>
+<p>One of the most counterintuitive and empirically robust findings in financial markets is that low-beta stocks have historically delivered competitive — and in some studies superior — risk-adjusted returns compared with high-beta stocks. This contradicts CAPM directly, which predicts that higher beta should yield higher return. The leading explanations include:</p>
+<ul>
+  <li>Institutional constraints that force fund managers to hold high-beta stocks to meet return targets, driving up the prices (and reducing the forward returns) of high-beta securities</li>
+  <li>Investor preference for "lottery-ticket" characteristics in high-beta, high-volatility stocks, causing them to be overpriced</li>
+  <li>Leverage aversion: risk-averse investors who want equity returns but cannot use leverage buy high-beta stocks instead, driving their prices up</li>
+</ul>
+
+<p>This anomaly is the basis for "low volatility" or "minimum variance" ETFs like USMV (iShares MSCI USA Min Vol Factor ETF) and SPLV (Invesco S&amp;P 500 Low Volatility ETF), which systematically overweight low-beta stocks.</p>
+
+<h2>The Limitations of Beta</h2>
+
+<p>Beta is a useful tool, but it comes with important limitations that every serious investor should understand:</p>
+
+<h3>Beta Is Backward-Looking</h3>
+<p>Standard beta is calculated from historical data — typically 3–5 years of past returns. It tells you how a stock has behaved relative to the market in the past, not necessarily how it will behave in the future. Companies change: a business that was once a stable utility might pivot to capital-light software, dramatically changing its future beta. Using a 5-year trailing beta for a transformed company can be misleading.</p>
+
+<h3>Beta Is Unstable Over Time</h3>
+<p>Beta estimates are noisy and shift meaningfully across market regimes. During the 2008 financial crisis, correlations between all risky assets surged toward 1.0 — stocks that normally had different betas all moved together. Research has shown that in crisis periods, diversification via beta is much less effective than in normal periods, because the very tail risks that beta is supposed to help manage are precisely when correlations spike and beta estimates prove inaccurate.</p>
+
+<div class="callout callout-warn">
+<p><strong>Survivorship bias in beta:</strong> A stock that goes bankrupt is removed from the index, and its historical data eventually disappears from beta calculations. This means beta estimates for the overall market have a subtle upward bias — the most volatile and risky stocks that blew up are underrepresented in historical calculations. Be particularly skeptical of low beta readings for thinly traded small-cap stocks where illiquidity can suppress measured volatility and artificially compress beta.</p>
+</div>
+
+<h3>Beta Depends on the Benchmark Chosen</h3>
+<p>Beta is always relative to a specific market index. A stock's beta against the S&amp;P 500 will differ from its beta against the Russell 2000 or the MSCI World Index. For internationally diversified portfolios, using the S&amp;P 500 beta is less informative because a significant portion of the portfolio's risk comes from non-US markets. There is no single "true" beta — only beta relative to a specific benchmark.</p>
+
+<h3>Beta Does Not Capture Idiosyncratic Risk</h3>
+<p>Beta measures only systematic (market) risk. The total risk of a concentrated single-stock position includes substantial idiosyncratic (company-specific) risk that beta ignores entirely. A portfolio of 20–30 stocks diversifies away most idiosyncratic risk; a one- or two-stock portfolio does not. Using beta to assess the risk of a concentrated position is dangerously incomplete.</p>
+
+<h2>How to Find Beta for Any Security</h2>
+
+<p>Beta is widely and freely available:</p>
+<ul>
+  <li><strong>Yahoo Finance:</strong> Search any ticker, go to the Statistics tab. Beta (5Y Monthly) is listed under Market Measures.</li>
+  <li><strong>Morningstar:</strong> Available under the Risk section for any stock or fund.</li>
+  <li><strong>Finviz.com:</strong> Shows beta in the stock screener and individual stock pages.</li>
+  <li><strong>Your brokerage:</strong> Fidelity, Schwab, and TD Ameritrade all display beta in their research sections.</li>
+  <li><strong>ETF providers:</strong> iShares, Vanguard, and Invesco publish factor data including beta for their funds.</li>
+</ul>
+
+<h2>Using Beta in Portfolio Construction</h2>
+
+<p>Portfolio beta is simply the weighted average of the betas of all holdings:</p>
+
+<p><strong>Portfolio β = Σ (Weight<sub>i</sub> × β<sub>i</sub>)</strong></p>
+
+<p>If you hold 60% in VOO (S&amp;P 500 ETF, beta ~1.0), 20% in USMV (min vol ETF, beta ~0.6), and 20% in XLK (tech ETF, beta ~1.3), your portfolio beta is:</p>
+<p>0.60 × 1.0 + 0.20 × 0.6 + 0.20 × 1.3 = 0.60 + 0.12 + 0.26 = <strong>0.98</strong></p>
+
+<div class="key-stat">
+  <div class="stat-num">0.85</div>
+  <div class="stat-desc">A commonly targeted portfolio beta for moderate-risk investors who want equity exposure while reducing drawdown severity — roughly equivalent to a 60/40 stock-bond allocation in terms of historical downside, but achievable purely within equities using defensive sector tilts and low-volatility factors.</div>
+</div>
+
+<p>Practical beta-management strategies include:</p>
+<ul>
+  <li><strong>Cyclical positioning:</strong> Raise portfolio beta when confident in economic expansion (overweight financials, tech, discretionary); lower beta ahead of expected slowdowns (overweight staples, utilities, healthcare).</li>
+  <li><strong>Recession preparation:</strong> Reducing overall portfolio beta before a downturn — by rotating into low-beta defensives or increasing cash — can dramatically reduce drawdown even without shorting the market.</li>
+  <li><strong>Factor diversification:</strong> Combining high-beta growth stocks with low-beta value or dividend stocks can maintain a moderate portfolio beta while diversifying the source of returns.</li>
+  <li><strong>Tactical hedging:</strong> Institutional investors sometimes use S&amp;P 500 futures or put options to reduce portfolio beta during high-risk periods without selling underlying positions and triggering taxable events.</li>
+</ul>
+
+<p>Beta is not a perfect risk measure — no single number can fully capture the complexity of investment risk. But as a starting point for understanding how a security or portfolio will likely behave relative to broad market swings, it remains one of the most practical and widely used tools in professional investing. Knowing your portfolio's beta — and consciously choosing whether to raise or lower it based on your risk tolerance and market outlook — puts you ahead of most retail investors who accept whatever risk their holdings happen to generate.</p>
+
+<div class="author-box">
+  <div class="author-avatar">👤</div>
+  <div class="author-info">
+    <h4>James Whitfield, CFA</h4>
+    <p>Former equity research analyst with 12 years in institutional asset management. Covered technology, financials, and macro strategy before founding MarketPhase to make professional-grade market analysis accessible to individual investors.</p>
+  </div>
+</div>
+
+<div class="cite">
+  <h4>Sources &amp; References</h4>
+  <ol>
+    <li>Sharpe, William F. <a href="https://doi.org/10.2307/2977928" target="_blank" rel="noopener">"Capital Asset Prices: A Theory of Market Equilibrium Under Conditions of Risk."</a> Journal of Finance, 19(3), 1964.</li>
+    <li>Fama, Eugene F. and Kenneth R. French. <a href="https://doi.org/10.1111/j.1540-6261.1992.tb04398.x" target="_blank" rel="noopener">"The Cross-Section of Expected Stock Returns."</a> Journal of Finance, 47(2), 1992.</li>
+    <li>Baker, Malcolm, Brendan Bradley, and Jeffrey Wurgler. <a href="https://doi.org/10.2469/faj.v67.n1.1" target="_blank" rel="noopener">"Benchmarks as Limits to Arbitrage: Understanding the Low Volatility Anomaly."</a> Financial Analysts Journal, 67(1), 2011.</li>
+    <li>U.S. Securities and Exchange Commission. <a href="https://www.sec.gov/oiea/investor-alerts-and-bulletins/ib_leveraged_etfs" target="_blank" rel="noopener">"Leveraged and Inverse ETFs: Specialized Products with Extra Risks for Buy-and-Hold Investors."</a> SEC Investor Bulletin, 2009.</li>
+    <li>CFA Institute. <a href="https://www.cfainstitute.org/en/membership/professional-development/refresher-readings/portfolio-risk-and-return-part-i" target="_blank" rel="noopener">"Portfolio Risk and Return."</a> CFA Program Curriculum, Level I, 2024.</li>
+  </ol>
+</div>
+
+</div>
+<aside class="sidebar">
+  <div class="sidebar-card">
+    <h4>Live Market Signals</h4>
+    <p>See where the market stands right now with our real-time phase indicator.</p>
+    <a href="/signals/" class="btn">→ View Dashboard</a>
+  </div>
+  <div class="sidebar-card">
+    <h4>More Guides</h4>
+    <p>Explore our full library of market education guides.</p>
+    <a href="/guides/" class="btn">Browse All Guides</a>
+  </div>
+</aside>
+</div>
+
+<footer>
+  <p><a href="/">MarketPhase</a> · <a href="/signals/">Live Signals</a> · <a href="/guides/">Guides</a> · <a href="/daily/">Daily Digest</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/privacy.html">Privacy Policy</a></p>
+  <p style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.3)">For informational purposes only. Not financial advice. © 2026 MarketPhase.</p>
+</footer>
+<script src="/js/ads.js"></script>
+<script src="/js/mobile-nav.js"></script>
+</body>
+</html>

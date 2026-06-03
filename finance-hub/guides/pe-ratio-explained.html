@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-02WMHRBYWL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-02WMHRBYWL');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P/E Ratio Explained: How to Tell If a Stock Is Cheap or Expensive | MarketPhase</title>
+<meta name="description" content="A deep dive into the price-to-earnings ratio — how to calculate it, what it really measures, its limitations, and how professional investors use it to find value.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231d4ed8'/><text x='16' y='23' font-family='Inter,Arial,sans-serif' font-size='20' font-weight='700' text-anchor='middle' fill='white'>M</text></svg>">
+<link rel="canonical" href="https://www.market-phase.com/guides/pe-ratio-explained.html">
+<meta property="og:title" content="P/E Ratio Explained: How to Tell If a Stock Is Cheap or Expensive">
+<meta property="og:description" content="A deep dive into the price-to-earnings ratio — how to calculate it, what it really measures, its limitations, and how professional investors use it to find value.">
+<meta property="og:type" content="article">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"P/E Ratio Explained: How to Tell If a Stock Is Cheap or Expensive","author":{"@type":"Person","name":"James Whitfield","url":"https://www.market-phase.com/about.html"},"publisher":{"@type":"Organization","name":"MarketPhase","url":"https://www.market-phase.com"},"dateModified":"2026-06-01","description":"A deep dive into the price-to-earnings ratio — how to calculate it, what it really measures, its limitations, and how professional investors use it to find value."}
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264064065432511" crossorigin="anonymous"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--bg2:#f8fafc;--bg3:#f1f5f9;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--accent:#1d4ed8;--font:'Inter',system-ui,sans-serif;--max:1200px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+header{background:#0f172a;color:#fff;position:sticky;top:0;z-index:100}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;max-width:var(--max);margin:0 auto;height:60px}
+.logo{font-size:20px;font-weight:700;color:#fff}.logo span{color:#60a5fa}
+.nav-links{display:flex;gap:1.75rem;align-items:center}
+.nav-links a{color:rgba(255,255,255,0.8);font-size:14px;font-weight:500}
+.nav-links a:hover{color:#fff;text-decoration:none}
+.nav-cta{background:#1d4ed8;color:#fff!important;padding:7px 18px;border-radius:6px;font-size:13px!important}
+.article-layout{display:grid;grid-template-columns:1fr 300px;gap:3rem;max-width:var(--max);margin:0 auto;padding:48px 1.5rem}
+@media(max-width:900px){.article-layout{grid-template-columns:1fr}.sidebar{display:none}}
+.article-tag{display:inline-block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;padding:4px 12px;border-radius:20px;margin-bottom:12px}
+.tag-blue{background:#dbeafe;color:#1e40af}
+.tag-green{background:#dcfce7;color:#166534}
+.tag-red{background:#fee2e2;color:#991b1b}
+.tag-purple{background:#f3e8ff;color:#6b21a8}
+.tag-amber{background:#fef3c7;color:#92400e}
+.article-body h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;line-height:1.2;margin-bottom:1rem;letter-spacing:-0.5px}
+.article-body .meta{font-size:13px;color:var(--muted);margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.article-body h2{font-size:1.35rem;font-weight:700;color:var(--text);margin:2.5rem 0 1rem}
+.article-body h3{font-size:1.1rem;font-weight:600;color:var(--text);margin:2rem 0 0.75rem}
+.article-body p{font-size:1rem;color:#1e293b;line-height:1.8;margin-bottom:1.25rem}
+.article-body ul,.article-body ol{margin:0 0 1.25rem 1.5rem}
+.article-body li{font-size:1rem;color:#1e293b;line-height:1.8;margin-bottom:6px}
+.callout{background:var(--bg2);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:1rem 1.25rem;margin:1.75rem 0}
+.callout p{margin:0;font-size:0.95rem;color:#1e293b;line-height:1.7}
+.callout-warn{border-left-color:#dc2626;background:#fff5f5}
+.callout-green{border-left-color:#059669;background:#f0fdf4}
+.callout-amber{border-left-color:#d97706;background:#fffbeb}
+.data-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:.9rem}
+.data-table th{background:var(--bg3);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.data-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:#1e293b;vertical-align:top}
+.data-table tr:last-child td{border-bottom:none}
+.key-stat{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:1rem 1.25rem;margin:1.5rem 0;display:flex;align-items:center;gap:1rem}
+.key-stat .stat-num{font-size:2rem;font-weight:700;color:var(--accent);flex-shrink:0}
+.key-stat .stat-desc{font-size:.9rem;color:#1e293b;line-height:1.6}
+.phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+@media(max-width:600px){.phase-grid{grid-template-columns:1fr}}
+.phase-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem}
+.phase-card h4{font-size:.85rem;font-weight:700;margin-bottom:.5rem;color:var(--text)}
+.phase-card p{font-size:.875rem;color:#334155;line-height:1.65;margin:0}
+.author-box{display:flex;gap:1rem;align-items:flex-start;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin:2.5rem 0}
+.author-avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1d4ed8,#0ea5e9);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.author-info h4{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.author-info p{font-size:.85rem;color:var(--muted);line-height:1.6;margin:0}
+.sidebar-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem}
+.sidebar-card h4{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.75rem}
+.sidebar-card p{font-size:.9rem;color:#1e293b;line-height:1.65;margin-bottom:.75rem}
+.sidebar-card a.btn{display:block;text-align:center;background:var(--accent);color:#fff;padding:.6rem 1rem;border-radius:8px;font-size:.9rem;font-weight:600;text-decoration:none;margin-top:.5rem}
+.cite{font-size:.8rem;color:var(--muted);margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+.cite h4{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.75rem;color:var(--muted)}
+.cite ol{margin-left:1.25rem}
+.cite li{font-size:.8rem;line-height:1.7;margin-bottom:4px;color:var(--muted)}
+.cite a{color:var(--accent)}
+footer{background:#0f172a;color:rgba(255,255,255,.5);padding:32px 0;margin-top:48px;text-align:center;font-size:13px}
+footer a{color:rgba(255,255,255,.6)}
+@media(max-width:640px){.nav-links{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <nav class="nav">
+    <a href="/" class="logo">Market<span>Phase</span></a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/signals/">Live Signals</a>
+      <a href="/guides/">Guides</a>
+      <a href="/daily/">Daily Digest</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/signals/" class="nav-cta">→ Live Signals</a>
+    </div>
+  </nav>
+</header>
+
+<div class="article-layout">
+<div class="article-body">
+
+<span class="article-tag tag-blue">Valuation</span>
+<h1>P/E Ratio Explained: How to Tell If a Stock Is Cheap or Expensive</h1>
+<p class="meta">By <a href="/about.html">James Whitfield, CFA</a> &nbsp;·&nbsp; Updated June 2026 &nbsp;·&nbsp; 9 min read</p>
+
+<p>The price-to-earnings ratio — P/E ratio — is the single most quoted valuation metric in investing. Open any financial news site and you'll see it applied to individual stocks, sectors, and entire markets. Fund managers reference it in quarterly letters. Analysts anchor forecasts around it. Warren Buffett's mentor Benjamin Graham built an entire school of investing on finding stocks with low P/E ratios relative to their intrinsic worth.</p>
+
+<p>And yet, despite its ubiquity, the P/E ratio is deeply misunderstood by most retail investors. People use it as a simple gauge — high P/E means expensive, low P/E means cheap — without grasping what it actually measures, what drives it, and where it systematically misleads. Used correctly, the P/E ratio is one of the most powerful tools in your analytical toolkit. Used naively, it produces confident but wrong conclusions.</p>
+
+<p>This guide will teach you to use the P/E ratio the way professional analysts do: as a starting point for deeper inquiry, not a final verdict.</p>
+
+<h2>The Basic Definition: What P/E Actually Measures</h2>
+
+<p>The price-to-earnings ratio divides the current share price by the earnings per share (EPS) over a defined period:</p>
+
+<p style="background:#f1f5f9;padding:12px 16px;border-radius:8px;font-family:monospace;font-size:1rem;margin-bottom:1.25rem"><strong>P/E Ratio = Share Price ÷ Earnings Per Share (EPS)</strong></p>
+
+<p>If Apple trades at $200 per share and earned $6.50 per share over the trailing 12 months, its trailing P/E ratio is 200 ÷ 6.50 = 30.8x. This means investors are paying $30.80 for every $1 of Apple's current earnings.</p>
+
+<p>The P/E ratio can be read as a "payback period" — at current earnings, it would take 30.8 years to earn back your investment in pure profits. But this interpretation, while intuitive, is too simplistic. Nobody buys a growth company expecting earnings to stay flat for 30 years. The actual P/E ratio reflects not just current earnings but the market's expectation of <em>future</em> earnings growth.</p>
+
+<p>This is the fundamental insight that most casual P/E users miss: the P/E ratio is as much a forecast as it is a measurement.</p>
+
+<div class="key-stat">
+  <div class="stat-num">~16x</div>
+  <div class="stat-desc">The long-run historical average trailing P/E ratio for the S&P 500, based on data going back to 1871. This benchmark, compiled by Yale economist Robert Shiller, provides context for evaluating whether the overall market is trading at a premium or discount to historical norms.</div>
+</div>
+
+<h2>Trailing P/E vs. Forward P/E: A Critical Distinction</h2>
+
+<p>When you see "the P/E ratio" quoted for a stock, you need to know which version is being used. The two most common variants are fundamentally different in what they measure and how reliable they are.</p>
+
+<h3>Trailing Twelve Months (TTM) P/E</h3>
+
+<p>The trailing P/E divides the current price by actual earnings reported over the last 12 months. Because the earnings figure is based on reported financial results, it is factual — there's no estimation involved. This makes it the most reliable for backward-looking comparison and for identifying accounting-related anomalies.</p>
+
+<p>The limitation of trailing P/E is that it's inherently backward-looking. If a company just had a bad year due to a one-time restructuring charge, its trailing P/E might look artificially high because earnings were depressed by a non-recurring event. Conversely, if a company had a blowout year from a one-time sale of assets, its trailing P/E might look artificially low.</p>
+
+<h3>Forward P/E</h3>
+
+<p>The forward P/E divides the current price by consensus analyst estimates of earnings over the next 12 months. Most financial news sites and investment research platforms default to the forward P/E when quoting "the P/E ratio" for growth stocks.</p>
+
+<p>Forward P/E is a more meaningful metric for evaluating what you're actually paying for future value — but it's only as accurate as the earnings estimates. Analyst forecasts are frequently wrong. In periods of economic uncertainty, consensus estimates can miss by 20–30% or more. And analysts have structural biases: they tend to be too optimistic about near-term earnings, partly because maintaining positive relationships with management teams is in their interest.</p>
+
+<div class="callout callout-warn">
+  <p><strong>Always check which P/E you're looking at.</strong> A stock that looks cheap at 15x forward earnings might actually trade at 25x trailing earnings if analyst growth estimates prove too optimistic. Reconcile the two figures — if there's a large gap, understand why before drawing conclusions.</p>
+</div>
+
+<h2>The Shiller CAPE: A More Robust Market Valuation Tool</h2>
+
+<p>Nobel Prize-winning economist Robert Shiller developed the Cyclically Adjusted Price-to-Earnings ratio (CAPE, also called the Shiller P/E or P/E 10) to address one of the core problems with standard P/E ratios: they are extremely noisy at economic turning points.</p>
+
+<p>During recessions, earnings collapse — sometimes by 50% or more. This makes standard P/E ratios spike to absurd levels at exactly the moment when stocks are actually cheapest. In March 2009, the trailing P/E on the S&P 500 briefly touched 120x as earnings had been devastated — but that was one of the greatest buying opportunities in market history, not a warning to stay away.</p>
+
+<p>The CAPE ratio solves this by using 10-year average inflation-adjusted earnings as the denominator instead of a single year's results. By averaging across a full business cycle, CAPE smooths out the recession/recovery earnings swings and provides a more stable comparison of price to fundamental earnings power.</p>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Period / Event</th>
+      <th>CAPE Ratio</th>
+      <th>Context</th>
+      <th>Subsequent 10-yr S&P Return</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>December 1999 (Dot-com peak)</td><td>44.2x</td><td>Extreme overvaluation</td><td>~-1% annualized</td></tr>
+    <tr><td>March 2009 (Financial crisis trough)</td><td>13.3x</td><td>Significant undervaluation</td><td>~17% annualized</td></tr>
+    <tr><td>January 2022 (Post-COVID peak)</td><td>38.6x</td><td>Near-historic highs</td><td>TBD</td></tr>
+    <tr><td>Long-run average (1871–present)</td><td>~17x</td><td>Historical baseline</td><td>~7% real annualized</td></tr>
+    <tr><td>+1 std deviation above mean</td><td>~25x</td><td>Above-average valuation</td><td>Lower expected returns</td></tr>
+  </tbody>
+</table>
+
+<p>The CAPE ratio's predictive power for 10-year forward returns is well-documented. High CAPE readings have consistently preceded periods of below-average returns; low readings have preceded above-average returns. However — critically — CAPE is a terrible short-term timing tool. Markets traded at extreme CAPE valuations for years during the dot-com boom before the crash arrived. You cannot use CAPE to predict when a correction will happen, only to set expectations about long-run returns.</p>
+
+<h2>Why P/E Ratios Differ Across Stocks: Growth, Risk, and Interest Rates</h2>
+
+<p>Understanding why one stock deserves a P/E of 8x while another deserves 35x is the core skill of equity valuation. Three primary factors drive P/E differences:</p>
+
+<h3>Growth Expectations</h3>
+
+<p>A company expected to grow earnings at 25% per year for the next decade deserves a much higher P/E than one growing at 3% per year. Today's earnings are just the base — the question is what those earnings will be in 5 and 10 years. This is why high-quality technology companies with durable competitive advantages (think Microsoft, Google, or Amazon) have historically traded at significant P/E premiums to the market — and why that has often been justified in retrospect.</p>
+
+<p>A useful rough rule comes from growth-adjusted valuation. The PEG ratio (Price/Earnings to Growth) divides the P/E ratio by the expected earnings growth rate. A PEG of 1.0x is often considered fair value — a P/E of 30x for a company growing earnings 30% annually is roughly equivalent to a P/E of 10x for a company growing at 10%.</p>
+
+<h3>Quality and Business Risk</h3>
+
+<p>Two companies might have identical growth expectations but deserve very different P/E ratios if one has much higher earnings visibility than the other. A regulated utility with stable, predictable earnings deserves a different multiple than a cyclical semiconductor company with highly volatile margins. This "quality premium" explains why consumer staples companies like Procter &amp; Gamble or Coca-Cola have historically traded at premiums to their earnings growth rate — investors pay up for the certainty of the cash flows.</p>
+
+<h3>Interest Rates</h3>
+
+<p>Perhaps the most systematically underappreciated driver of P/E ratios is the prevailing level of interest rates. The P/E ratio is, at its core, a valuation relative to alternatives. When 10-year Treasury bonds yield 1.5%, a P/E of 30x (equivalent to an earnings yield of 3.3%) looks attractive relative to bonds. When 10-year Treasuries yield 5%, that same 3.3% earnings yield looks far less compelling.</p>
+
+<p>This relationship — often summarized in the "Fed Model" — explains a significant portion of why S&P 500 P/E ratios were so elevated in the 2020–2021 period (near-zero interest rates made equities the only game in town) and why they compressed sharply in 2022–2023 as the Fed raised rates aggressively. Rising rates are a gravitational force on P/E multiples; falling rates are the reverse.</p>
+
+<div class="callout">
+  <p><strong>The earnings yield relationship:</strong> The inverse of the P/E ratio is the earnings yield (EPS ÷ Price). At a P/E of 20x, the earnings yield is 5%. Comparing the earnings yield to the 10-year Treasury yield gives you a quick sense of relative attractiveness. When the earnings yield significantly exceeds bond yields, equities are cheap relative to bonds; when it's below bond yields, equities are expensive relative to alternatives.</p>
+</div>
+
+<h2>Sector Context: P/E Ratios Are Not Universal</h2>
+
+<p>Comparing a technology company's P/E to a bank's P/E is nearly meaningless without sector context. Each sector has structural characteristics that produce systematically higher or lower P/E ratios.</p>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Sector</th>
+      <th>Typical P/E Range</th>
+      <th>Why It's Higher/Lower</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Technology (growth)</td><td>25–50x+</td><td>High growth, scalable business models, recurring revenue</td></tr>
+    <tr><td>Consumer Staples</td><td>18–28x</td><td>Stable earnings, strong brands, low cyclicality (quality premium)</td></tr>
+    <tr><td>Healthcare</td><td>15–30x</td><td>Mix of steady (pharma) and high-growth (biotech) names</td></tr>
+    <tr><td>Industrials</td><td>15–22x</td><td>Moderate growth, capital-intensive, economic sensitivity</td></tr>
+    <tr><td>Financials (banks)</td><td>8–14x</td><td>Book value matters more than P/E; earnings are levered and volatile</td></tr>
+    <tr><td>Energy</td><td>8–15x</td><td>Commodity-price dependent, highly cyclical earnings</td></tr>
+    <tr><td>Utilities</td><td>14–20x</td><td>Regulated, stable but slow-growing; interest-rate sensitive</td></tr>
+  </tbody>
+</table>
+
+<p>Within each sector, P/E comparison is meaningful — a bank trading at 7x earnings while peers trade at 12x invites scrutiny. Across sectors, the comparison needs heavy qualification. Saying "Apple at 28x is more expensive than JPMorgan at 10x" tells you almost nothing actionable about which is the better investment.</p>
+
+<h2>P/E Limitations: What the Ratio Cannot Tell You</h2>
+
+<p>No single metric captures the full picture of a company's value. The P/E ratio has several well-documented blind spots that sophisticated investors navigate carefully.</p>
+
+<p><strong>Earnings can be manipulated.</strong> Under GAAP accounting, management has significant discretion over reported earnings — through depreciation schedules, revenue recognition timing, and treatment of one-time items. A company can "manage" earnings to hit analyst estimates by accelerating revenue recognition or deferring expenses. This is legal but misleading. Always compare the P/E to price-to-cash-flow (P/CF) ratios: cash is much harder to fake than accrual earnings.</p>
+
+<p><strong>Companies with no earnings have no P/E.</strong> High-growth companies in early stages often report losses while building market share. The P/E ratio simply doesn't apply. Analysts use alternative metrics: price-to-sales (P/S), EV/EBITDA, or discounted cash flow models based on projected future profitability.</p>
+
+<p><strong>P/E ignores balance sheet strength.</strong> A company with $50 in cash per share trading at $100 has a headline P/E of 20x. But adjusted for the cash, you're really paying only $50 for the operating business — an adjusted P/E of 10x. Conversely, a highly leveraged company might show a deceptively low P/E while carrying debt loads that create existential risk during downturns.</p>
+
+<p><strong>P/E is not useful for financial comparisons across accounting regimes.</strong> GAAP earnings in the US differ meaningfully from IFRS earnings elsewhere. International P/E comparisons require careful adjustment. Japanese stocks famously appeared "cheap" on P/E for decades due to cross-holdings and accounting practices that made earnings appear lower than economic reality.</p>
+
+<h2>How Professional Analysts Actually Use P/E</h2>
+
+<p>After 12 years covering equities, here's how I actually used P/E in practice — as a framework for generating questions, not a standalone buy/sell signal.</p>
+
+<p>The workflow typically goes like this: identify a company's current P/E versus its own 5-year history, versus sector peers, and versus the broad market. Large deviations in any direction prompt deeper investigation. If a stock is trading at a 40% discount to its 5-year average P/E, ask why: Has the business fundamentally deteriorated? Have interest rates risen? Have earnings been artificially inflated in prior periods? Is the market overreacting to temporary bad news?</p>
+
+<p>The most actionable P/E opportunities often arise during sector-wide selloffs, when high-quality companies get swept down alongside weaker peers. If a sector sells off 30% and all P/E ratios compress together, the stocks with the strongest balance sheets and most durable earnings deserve to recover first — their P/E compression was purely sentiment-driven, not fundamental.</p>
+
+<div class="callout callout-green">
+  <p><strong>The most reliable P/E signal:</strong> A stock trading at a significant discount to its own historical P/E range, while the underlying business is fundamentally intact, is often more informative than any absolute comparison to sector averages. The stock's own history is the best baseline for what the market has historically been willing to pay for that specific set of earnings characteristics.</p>
+</div>
+
+<h2>Putting It Together: A Practical P/E Checklist</h2>
+
+<p>When evaluating any stock's P/E ratio, work through these questions systematically:</p>
+
+<ol>
+  <li><strong>Trailing or forward?</strong> Understand which figure you're working with. Cross-check the two.</li>
+  <li><strong>What's the sector baseline?</strong> Compare to industry peers, not the broad market.</li>
+  <li><strong>What does the company's own history say?</strong> Is the current multiple above or below its 5-year median?</li>
+  <li><strong>Are earnings clean?</strong> Check for large one-time items, impairments, or revenue recognition flags. Compare to cash flow.</li>
+  <li><strong>What growth rate is priced in?</strong> Calculate the PEG ratio. Does the growth assumption seem realistic?</li>
+  <li><strong>What is the interest rate environment?</strong> Higher rates compress justified P/E multiples; factor this into your assessment.</li>
+  <li><strong>What does the balance sheet look like?</strong> Adjust for net cash or debt if material.</li>
+</ol>
+
+<p>The P/E ratio is a door, not a destination. It tells you where to look, what questions to ask, and which comparisons to make — but the investment decision requires far more context than a single number can provide. Investors who treat P/E as a verdict rather than a starting point will find it as often misleading as illuminating.</p>
+
+<div class="author-box">
+  <div class="author-avatar">👤</div>
+  <div class="author-info">
+    <h4>James Whitfield, CFA</h4>
+    <p>Former equity research analyst with 12 years in institutional asset management. Covered technology, financials, and macro strategy before founding MarketPhase to make professional-grade market analysis accessible to individual investors.</p>
+  </div>
+</div>
+
+<div class="cite">
+  <h4>Sources &amp; References</h4>
+  <ol>
+    <li>Shiller, R.J. Online Data: U.S. Stock Markets 1871–Present and CAPE Ratio. Yale University. <a href="http://www.econ.yale.edu/~shiller/data.htm" target="_blank" rel="noopener">econ.yale.edu</a></li>
+    <li>Graham, B. &amp; Dodd, D. (1934). <em>Security Analysis</em>. McGraw-Hill. (foundational text on earnings-based valuation)</li>
+    <li>SEC: Beginners' Guide to Financial Statements. <a href="https://www.sec.gov/investor/pubs/begfinstmtguide.htm" target="_blank" rel="noopener">sec.gov</a></li>
+    <li>Federal Reserve: "The Fed Model: A Note on the Stock Market's Valuation." Federal Reserve Board of Governors. <a href="https://www.federalreserve.gov/pubs/feds/2003/200357/200357pap.pdf" target="_blank" rel="noopener">federalreserve.gov</a></li>
+    <li>Damodaran, A. Historical P/E Ratios by Sector. NYU Stern School of Business. <a href="https://pages.stern.nyu.edu/~adamodar/" target="_blank" rel="noopener">stern.nyu.edu</a></li>
+  </ol>
+</div>
+
+</div>
+<aside class="sidebar">
+  <div class="sidebar-card">
+    <h4>Live Market Signals</h4>
+    <p>See where the market stands right now with our real-time phase indicator.</p>
+    <a href="/signals/" class="btn">→ View Dashboard</a>
+  </div>
+  <div class="sidebar-card">
+    <h4>More Guides</h4>
+    <p>Explore our full library of market education guides.</p>
+    <a href="/guides/" class="btn">Browse All Guides</a>
+  </div>
+</aside>
+</div>
+
+<footer>
+  <p><a href="/">MarketPhase</a> · <a href="/signals/">Live Signals</a> · <a href="/guides/">Guides</a> · <a href="/daily/">Daily Digest</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/privacy.html">Privacy Policy</a></p>
+  <p style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.3)">For informational purposes only. Not financial advice. © 2026 MarketPhase.</p>
+</footer>
+<script src="/js/ads.js"></script>
+<script src="/js/mobile-nav.js"></script>
+</body>
+</html>
