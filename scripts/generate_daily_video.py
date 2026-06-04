@@ -430,12 +430,10 @@ Pick the single most compelling story and output a JSON object with exactly thes
    - No stage cues, no filler. Pure spoken words only.
    - MINIMUM 150 WORDS. Count before returning.
 
-3. "clip_tag": One tag from this list that best matches the story (or null):
-   stock_bull, stock_crash, federal_reserve, wall_street, inflation, gold, crypto,
-   oil_energy, recession, interest_rates, global_economy, tech_stocks, jobs, bonds,
-   consumer, earnings, nyse_open, dollar, bear_market, data_screens, housing_market,
-   banking, china_trade, us_debt, ai_stocks, commodities, retail_earnings, ipo,
-   supply_chain, mergers, election_market, healthcare_costs
+3. "clip_tag": One tag from this list that best matches the story (or null).
+   ONLY choose from these 10 available clips — any other value will be ignored:
+   stock_bull, stock_crash, federal_reserve, wall_street, inflation,
+   tech_stocks, earnings, nyse_open, data_screens, global_economy
 
 4. "pexels_keyword": A 3-5 word image search term as fallback if clip_tag is null.
 
@@ -1202,7 +1200,7 @@ def generate_short_video(short_hook: str, short_title: str,
             "-vf", f"scale={SHORT_W}:{SHORT_H}:force_original_aspect_ratio=increase,"
                    f"crop={SHORT_W}:{SHORT_H}",
             "-frames:v", "1", "-q:v", "2", str(frame_path)
-        ], check=True, capture_output=True)
+        ], check=True, stdout=subprocess.DEVNULL)
         bg = Image.open(frame_path).convert("RGB")
         bg = ImageEnhance.Brightness(bg).enhance(0.45)
     else:
@@ -1284,7 +1282,7 @@ def generate_short_video(short_hook: str, short_title: str,
             "-af", f"apad=pad_dur={pad:.1f}",
             "-c:a", "libmp3lame", "-b:a", "192k",
             str(padded_audio),
-        ], check=True, capture_output=True)
+        ], check=True, stdout=subprocess.DEVNULL)
         short_audio    = padded_audio
         short_duration = MIN_DURATION
         print(f"  Padded audio to {MIN_DURATION:.0f}s", file=sys.stderr)
@@ -1305,7 +1303,7 @@ def generate_short_video(short_hook: str, short_title: str,
             "-map", "[out]", "-t", str(short_duration),
             "-c:v", "libx264", "-preset", "fast", "-crf", "23",
             "-pix_fmt", "yuv420p", "-an", str(short_video),
-        ], check=True, capture_output=True)
+        ], check=True, stdout=subprocess.DEVNULL)
     else:
         subprocess.run([
             "ffmpeg", "-y",
@@ -1313,7 +1311,7 @@ def generate_short_video(short_hook: str, short_title: str,
             "-t", str(short_duration),
             "-c:v", "libx264", "-preset", "fast", "-crf", "23",
             "-pix_fmt", "yuv420p", "-an", str(short_video),
-        ], check=True, capture_output=True)
+        ], check=True, stdout=subprocess.DEVNULL)
 
     # Mux audio
     out_path = tmp_dir / "short_final.mp4"
@@ -1322,7 +1320,7 @@ def generate_short_video(short_hook: str, short_title: str,
         "-i", str(short_video), "-i", str(short_audio),
         "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest",
         str(out_path),
-    ], check=True, capture_output=True)
+    ], check=True, stdout=subprocess.DEVNULL)
 
     print(f"  Short video built ({short_duration:.0f}s)", file=sys.stderr)
     return out_path
