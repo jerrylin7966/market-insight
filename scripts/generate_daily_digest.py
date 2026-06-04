@@ -147,44 +147,59 @@ Write a comprehensive daily market digest for individual investors. Structure yo
 
 Write with authority and original insight. Each section must contain substantive analysis, not just summaries. Investors rely on this for genuine understanding of market conditions."""
 
-    payload = json.dumps({
-        "model": "claude-haiku-4-5-20251001",
-        "max_tokens": 2800,
-        "messages": [{"role": "user", "content": prompt}],
-    }).encode()
+    def _call_api(max_tok: int, msgs: list) -> dict:
+        """Make one API call and return parsed JSON."""
+        payload = json.dumps({
+            "model": "claude-haiku-4-5-20251001",
+            "max_tokens": max_tok,
+            "messages": msgs,
+        }).encode()
+        req = urllib.request.Request(
+            "https://api.anthropic.com/v1/messages",
+            data=payload,
+            headers={
+                "x-api-key": ANTHROPIC_API_KEY,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json",
+            },
+            method="POST",
+        )
+        with urlopen_with_retry(req, timeout=90) as resp:
+            result = json.loads(resp.read())
 
-    req = urllib.request.Request(
-        "https://api.anthropic.com/v1/messages",
-        data=payload,
-        headers={
-            "x-api-key": ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
-        },
-        method="POST",
-    )
-    with urlopen_with_retry(req, timeout=90) as resp:
-        result = json.loads(resp.read())
+        # Check if we hit the token limit
+        stop_reason = result.get("stop_reason", "")
+        if stop_reason == "max_tokens":
+            raise ValueError(f"Response truncated (stop_reason=max_tokens, tokens={max_tok})")
 
-    raw_text = result["content"][0]["text"].strip()
-    # Strip markdown code fences if present
-    json_match = re.search(r"```(?:json)?\s*([\s\S]+?)```", raw_text)
-    if json_match:
-        raw_text = json_match.group(1).strip()
-    # Find the start of the JSON object
-    start = raw_text.find('{')
-    if start != -1:
-        raw_text = raw_text[start:]
-    # Use raw_decode: parses the first valid JSON object and ignores trailing text
-    decoder = json.JSONDecoder()
-    try:
-        obj, _ = decoder.raw_decode(raw_text)
-        return obj
-    except json.JSONDecodeError:
-        # Remove trailing commas before } or ] (common Claude quirk) then retry
-        cleaned = re.sub(r',\s*([}\]])', r'\1', raw_text)
-        obj, _ = decoder.raw_decode(cleaned)
-        return obj
+        raw = result["content"][0]["text"].strip()
+        # Strip markdown fences
+        fence = re.search(r"```(?:json)?\s*([\s\S]+?)```", raw)
+        if fence:
+            raw = fence.group(1).strip()
+        start = raw.find('{')
+        if start != -1:
+            raw = raw[start:]
+        decoder = json.JSONDecoder()
+        try:
+            obj, _ = decoder.raw_decode(raw)
+            return obj
+        except json.JSONDecodeError:
+            cleaned = re.sub(r',\s*([}\]])', r'\1', raw)
+            obj, _ = decoder.raw_decode(cleaned)
+            return obj
+
+    msgs = [{"role": "user", "content": prompt}]
+
+    # Try with increasing token budgets before giving up
+    for max_tok in [4096, 6000, 8000]:
+        try:
+            return _call_api(max_tok, msgs)
+        except (ValueError, json.JSONDecodeError) as e:
+            print(f"  [warn] Claude parse failed at {max_tok} tokens: {e}", file=sys.stderr)
+            if max_tok == 8000:
+                raise
+            continue
 
 
 def render_html(digest: dict, today: date, headlines: list[dict]) -> str:
