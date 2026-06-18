@@ -1193,22 +1193,13 @@ def generate_short_video(short_hook: str, short_title: str,
     # ── Background clip or solid ──
     clip_path = get_clip_for_slide(clip_tag) if clip_tag else None
     if clip_path:
-        # Extract a frame from the clip as background image
-        frame_path = tmp_dir / "short_bg_frame.png"
-        subprocess.run([
-            "ffmpeg", "-y", "-i", str(clip_path),
-            "-vf", f"scale={SHORT_W}:{SHORT_H}:force_original_aspect_ratio=increase,"
-                   f"crop={SHORT_W}:{SHORT_H}",
-            "-frames:v", "1", "-q:v", "2", str(frame_path)
-        ], check=True, stdout=subprocess.DEVNULL)
-        bg = Image.open(frame_path).convert("RGB")
-        bg = ImageEnhance.Brightness(bg).enhance(0.45)
+        # Transparent canvas — the actual moving clip video becomes the bg layer.
+        # The overlay only carries text/branding so the clip plays through.
+        bg = Image.new("RGBA", (SHORT_W, SHORT_H), (0, 0, 0, 0))
     else:
-        bg = Image.new("RGB", (SHORT_W, SHORT_H), (10, 15, 30))
+        bg = Image.new("RGBA", (SHORT_W, SHORT_H), (10, 15, 30, 255))
 
-    bg = bg.convert("RGBA")
-
-    # ── Dark gradient overlay ──
+    # ── Dark gradient (semi-transparent so clip shows through at the top) ──
     grad = Image.new("RGBA", (SHORT_W, SHORT_H), (0, 0, 0, 0))
     gd   = ImageDraw.Draw(grad)
     for y in range(SHORT_H // 3, SHORT_H):
