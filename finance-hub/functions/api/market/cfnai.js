@@ -1,21 +1,22 @@
 import { withCache, jsonResponse } from './_shared.js';
 
-const HEADERS = {
-  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-  'Referer': 'https://fred.stlouisfed.org/',
-};
+async function fetchSeries(seriesId, fredKey) {
+  const url = `https://api.stlouisfed.org/fred/series/observations`
+    + `?series_id=${seriesId}&api_key=${fredKey}&file_type=json`
+    + `&sort_order=asc&observation_start=2000-01-01`;
+  const r = await fetch(url, { signal: AbortSignal.timeout(15000) });
+  if (!r.ok) throw new Error(`FRED API ${seriesId} ${r.status}`);
+  const body = await r.json();
+  return (body.observations ?? [])
+    .map(obs => ({ date: obs.date.slice(0, 7), value: parseFloat(obs.value) }))
+    .filter(d => !isNaN(d.value));
+}
 
-function parseCSV(text, truncateToMonth = false) {
-  const lines = text.trim().split('\n');
-  return lines.slice(1)
-    .map(line => {
-      const [date, val] = line.split(',');
-      const value = parseFloat(val);
-      if (!date || isNaN(value)) return null;
-      return { date: truncateToMonth ? date.trim().slice(0, 7) : date.trim(), value };
-    })
-    .filter(Boolean);
+function computeMA3(rawSeries) {
+  return rawSeries.slice(2).map((_, i) => ({
+    date:  rawSeries[i + 2].date,
+    value: +((rawSeries[i].value + rawSeries[i+1].value + rawSeries[i+2].value) / 3).toFixed(4),
+  }));
 }
 
 function analyseCfnai(ma3Series, rawSeries) {
@@ -36,32 +37,17 @@ function analyseCfnai(ma3Series, rawSeries) {
   };
 }
 
-async function fetchCSV(seriesId) {
-  const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${seriesId}`;
-  const r = await fetch(url, { headers: HEADERS, signal: AbortSignal.timeout(15000) });
-  if (!r.ok) throw new Error(`FRED CSV ${seriesId} ${r.status}`);
-  return r.text();
-}
-
-function computeMA3(rawSeries) {
-  // Compute 3-month moving average from raw CFNAI when CFNAIMA3 series unavailable
-  return rawSeries.slice(2).map((_, i) => ({
-    date:  rawSeries[i + 2].date,
-    value: +((rawSeries[i].value + rawSeries[i+1].value + rawSeries[i+2].value) / 3).toFixed(4),
-  }));
-}
-
 export const onRequestGet = async (ctx) => {
-  return withCache(ctx, 'cfnai-v6', 21600, async () => {
-    // Fetch raw CFNAI (always needed). Try CFNAIMA3 too — fall back to computing MA3 manually.
-    const rawText = await fetchCSV('CFNAI');
-    const rawSeries = parseCSV(rawText, true);
-    if (!rawSeries.length) throw new Error('No CFNAI raw data from FRED CSV v5');
+  const fredKey = ctx.env.FRED_API_KEY;
+  if (!fredKey) return jsonResponse({ error: 'FRED_API_KEY not configured' }, 0);
+
+  return withCache(ctx, 'cfnai-v7', 21600, async () => {
+    const rawSeries = await fetchSeries('CFNAI', fredKey);
+    if (!rawSeries.length) throw new Error('No CFNAI data from FRED API');
 
     let ma3Series;
     try {
-      const ma3Text = await fetchCSV('CFNAIMA3');
-      const parsed = parseCSV(ma3Text, true);
+      const parsed = await fetchSeries('CFNAIMA3', fredKey);
       ma3Series = parsed.length ? parsed : computeMA3(rawSeries);
     } catch {
       ma3Series = computeMA3(rawSeries);
