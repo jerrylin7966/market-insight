@@ -13,7 +13,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contact Us | MarketPhase</title>
 <meta name="description" content="Get in touch with the MarketPhase team. Questions, feedback, data corrections, or partnership inquiries — we read every message.">
-<link rel="canonical" href="https://www.market-phase.com/contact.html">
+<link rel="canonical" href="https://www.market-phase.com/contact">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231d4ed8'/><text x='16' y='23' font-family='Inter,Arial,sans-serif' font-size='20' font-weight='700' text-anchor='middle' fill='white'>M</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <!-- Google AdSense -->
@@ -49,6 +49,20 @@ p{font-size:1rem;color:#1e293b;line-height:1.85;margin-bottom:1rem}
 .topic h4{font-size:.9rem;font-weight:600;margin-bottom:.3rem}
 .topic p{font-size:.85rem;color:var(--muted);margin-bottom:0;line-height:1.6}
 .response-note{font-size:.9rem;color:var(--muted);text-align:center;margin-top:1.5rem}
+.contact-form{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:2rem 2.5rem;margin:2rem 0}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:560px){.form-row{grid-template-columns:1fr}}
+.form-group{margin-bottom:1.25rem}
+.form-group label{display:block;font-size:.875rem;font-weight:600;color:var(--text);margin-bottom:.4rem}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:.7rem 1rem;border:1px solid var(--border);border-radius:8px;font-size:.95rem;font-family:var(--font);background:#fff;color:var(--text);transition:border-color .15s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(29,78,216,.1)}
+.form-group textarea{resize:vertical;min-height:140px}
+.form-submit{background:#1d4ed8;color:#fff;border:none;padding:13px 32px;border-radius:8px;font-size:1rem;font-weight:600;font-family:var(--font);cursor:pointer;transition:background .15s;width:100%}
+.form-submit:hover{background:#1e40af}
+.form-submit:disabled{opacity:.6;cursor:not-allowed}
+.form-status{display:none;padding:1rem 1.25rem;border-radius:8px;margin-top:1rem;font-size:.95rem;font-weight:500}
+.form-status.success{background:#dcfce7;color:#166534;border:1px solid #86efac}
+.form-status.error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
 footer{background:#0f172a;color:rgba(255,255,255,0.5);padding:32px 0;margin-top:48px;text-align:center;font-size:13px}
 footer a{color:rgba(255,255,255,0.6);text-decoration:none}
 footer a:hover{color:#fff}
@@ -57,6 +71,9 @@ footer a:hover{color:#fff}
 <!-- PostHog Analytics -->
 <script>!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]);t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+" (stub people)"},o="init bs ws ge fs capture De calculateEventProperties $s register unregister registerOnce $i opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug identify alias set_config reset people.set people.set_once".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);posthog.init('phc_Dn75vEUONtcBO3kEBaYw7w6xaoHJIHuzIWhEf4kbgpj',{api_host:'https://us.i.posthog.com',person_profiles:'always'});posthog.register({site:'market-phase.com',page_path:window.location.pathname,page_url:window.location.href});
 <script>posthog.capture('contact_viewed');</script>
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@MarketPhase">
+<meta name="twitter:image" content="https://www.market-phase.com/og-image.png">
 </head>
 <body>
 
@@ -85,11 +102,49 @@ footer a:hover{color:#fff}
 
 <div class="content">
 
-  <div class="contact-card">
-    <div class="icon">✉️</div>
-    <h3>Email Us Directly</h3>
-    <p>The fastest way to reach our team. We aim to respond within 1–2 business days.</p>
-    <a href="mailto:support@convoflow.work" class="email-link">support@convoflow.work</a>
+  <div class="contact-form">
+    <form id="contactForm">
+      <input type="hidden" name="botcheck" style="display:none">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fname">Your Name</label>
+          <input type="text" id="fname" name="name" placeholder="Jane Smith" required>
+        </div>
+        <div class="form-group">
+          <label for="femail">Your Email</label>
+          <input type="email" id="femail" name="email" placeholder="jane@example.com" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="fsubject">Topic</label>
+        <select id="fsubject" name="topic" required>
+          <option value="" disabled selected>Select a topic…</option>
+          <option value="Data Question">📊 Data / Signal Question</option>
+          <option value="Bug Report">🐛 Bug Report</option>
+          <option value="Feature Suggestion">💡 Feature Suggestion</option>
+          <option value="Content Correction">📝 Content Correction</option>
+          <option value="Partnership">🤝 Partnership / Advertising</option>
+          <option value="Privacy Request">🔒 Privacy Request</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="fmessage">Message</label>
+        <textarea id="fmessage" name="message" placeholder="Tell us what's on your mind…" required></textarea>
+      </div>
+
+      <button type="submit" class="form-submit" id="submitBtn">Send Message</button>
+
+      <div class="form-status success" id="statusSuccess">
+        ✅ Message sent! We'll get back to you within 1–2 business days.
+      </div>
+      <div class="form-status error" id="statusError">
+        ❌ Something went wrong. Please try again or email us directly.
+      </div>
+    </form>
   </div>
 
   <h2>What Can We Help With?</h2>
@@ -137,12 +192,49 @@ footer a:hover{color:#fff}
     <a href="/daily/">Daily Digest</a> ·
     <a href="/about.html">About</a> ·
     <a href="/contact.html">Contact</a> ·
-    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/privacy.html">Privacy Policy</a> · <a href="/terms">Terms of Service</a>
   </p>
   <p style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.3)">For informational purposes only. Not financial advice. © 2025 MarketPhase.</p>
 </footer>
 
 <script src="/js/ads.js"></script>
 <script src="/js/mobile-nav.js"></script>
+<script>
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const ok  = document.getElementById('statusSuccess');
+  const err = document.getElementById('statusError');
+  ok.style.display = 'none';
+  err.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  try {
+    const data = {
+      name:    document.getElementById('fname').value,
+      email:   document.getElementById('femail').value,
+      topic:   document.getElementById('fsubject').value,
+      message: document.getElementById('fmessage').value,
+    };
+    const res  = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    if (json.success) {
+      ok.style.display = 'block';
+      this.reset();
+    } else {
+      err.style.display = 'block';
+    }
+  } catch {
+    err.style.display = 'block';
+  }
+  btn.disabled = false;
+  btn.textContent = 'Send Message';
+});
+</script>
 </body>
 </html>

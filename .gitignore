@@ -11,3 +11,4 @@ asset-hub.db-wal
 refresh-oecd.log
 refresh-oecd.log
 refresh-oecd.log
+client_secret*.json

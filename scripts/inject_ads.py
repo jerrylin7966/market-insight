@@ -34,6 +34,12 @@ ADSENSE_SCRIPT = (
 ADS_JS_TAG        = '<script src="/js/ads.js"></script>'
 MOBILE_NAV_TAG    = '<script src="/js/mobile-nav.js"></script>'
 
+TWITTER_CARD_TAG = (
+    '<meta name="twitter:card" content="summary_large_image">\n'
+    '<meta name="twitter:site" content="@MarketPhase">\n'
+    '<meta name="twitter:image" content="https://www.market-phase.com/og-image.png">'
+)
+
 # Pages that intentionally carry no ads
 ADS_EXCLUDE = {
     "signals/index.html",
@@ -59,6 +65,26 @@ def needs_ads_js(content: str) -> bool:
 
 def needs_mobile_nav(content: str) -> bool:
     return MOBILE_NAV_TAG not in content and ('class="nav"' in content or 'class="site-nav"' in content)
+
+def needs_twitter_card(content: str) -> bool:
+    return 'twitter:card' not in content
+
+def needs_terms_footer(content: str) -> bool:
+    return '/terms' not in content and '<footer' in content
+
+def inject_twitter_card(content: str) -> str:
+    """Insert Twitter Card tags just before </head>."""
+    return content.replace("</head>", f"{TWITTER_CARD_TAG}\n</head>", 1)
+
+def inject_terms_footer(content: str) -> str:
+    """Add Terms of Service link next to Privacy Policy in footer."""
+    return content.replace(
+        '<a href="/privacy.html">Privacy Policy</a>',
+        '<a href="/privacy.html">Privacy Policy</a> · <a href="/terms">Terms of Service</a>'
+    ).replace(
+        '<a href="/privacy">Privacy Policy</a>',
+        '<a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a>'
+    )
 
 def inject_ga(content: str) -> str:
     """Insert GA4 tag right after <head>."""
@@ -110,6 +136,16 @@ def main():
         if rel not in NAV_EXCLUDE and needs_mobile_nav(content):
             content = inject_mobile_nav(content)
             injected.append("mobile-nav.js")
+
+        # Twitter Card meta tags
+        if needs_twitter_card(content):
+            content = inject_twitter_card(content)
+            injected.append("Twitter Card")
+
+        # Terms of Service link in footer
+        if needs_terms_footer(content):
+            content = inject_terms_footer(content)
+            injected.append("Terms footer link")
 
         if content != original:
             path.write_text(content, encoding="utf-8")
