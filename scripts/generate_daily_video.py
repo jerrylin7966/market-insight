@@ -45,6 +45,11 @@ DAILY_DIR  = REPO_ROOT / "finance-hub" / "daily"
 TMP_DIR    = Path("/tmp/marketphase_video")
 
 ELEVENLABS_VOICE_ID = "G17SuINrv2H9FC6nvetn"
+# Voice model: eleven_v3 = most expressive / natural, ideal for video narration.
+# Override via ELEVENLABS_MODEL env. Any v3 error auto-falls-back to multilingual_v2
+# mid-run so a model/access hiccup never breaks the daily upload.
+ELEVENLABS_MODEL          = os.environ.get("ELEVENLABS_MODEL", "eleven_v3")
+ELEVENLABS_FALLBACK_MODEL = "eleven_multilingual_v2"
 SITE_URL   = "https://market-phase.com/"
 CLIPS_DIR  = Path(__file__).parent / "assets" / "clips"
 
@@ -520,7 +525,7 @@ def tts_elevenlabs(text: str, out_path: Path) -> Path:
         raise ValueError("ELEVENLABS_API_KEY not set")
 
     voice_id = ELEVENLABS_VOICE_ID
-    print(f"  Using voice ID: {voice_id}", file=sys.stderr)
+    print(f"  Using voice ID: {voice_id} | model: {ELEVENLABS_MODEL}", file=sys.stderr)
 
     MAX_CHARS = 5000
     chunks = []
@@ -534,13 +539,18 @@ def tts_elevenlabs(text: str, out_path: Path) -> Path:
         chunks.append(text[:split_at + 1])
         text = text[split_at + 1:].strip()
 
-    audio_parts = []
-    for i, chunk in enumerate(chunks):
-        chunk_path = out_path.parent / f"audio_chunk_{i}.mp3"
+    def _synth(chunk_text: str, model: str) -> bytes:
+        # stability 0.5 = "Natural" — a valid value for both v2 and v3 (v3
+        # discretizes stability to 0.0/0.5/1.0). use_speaker_boost keeps the
+        # cloned voice's identity under v3's wider dynamic range.
         payload = json.dumps({
-            "text": chunk,
-            "model_id": "eleven_multilingual_v2",
-            "voice_settings": {"stability": 0.5, "similarity_boost": 0.75},
+            "text": chunk_text,
+            "model_id": model,
+            "voice_settings": {
+                "stability": 0.5,
+                "similarity_boost": 0.75,
+                "use_speaker_boost": True,
+            },
         }).encode()
         req = urllib.request.Request(
             f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
@@ -553,9 +563,26 @@ def tts_elevenlabs(text: str, out_path: Path) -> Path:
             method="POST",
         )
         with urlopen_with_retry(req, timeout=90) as resp:
-            chunk_path.write_bytes(resp.read())
+            return resp.read()
+
+    model = ELEVENLABS_MODEL
+    audio_parts = []
+    for i, chunk in enumerate(chunks):
+        chunk_path = out_path.parent / f"audio_chunk_{i}.mp3"
+        try:
+            data = _synth(chunk, model)
+        except Exception as e:
+            if model != ELEVENLABS_FALLBACK_MODEL:
+                print(f"  ⚠ {model} failed ({e}); falling back to "
+                      f"{ELEVENLABS_FALLBACK_MODEL} for the rest of this run",
+                      file=sys.stderr)
+                model = ELEVENLABS_FALLBACK_MODEL   # stick with fallback for remaining chunks
+                data = _synth(chunk, model)
+            else:
+                raise
+        chunk_path.write_bytes(data)
         audio_parts.append(str(chunk_path))
-        print(f"  Audio chunk {i+1}/{len(chunks)} done", file=sys.stderr)
+        print(f"  Audio chunk {i+1}/{len(chunks)} done [{model}]", file=sys.stderr)
         time.sleep(1)
 
     if len(audio_parts) == 1:
