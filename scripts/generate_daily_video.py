@@ -408,34 +408,64 @@ def call_claude_short(digest_summary: str, today_display: str) -> dict:
     if not ANTHROPIC_API_KEY:
         raise ValueError("ANTHROPIC_API_KEY not set")
 
-    prompt = f"""You are a YouTube Shorts scriptwriter for "MarketPhase", a financial education channel.
+    # Rotate the narrative angle daily so the channel isn't wall-to-wall doom.
+    # (Doomsday fatigue tanks CTR once viewers feel they've "seen this panic.")
+    ANGLES = [
+        ("Wallet translation",
+         "Translate the macro story into the viewer's daily life — gas, groceries, rent, "
+         "their paycheck, their 401(k). The money-in-their-pocket consequence IS the opening line."),
+        ("Hidden opportunity",
+         "Frame it as a quiet opportunity most people are missing. What is smart money doing "
+         "while everyone else panics? Positive-leaning, not doom."),
+        ("Contrarian",
+         "Take the counter-narrative to today's headlines. If the media screams panic, explain "
+         "calmly why that's the wrong read (or vice versa). Challenge the obvious take."),
+        ("Myth-buster / educational",
+         "Debunk one common misconception the story exposes and teach one concrete concept the "
+         "viewer can reuse. Curiosity, not fear."),
+        ("Smart money watch",
+         "Contrast what institutions/insiders are actually doing right now with what retail is "
+         "being told. 'Wall Street is quietly ___.'"),
+    ]
+    angle_name, angle_dir = ANGLES[date.today().toordinal() % len(ANGLES)]
+
+    prompt = f"""You are a YouTube Shorts scriptwriter for "Tech Me Home", a financial education channel by MarketPhase.
 Today is {today_display}. Here is a summary of today's market news:
 
 {digest_summary}
 
-Pick the single most compelling story and output a JSON object with exactly these 5 keys:
+Pick the single most compelling story and write a 55-60 second Short.
 
-1. "short_title": YouTube Shorts title, max 60 characters. Punchy, no hashtags.
+TODAY'S NARRATIVE ANGLE: {angle_name}
+{angle_dir}
+Do NOT default to a market-crash / catastrophe framing unless the angle above is explicitly
+about a crash. Vary the emotional register — confident and curious beats panicked.
+
+Output a JSON object with exactly these 5 keys:
+
+1. "short_title": YouTube Shorts title, max 60 characters. Punchy, curiosity-driven, no hashtags.
+   It does NOT have to be alarming — match the angle.
 
 2. "short_hook": A 55-60 second spoken script (150-180 words minimum — count carefully).
    CRITICAL RULES — follow exactly:
-   - Open with a shocking statement or number. No "hey", no intro, no name. Start mid-thought.
-     Examples: "The Fed just lied to you." / "$39 trillion. That's the hole America is in."
-   - Second sentence: make the viewer feel stupid for not already knowing this.
-   - Middle: two to three sentences of punchy ELI5 context — explain like the viewer is 12.
-     Build tension. Give one surprising data point or comparison.
-   - Near end: one sentence on what this means for regular people.
-   - End with exactly: "Watch the full breakdown — link in bio."
-   - Tone: urgent, slightly conspiratorial, like sharing a secret.
-   - No stage cues, no filler. Pure spoken words only.
+   - FIRST SENTENCE lands the personal stakes: what this means for the viewer's money, job,
+     savings, or bills. Never bury this lead.
+     Example: "If you've got a 401(k), today's move just changed your retirement math."
+   - Then deliver the angle above in a fresh, specific voice — no generic panic.
+   - Middle: two to three sentences of punchy ELI5 context. One surprising data point or
+     comparison. Explain like the viewer is 12.
+   - Tone: confident, clear, a little insider — a smart friend, NOT a doomsday siren.
+   - End with exactly: "Follow for tomorrow's move — every weekday."
+   - No stage cues, no filler, no "hey", no intro, no name. Pure spoken words only.
    - MINIMUM 150 WORDS. Count before returning.
 
-3. "clip_tag": One tag from this list that best matches the story (or null).
-   ONLY choose from these 10 available clips — any other value will be ignored:
+3. "clip_tags": An ORDERED array of 4 to 6 tags for a fast-cut background (a new clip every
+   ~3-4 seconds), chosen to match the story's beats in sequence. Repeats allowed.
+   ONLY choose from these 10 available clips — any other value is ignored:
    stock_bull, stock_crash, federal_reserve, wall_street, inflation,
    tech_stocks, earnings, nyse_open, data_screens, global_economy
 
-4. "pexels_keyword": A 3-5 word image search term as fallback if clip_tag is null.
+4. "pexels_keyword": A 3-5 word image search term as fallback if no clip_tags match.
 
 5. "tags": Array of 8-10 tags (no # prefix). Always include "finance", "markets",
    "investing", "Shorts". Add story-specific tags.
@@ -1180,8 +1210,13 @@ def upload_to_youtube(video_path: Path, title: str, hook_text: str,
 SHORT_W, SHORT_H = 1080, 1920  # vertical 9:16
 
 def generate_short_video(short_hook: str, short_title: str,
-                         clip_tag: str, tmp_dir: Path) -> Path:
-    """Render a vertical YouTube Short: clip bg + bold hook text + host photo."""
+                         clip_tags, tmp_dir: Path) -> Path:
+    """Render a vertical YouTube Short: fast-cut clip montage + bold hook text.
+
+    clip_tags may be a LIST of tags (preferred — a new clip every ~3-4s) or a
+    single tag string (back-compat). The static host photo is intentionally gone
+    (faceless/dynamic format) — visual change every few seconds drives retention.
+    """
     from PIL import Image, ImageDraw, ImageFilter, ImageEnhance
     import numpy as np
 
@@ -1190,11 +1225,20 @@ def generate_short_video(short_hook: str, short_title: str,
     RED    = (239, 68, 68)
     ACCENT = (29, 78, 216)
 
-    # ── Background clip or solid ──
-    clip_path = get_clip_for_slide(clip_tag) if clip_tag else None
-    if clip_path:
-        # Transparent canvas — the actual moving clip video becomes the bg layer.
-        # The overlay only carries text/branding so the clip plays through.
+    # ── Normalize clip tags → ordered list of existing clip paths ──
+    if isinstance(clip_tags, str):
+        clip_tags = [clip_tags]
+    clip_paths = []
+    for t in (clip_tags or []):
+        if not t:
+            continue
+        p = get_clip_for_slide(t)
+        if p and (not clip_paths or clip_paths[-1] != p):  # skip consecutive dupes
+            clip_paths.append(p)
+
+    if clip_paths:
+        # Transparent canvas — the moving clip montage becomes the bg layer.
+        # The overlay only carries text/branding so the clips play through.
         bg = Image.new("RGBA", (SHORT_W, SHORT_H), (0, 0, 0, 0))
     else:
         bg = Image.new("RGBA", (SHORT_W, SHORT_H), (10, 15, 30, 255))
@@ -1229,32 +1273,24 @@ def generate_short_video(short_hook: str, short_title: str,
         draw.text((40, y_start + i * 100), line, font=title_font,
                   fill=YELLOW + (255,))
 
-    # ── Host photo bottom-left ──
-    assets_dir = Path(__file__).parent / "assets"
-    host_files = sorted(assets_dir.glob("host_*.jp*g"))
-    if host_files:
-        idx = date.today().toordinal() % len(host_files)
-        host_img = Image.open(host_files[idx])
-        host_img = remove_green_screen(host_img)
-        target_h = int(SHORT_H * 0.65)
-        scale    = target_h / host_img.height
-        target_w = int(host_img.width * scale)
-        host_img = host_img.resize((target_w, target_h), Image.LANCZOS)
-        x_pos = (SHORT_W // 2 - target_w) // 2
-        y_pos = SHORT_H - target_h + 30
-        bg.paste(host_img, (x_pos, y_pos), host_img)
-
-    # ── "Watch the full breakdown" CTA ──
-    cta_font = get_font(44, bold=True)
-    cta = "Watch the full breakdown ↓"
+    # ── Follow CTA (host photo removed → faceless/dynamic format) ──
+    # Shorts "Related video" links are Studio-only (not in the Data API), so we
+    # drive follows rather than point to a "link in bio" that YouTube hides.
+    cta_font = get_font(46, bold=True)
+    cta = "▶  Follow for tomorrow's move"
     cw  = draw.textlength(cta, font=cta_font)
+    pad = 24
+    draw.rounded_rectangle(
+        [((SHORT_W - cw) // 2 - pad, SHORT_H - 132),
+         ((SHORT_W + cw) // 2 + pad, SHORT_H - 132 + 68)],
+        radius=16, fill=(0, 0, 0, 150))
     draw.text(((SHORT_W - cw) // 2, SHORT_H - 120), cta,
               font=cta_font, fill=YELLOW + (255,))
 
     # ── Bottom bar ──
     draw.rectangle([(0, SHORT_H - 8), (SHORT_W, SHORT_H)], fill=RED + (255,))
 
-    # ── Build video: use slowed clip or static frame ──
+    # ── Build video: static overlay over a fast-cut clip montage ──
     overlay_path = tmp_dir / "short_overlay.png"
     bg.convert("RGBA").save(overlay_path, "PNG")
 
@@ -1278,28 +1314,54 @@ def generate_short_video(short_hook: str, short_title: str,
         short_duration = MIN_DURATION
         print(f"  Padded audio to {MIN_DURATION:.0f}s", file=sys.stderr)
 
-    # Composite: clip bg (slowed) + overlay + audio
     short_video = tmp_dir / "short_silent.mp4"
-    if clip_path:
-        SLOW = 4.0
-        loops = max(0, int(short_duration / (5.0 * SLOW)) + 1)
+
+    if clip_paths:
+        # Fast-cut montage: a new clip every ~SEG seconds at NORMAL speed (no 4×
+        # slowdown). Visual change every few seconds is the retention driver.
+        SEG = 3.5
+        n_segs = int(short_duration // SEG) + 1
+        seg_paths = []
+        for i in range(n_segs):
+            clip = clip_paths[i % len(clip_paths)]
+            seg  = tmp_dir / f"short_seg_{i:02d}.mp4"
+            subprocess.run([
+                "ffmpeg", "-y",
+                "-stream_loop", "-1", "-i", str(clip),
+                "-t", f"{SEG:.2f}",
+                "-vf", (f"scale={SHORT_W}:{SHORT_H}:force_original_aspect_ratio=increase,"
+                        f"crop={SHORT_W}:{SHORT_H},setsar=1,fps=30,format=yuv420p"),
+                "-an", "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+                "-video_track_timescale", "30000",
+                str(seg),
+            ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            seg_paths.append(seg)
+            print(f"  Montage seg {i+1}/{n_segs}: {clip.stem}", file=sys.stderr)
+
+        # Concat (identical encode params → stream copy is safe)
+        list_file = tmp_dir / "short_montage.txt"
+        list_file.write_text("\n".join(f"file '{p}'" for p in seg_paths))
+        bg_video = tmp_dir / "short_bg.mp4"
+        subprocess.run([
+            "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(list_file),
+            "-t", f"{short_duration:.2f}", "-c", "copy", str(bg_video),
+        ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+        # Static overlay (branding/title/CTA) on top of the moving montage
         subprocess.run([
             "ffmpeg", "-y",
-            "-stream_loop", str(loops), "-i", str(clip_path),
-            "-i", str(overlay_path),
-            "-filter_complex",
-            f"[0:v]setpts={SLOW}*PTS,scale={SHORT_W}:{SHORT_H}:"
-            f"force_original_aspect_ratio=increase,crop={SHORT_W}:{SHORT_H},"
-            f"setsar=1[bg];[bg][1:v]overlay=0:0[out]",
-            "-map", "[out]", "-t", str(short_duration),
+            "-i", str(bg_video), "-i", str(overlay_path),
+            "-filter_complex", "[0:v][1:v]overlay=0:0[out]",
+            "-map", "[out]", "-t", f"{short_duration:.2f}",
             "-c:v", "libx264", "-preset", "fast", "-crf", "23",
             "-pix_fmt", "yuv420p", "-an", str(short_video),
         ], check=True, stdout=subprocess.DEVNULL)
     else:
+        # Fallback: static overlay only (no clips matched)
         subprocess.run([
             "ffmpeg", "-y",
             "-loop", "1", "-i", str(overlay_path),
-            "-t", str(short_duration),
+            "-t", f"{short_duration:.2f}",
             "-c:v", "libx264", "-preset", "fast", "-crf", "23",
             "-pix_fmt", "yuv420p", "-an", str(short_video),
         ], check=True, stdout=subprocess.DEVNULL)
@@ -1313,7 +1375,8 @@ def generate_short_video(short_hook: str, short_title: str,
         str(out_path),
     ], check=True, stdout=subprocess.DEVNULL)
 
-    print(f"  Short video built ({short_duration:.0f}s)", file=sys.stderr)
+    kind = f"{len(clip_paths)} clips, fast-cut" if clip_paths else "static"
+    print(f"  Short video built ({short_duration:.0f}s, {kind})", file=sys.stderr)
     return out_path
 
 
@@ -1472,7 +1535,8 @@ def main():
         data       = call_claude_short(digest_summary, today_display)
         short_hook = data.get("short_hook", "")
         short_title = data.get("short_title", f"Market Update {today.strftime('%b %d')}").strip()
-        clip_tag   = data.get("clip_tag")
+        # Prefer the new ordered shot-list; fall back to a single tag for back-compat.
+        clip_tags  = data.get("clip_tags") or data.get("clip_tag")
         extra_tags = data.get("tags", [])
 
         if not short_hook:
@@ -1481,9 +1545,10 @@ def main():
 
         print(f"  Title: {short_title}", file=sys.stderr)
         print(f"  Hook:  {short_hook[:80]}…", file=sys.stderr)
+        print(f"  Clips: {clip_tags}", file=sys.stderr)
 
         print("Generating YouTube Short…", file=sys.stderr)
-        short_path = generate_short_video(short_hook, short_title, clip_tag, TMP_DIR)
+        short_path = generate_short_video(short_hook, short_title, clip_tags, TMP_DIR)
         short_url  = upload_short_to_youtube(short_path, short_title,
                                              f"MarketPhase Daily — {today_display}")
         print(f"\n✅ Short live: {short_url}", file=sys.stderr)
@@ -1571,10 +1636,12 @@ def main():
     # 7. Short (derived from long video data)
     if short_hook:
         print("Generating YouTube Short…", file=sys.stderr)
-        short_clip_tag = slides_data[0].get("clip_tag") if slides_data else None
+        # Shot-list for the fast-cut Short = every slide's clip tag, in order.
+        short_clip_tags = [s.get("clip_tag") for s in slides_data if s.get("clip_tag")] \
+            if slides_data else []
         try:
             short_path = generate_short_video(short_hook, short_title,
-                                              short_clip_tag, TMP_DIR)
+                                              short_clip_tags, TMP_DIR)
             short_url  = upload_short_to_youtube(short_path, short_title, video_title)
             print(f"  Short: {short_url}", file=sys.stderr)
         except Exception as e:
