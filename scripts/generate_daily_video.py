@@ -76,6 +76,16 @@ def ensure_deps():
         import requests
     except ImportError:
         install("requests")
+    # Captions (best-effort): a failed install must NOT break the run —
+    # transcribe_words() degrades to "no captions" if faster-whisper is absent.
+    try:
+        import faster_whisper  # noqa: F401
+    except ImportError:
+        try:
+            install("faster-whisper")
+        except Exception as e:
+            print(f"  faster-whisper install failed ({e}); captions will be skipped",
+                  file=sys.stderr)
 
 
 def read_today_digest() -> str:
@@ -699,11 +709,18 @@ def get_font(size, bold=False):
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
         "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
         "/usr/share/fonts/truetype/ubuntu/Ubuntu-B.ttf",
+        # macOS fallbacks (local dev/testing — Linux paths above win on CI)
+        "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+        "/Library/Fonts/Arial Bold.ttf",
+        "/System/Library/Fonts/HelveticaNeue.ttc",
     ]
     paths_reg = [
         "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
         "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
         "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
+        "/System/Library/Fonts/Supplemental/Arial.ttf",
+        "/Library/Fonts/Arial.ttf",
+        "/System/Library/Fonts/Helvetica.ttc",
     ]
     for fp in (paths_bold if bold else paths_reg):
         if Path(fp).exists():
@@ -1236,6 +1253,97 @@ def upload_to_youtube(video_path: Path, title: str, hook_text: str,
 
 SHORT_W, SHORT_H = 1080, 1920  # vertical 9:16
 
+def transcribe_words(audio_path: Path):
+    """Word-level timestamps via faster-whisper. Returns [(text, start, end)] or []
+    on any failure (captions are best-effort — never break the render)."""
+    try:
+        from faster_whisper import WhisperModel
+    except Exception as e:
+        print(f"  [captions] faster-whisper unavailable ({e}); skipping captions", file=sys.stderr)
+        return []
+    try:
+        size  = os.environ.get("WHISPER_MODEL", "base")
+        model = WhisperModel(size, device="cpu", compute_type="int8")
+        segs, _ = model.transcribe(str(audio_path), word_timestamps=True)
+        words = []
+        for s in segs:
+            for w in (s.words or []):
+                t = w.word.strip()
+                if t:
+                    words.append((t, float(w.start), float(w.end)))
+        print(f"  [captions] {len(words)} words aligned", file=sys.stderr)
+        return words
+    except Exception as e:
+        print(f"  [captions] transcription failed ({e}); skipping captions", file=sys.stderr)
+        return []
+
+
+def build_caption_pngs(words, tmp_dir: Path):
+    """Hype color-pop captions: a 1-3 word window with the ACTIVE word popped in
+    brand-yellow, rest white, thick outline. Returns [(png, start, end)] for
+    ffmpeg overlay timing. Uses PIL (no libass) so fonts are guaranteed present."""
+    from PIL import Image, ImageDraw
+    if not words:
+        return []
+    YELLOW = (251, 191, 36, 255)
+    WHITE  = (255, 255, 255, 255)
+    font   = get_font(92, bold=True)
+    space  = 26
+    y       = int(SHORT_H * 0.60)   # lower-third, clear of top title + bottom CTA
+
+    # Group into chunks of ≤3 words; also break on a pause > 0.6s.
+    chunks, cur = [], []
+    for w in words:
+        if cur and (len(cur) >= 3 or w[1] - cur[-1][2] > 0.6):
+            chunks.append(cur); cur = []
+        cur.append(w)
+    if cur:
+        chunks.append(cur)
+
+    scratch = ImageDraw.Draw(Image.new("RGBA", (10, 10)))
+    items, k = [], 0
+    for chunk in chunks:
+        txts   = [t.upper() for (t, _, _) in chunk]
+        widths = [scratch.textlength(t, font=font) for t in txts]
+        total  = sum(widths) + space * (len(txts) - 1)
+        x0     = int((SHORT_W - total) // 2)
+        for ai, (_, ws, we) in enumerate(chunk):
+            img = Image.new("RGBA", (SHORT_W, SHORT_H), (0, 0, 0, 0))
+            d   = ImageDraw.Draw(img)
+            x   = x0
+            for wi, t in enumerate(txts):
+                draw_outlined_text(d, (x, y), t, font,
+                                   YELLOW if wi == ai else WHITE,
+                                   outline=(0, 0, 0, 255), thickness=7)
+                x += widths[wi] + space
+            png = tmp_dir / f"cap_{k:03d}.png"
+            img.save(png, "PNG"); k += 1
+            nxt = chunk[ai + 1][1] if ai + 1 < len(chunk) else we + 0.10
+            items.append((png, round(ws, 2), round(max(nxt, ws + 0.12), 2)))
+    print(f"  [captions] {len(items)} caption frames built", file=sys.stderr)
+    return items
+
+
+def burn_captions(base_video: Path, items, duration: float, out_path: Path) -> Path:
+    """Overlay timed caption PNGs onto base_video via ffmpeg enable windows."""
+    inputs = []
+    for png, _, _ in items:
+        inputs += ["-i", str(png)]
+    fc, cur = [], "0:v"
+    for idx, (_, s, e) in enumerate(items, start=1):
+        nxt = f"c{idx}"
+        fc.append(f"[{cur}][{idx}:v]overlay=0:0:enable='between(t,{s},{e})'[{nxt}]")
+        cur = nxt
+    subprocess.run([
+        "ffmpeg", "-y", "-i", str(base_video), *inputs,
+        "-filter_complex", ";".join(fc),
+        "-map", f"[{cur}]", "-t", f"{duration:.2f}",
+        "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+        "-pix_fmt", "yuv420p", "-an", str(out_path),
+    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    return out_path
+
+
 def generate_short_video(short_hook: str, short_title: str,
                          clip_tags, tmp_dir: Path) -> Path:
     """Render a vertical YouTube Short: fast-cut clip montage + bold hook text.
@@ -1341,7 +1449,7 @@ def generate_short_video(short_hook: str, short_title: str,
         short_duration = MIN_DURATION
         print(f"  Padded audio to {MIN_DURATION:.0f}s", file=sys.stderr)
 
-    short_video = tmp_dir / "short_silent.mp4"
+    composited = tmp_dir / "short_composited.mp4"
 
     if clip_paths:
         # Fast-cut montage: a new clip every ~SEG seconds at NORMAL speed (no 4×
@@ -1381,7 +1489,7 @@ def generate_short_video(short_hook: str, short_title: str,
             "-filter_complex", "[0:v][1:v]overlay=0:0[out]",
             "-map", "[out]", "-t", f"{short_duration:.2f}",
             "-c:v", "libx264", "-preset", "fast", "-crf", "23",
-            "-pix_fmt", "yuv420p", "-an", str(short_video),
+            "-pix_fmt", "yuv420p", "-an", str(composited),
         ], check=True, stdout=subprocess.DEVNULL)
     else:
         # Fallback: static overlay only (no clips matched)
@@ -1390,8 +1498,22 @@ def generate_short_video(short_hook: str, short_title: str,
             "-loop", "1", "-i", str(overlay_path),
             "-t", f"{short_duration:.2f}",
             "-c:v", "libx264", "-preset", "fast", "-crf", "23",
-            "-pix_fmt", "yuv420p", "-an", str(short_video),
+            "-pix_fmt", "yuv420p", "-an", str(composited),
         ], check=True, stdout=subprocess.DEVNULL)
+
+    # ── Kinetic captions (hype color-pop, word-synced) ──
+    # Best-effort: if alignment/caption build fails, ship the uncaptioned video.
+    short_video = composited
+    try:
+        cap_items = build_caption_pngs(transcribe_words(short_audio), tmp_dir)
+        if cap_items:
+            captioned = tmp_dir / "short_silent.mp4"
+            burn_captions(composited, cap_items, short_duration, captioned)
+            short_video = captioned
+            print(f"  Captions burned ({len(cap_items)} frames)", file=sys.stderr)
+    except Exception as e:
+        print(f"  [captions] burn failed ({e}); shipping without captions", file=sys.stderr)
+        short_video = composited
 
     # Mux audio
     out_path = tmp_dir / "short_final.mp4"
