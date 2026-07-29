@@ -1344,6 +1344,35 @@ def burn_captions(base_video: Path, items, duration: float, out_path: Path) -> P
     return out_path
 
 
+def build_montage_bg(clip_paths, duration: float, tmp_dir: Path) -> Path:
+    """Fast-cut montage: a new clip every ~3.5s at normal speed. Returns bg video."""
+    SEG = 3.5
+    n_segs = int(duration // SEG) + 1
+    seg_paths = []
+    for i in range(n_segs):
+        clip = clip_paths[i % len(clip_paths)]
+        seg  = tmp_dir / f"mseg_{i:02d}.mp4"
+        subprocess.run([
+            "ffmpeg", "-y",
+            "-stream_loop", "-1", "-i", str(clip),
+            "-t", f"{SEG:.2f}",
+            "-vf", (f"scale={SHORT_W}:{SHORT_H}:force_original_aspect_ratio=increase,"
+                    f"crop={SHORT_W}:{SHORT_H},setsar=1,fps=30,format=yuv420p"),
+            "-an", "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+            "-video_track_timescale", "30000",
+            str(seg),
+        ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        seg_paths.append(seg)
+    list_file = tmp_dir / "montage.txt"
+    list_file.write_text("\n".join(f"file '{p}'" for p in seg_paths))
+    bg_video = tmp_dir / "montage_bg.mp4"
+    subprocess.run([
+        "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(list_file),
+        "-t", f"{duration:.2f}", "-c", "copy", str(bg_video),
+    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    return bg_video
+
+
 def generate_short_video(short_hook: str, short_title: str,
                          clip_tags, tmp_dir: Path) -> Path:
     """Render a vertical YouTube Short: fast-cut clip montage + bold hook text.
@@ -1452,35 +1481,8 @@ def generate_short_video(short_hook: str, short_title: str,
     composited = tmp_dir / "short_composited.mp4"
 
     if clip_paths:
-        # Fast-cut montage: a new clip every ~SEG seconds at NORMAL speed (no 4×
-        # slowdown). Visual change every few seconds is the retention driver.
-        SEG = 3.5
-        n_segs = int(short_duration // SEG) + 1
-        seg_paths = []
-        for i in range(n_segs):
-            clip = clip_paths[i % len(clip_paths)]
-            seg  = tmp_dir / f"short_seg_{i:02d}.mp4"
-            subprocess.run([
-                "ffmpeg", "-y",
-                "-stream_loop", "-1", "-i", str(clip),
-                "-t", f"{SEG:.2f}",
-                "-vf", (f"scale={SHORT_W}:{SHORT_H}:force_original_aspect_ratio=increase,"
-                        f"crop={SHORT_W}:{SHORT_H},setsar=1,fps=30,format=yuv420p"),
-                "-an", "-c:v", "libx264", "-preset", "fast", "-crf", "23",
-                "-video_track_timescale", "30000",
-                str(seg),
-            ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            seg_paths.append(seg)
-            print(f"  Montage seg {i+1}/{n_segs}: {clip.stem}", file=sys.stderr)
-
-        # Concat (identical encode params → stream copy is safe)
-        list_file = tmp_dir / "short_montage.txt"
-        list_file.write_text("\n".join(f"file '{p}'" for p in seg_paths))
-        bg_video = tmp_dir / "short_bg.mp4"
-        subprocess.run([
-            "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(list_file),
-            "-t", f"{short_duration:.2f}", "-c", "copy", str(bg_video),
-        ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # Fast-cut montage: a new clip every ~3.5s at NORMAL speed (no 4× slowdown).
+        bg_video = build_montage_bg(clip_paths, short_duration, tmp_dir)
 
         # Static overlay (branding/title/CTA) on top of the moving montage
         subprocess.run([
@@ -1529,13 +1531,282 @@ def generate_short_video(short_hook: str, short_title: str,
     return out_path
 
 
+TRIVIA_COUNTDOWN = 4.0  # seconds of silence + on-screen timer per question
+
+
+def call_claude_trivia(digest_summary: str, today_display: str) -> dict:
+    """Generate a 3-question 'Guess the X' finance quiz from today's news + evergreen."""
+    if not ANTHROPIC_API_KEY:
+        raise ValueError("ANTHROPIC_API_KEY not set")
+    prompt = f"""You are a YouTube Shorts quiz writer for "Tech Me Home", a finance channel by MarketPhase.
+Today is {today_display}. Today's market news:
+
+{digest_summary}
+
+Write an interactive "Only 1% can pass this" style finance quiz. Output JSON with exactly:
+
+1. "hook": one punchy line to open (e.g. "Only 1% of investors can ace today's market quiz.").
+2. "short_title": Shorts title, max 60 chars, curiosity-driven, no hashtags.
+3. "questions": array of EXACTLY 3 objects, progressively harder:
+   - Q1 easy, Q2 medium, Q3 hard.
+   - MIX: at least one tied to TODAY's news above, at least one evergreen finance concept.
+   - Each: {{"q": "question text (max ~90 chars)",
+             "choices": ["A text","B text","C text"]  (EXACTLY 3, each ≤ 4 words),
+             "answer_idx": 0/1/2,
+             "explain": "one short sentence why (max ~90 chars)"}}
+   - Questions must be SELF-CONTAINED and answerable from public knowledge — never
+     reference "the digest" or "today's summary". Verifiably correct answers only.
+4. "outro": one line pushing a comment (e.g. "Comment your score below — be honest!").
+5. "clip_tags": ordered array of 4-6 tags for the background montage, ONLY from:
+   stock_bull, stock_crash, federal_reserve, wall_street, inflation,
+   tech_stocks, earnings, nyse_open, data_screens, global_economy
+6. "tags": 8-10 YouTube tags (no #). Always include "finance","markets","quiz","Shorts".
+
+Return ONLY valid JSON. No markdown."""
+    payload = json.dumps({
+        "model": "claude-haiku-4-5-20251001",
+        "max_tokens": 1500,
+        "messages": [{"role": "user", "content": prompt}],
+    }).encode()
+    req = urllib.request.Request(
+        "https://api.anthropic.com/v1/messages", data=payload,
+        headers={"x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01",
+                 "content-type": "application/json"}, method="POST")
+    with urlopen_with_retry(req, timeout=90) as resp:
+        result = json.loads(resp.read())
+    raw = result["content"][0]["text"].strip()
+    raw = re.sub(r'^```(?:json)?\s*', '', raw); raw = re.sub(r'\s*```$', '', raw)
+    start = raw.find('{')
+    if start != -1:
+        raw = raw[start:]
+    dec = json.JSONDecoder()
+    try:
+        obj, _ = dec.raw_decode(raw)
+    except json.JSONDecodeError:
+        obj, _ = dec.raw_decode(re.sub(r',\s*([}\]])', r'\1', raw))
+    return obj
+
+
+def _trivia_canvas():
+    """Dark full-frame canvas (montage faintly behind) with MARKET QUIZ branding."""
+    from PIL import Image, ImageDraw
+    img = Image.new("RGBA", (SHORT_W, SHORT_H), (8, 12, 24, 190))
+    d   = ImageDraw.Draw(img)
+    d.rectangle([(0, 0), (SHORT_W, 8)], fill=(29, 78, 216, 255))
+    bf  = get_font(40, bold=True)
+    d.text((40, 42), "MARKET", font=bf, fill=(255, 255, 255, 255))
+    mw = d.textlength("MARKET", font=bf)
+    d.text((40 + mw, 42), "QUIZ", font=bf, fill=(96, 165, 250, 255))
+    d.rectangle([(0, SHORT_H - 8), (SHORT_W, SHORT_H)], fill=(239, 68, 68, 255))
+    return img, d
+
+
+def _wrap_text(draw, text, font, max_w):
+    words, lines, cur = text.split(), [], ""
+    for w in words:
+        t = (cur + " " + w).strip()
+        if draw.textlength(t, font=font) <= max_w:
+            cur = t
+        else:
+            if cur:
+                lines.append(cur)
+            cur = w
+    if cur:
+        lines.append(cur)
+    return lines
+
+
+def _draw_question(d, meta, highlight=None, explain=None):
+    """Draw QUESTION label + wrapped question + 3 choice rows (+optional reveal)."""
+    label_f = get_font(46, bold=True)
+    q_f     = get_font(58, bold=True)
+    c_f     = get_font(50, bold=True)
+    e_f     = get_font(40, bold=True)
+    draw_outlined_text(d, (60, 150), f"QUESTION {meta['n']} / 3", label_f,
+                       (96, 165, 250, 255), thickness=4)
+    y = 250
+    for line in _wrap_text(d, meta["q"], q_f, SHORT_W - 120):
+        draw_outlined_text(d, (60, y), line, q_f, (255, 255, 255, 255), thickness=5)
+        y += 74
+    cy = max(y + 50, 820)
+    for j, c in enumerate(meta["choices"]):
+        if highlight is None:
+            box, col = (30, 41, 59, 235), (255, 255, 255, 255)
+        elif j == highlight:
+            box, col = (5, 150, 105, 255), (255, 255, 255, 255)    # correct = green
+        else:
+            box, col = (30, 41, 59, 170), (148, 163, 184, 255)     # wrong = dim
+        d.rounded_rectangle([(60, cy), (SHORT_W - 60, cy + 116)], radius=18, fill=box)
+        draw_outlined_text(d, (90, cy + 26), chr(65 + j), c_f, (251, 191, 36, 255), thickness=3)
+        draw_outlined_text(d, (200, cy + 26), str(c), c_f, col, thickness=3)
+        cy += 140
+    if explain:
+        ey = cy + 24
+        for line in _wrap_text(d, explain, e_f, SHORT_W - 120):
+            draw_outlined_text(d, (60, ey), line, e_f, (226, 232, 240, 255), thickness=3)
+            ey += 52
+
+
+def render_question_card(tmp_dir, k, meta, highlight=None, explain=None):
+    img, d = _trivia_canvas()
+    _draw_question(d, meta, highlight, explain)
+    png = tmp_dir / f"tr_{k:03d}.png"; img.save(png, "PNG")
+    return png
+
+
+def render_countdown_frames(tmp_dir, k, meta, s, e):
+    """Question card + shrinking bar + big ticking number over [s, e]."""
+    import math
+    dur   = e - s
+    steps = max(1, int(round(dur / 0.25)))
+    nf    = get_font(210, bold=True)
+    frames, bar_max = [], SHORT_W - 160
+    for i in range(steps):
+        fs, fe    = s + i * (dur / steps), s + (i + 1) * (dur / steps)
+        remaining = dur - i * (dur / steps)
+        frac      = max(0.0, remaining / dur)
+        num       = max(1, int(math.ceil(remaining)))
+        img, d = _trivia_canvas()
+        _draw_question(d, meta, highlight=None, explain=None)
+        nt = str(num); nw = d.textlength(nt, font=nf)
+        draw_outlined_text(d, (int((SHORT_W - nw) // 2), 1360), nt, nf,
+                           (251, 191, 36, 255), thickness=8)
+        bx, by, bh = 80, 1620, 46
+        d.rounded_rectangle([(bx, by), (bx + bar_max, by + bh)], radius=23, fill=(30, 41, 59, 235))
+        if frac > 0:
+            d.rounded_rectangle([(bx, by), (bx + int(bar_max * frac), by + bh)],
+                                radius=23, fill=(251, 191, 36, 255))
+        png = tmp_dir / f"tr_{k + i:03d}.png"; img.save(png, "PNG")
+        frames.append((png, round(fs, 2), round(fe, 2)))
+    return frames
+
+
+def render_text_card(tmp_dir, k, text, sub=None):
+    img, d = _trivia_canvas()
+    f = get_font(84, bold=True)
+    lines = _wrap_text(d, text, f, SHORT_W - 140)
+    y = (SHORT_H - len(lines) * 104) // 2
+    for line in lines:
+        lw = d.textlength(line, font=f)
+        draw_outlined_text(d, (int((SHORT_W - lw) // 2), y), line, f,
+                           (251, 191, 36, 255), thickness=7)
+        y += 104
+    if sub:
+        sf = get_font(48, bold=True); sw = d.textlength(sub, font=sf)
+        draw_outlined_text(d, (int((SHORT_W - sw) // 2), y + 40), sub, sf,
+                           (255, 255, 255, 255), thickness=4)
+    png = tmp_dir / f"tr_{k:03d}.png"; img.save(png, "PNG")
+    return png
+
+
+def generate_trivia_short(trivia: dict, clip_tags, tmp_dir: Path) -> Path:
+    """Interactive quiz Short: hook → 3×(question → countdown → reveal) → outro."""
+    hook      = trivia.get("hook", "Can you pass today's market quiz?")
+    questions = (trivia.get("questions") or [])[:3]
+    outro     = trivia.get("outro", "Comment your score below!")
+    if not questions:
+        raise ValueError("trivia: no questions")
+
+    # ── Normalize clip tags → clip paths (same rule as the narrative Short) ──
+    if isinstance(clip_tags, str):
+        clip_tags = [clip_tags]
+    clip_paths = []
+    for t in (clip_tags or []):
+        p = get_clip_for_slide(t) if t else None
+        if p and (not clip_paths or clip_paths[-1] != p):
+            clip_paths.append(p)
+
+    # ── 1. Build the audio timeline (TTS segments + countdown silences) ──
+    audio_parts, timeline, t = [], [], 0.0
+
+    def add_audio(path):
+        nonlocal t
+        d = get_audio_duration(path); s = t; t += d; audio_parts.append(str(path))
+        return s, t
+
+    def add_silence(dur):
+        nonlocal t
+        sp = tmp_dir / f"tr_sil_{len(audio_parts)}.mp3"
+        subprocess.run(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=mono",
+                        "-t", f"{dur:.2f}", "-c:a", "libmp3lame", "-b:a", "192k", str(sp)],
+                       check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        s = t; t += dur; audio_parts.append(str(sp)); return s, t
+
+    hook_mp3 = tmp_dir / "tr_hook.mp3"; tts_elevenlabs(hook, hook_mp3)
+    s, e = add_audio(hook_mp3); timeline.append(("hook", {"text": hook}, s, e))
+
+    for qi, q in enumerate(questions):
+        choices = [str(c) for c in q.get("choices", [])][:3]
+        ai      = int(q.get("answer_idx", 0)) % max(1, len(choices))
+        meta    = {"q": q.get("q", ""), "choices": choices, "n": qi + 1,
+                   "answer": ai, "explain": q.get("explain", "")}
+        read = (f"Question {qi + 1}. {meta['q']} Is it: "
+                + " ".join(f"{chr(65 + j)}: {c}." for j, c in enumerate(choices)))
+        qmp3 = tmp_dir / f"tr_q{qi}.mp3"; tts_elevenlabs(read, qmp3)
+        s, e = add_audio(qmp3);  timeline.append(("question", meta, s, e))
+        s, e = add_silence(TRIVIA_COUNTDOWN); timeline.append(("countdown", meta, s, e))
+        ans  = f"The answer is {chr(65 + ai)}. {meta['explain']}"
+        amp3 = tmp_dir / f"tr_a{qi}.mp3"; tts_elevenlabs(ans, amp3)
+        s, e = add_audio(amp3);  timeline.append(("reveal", meta, s, e))
+
+    outro_mp3 = tmp_dir / "tr_outro.mp3"; tts_elevenlabs(outro, outro_mp3)
+    s, e = add_audio(outro_mp3); timeline.append(("outro", {"text": outro}, s, e))
+    total = t
+
+    # Concat the full narration
+    full_audio = tmp_dir / "tr_audio.mp3"
+    lf = tmp_dir / "tr_audio.txt"; lf.write_text("\n".join(f"file '{p}'" for p in audio_parts))
+    # Re-encode to a uniform rate (TTS chunks + silence may differ) → clean mux.
+    subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(lf),
+                    "-ar", "44100", "-ac", "1", "-c:a", "libmp3lame", "-b:a", "192k",
+                    str(full_audio)],
+                   check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    # ── 2. Background montage (or solid dark fallback) ──
+    if clip_paths:
+        bg_video = build_montage_bg(clip_paths, total, tmp_dir)
+    else:
+        bg_video = tmp_dir / "tr_bg.mp4"
+        subprocess.run(["ffmpeg", "-y", "-f", "lavfi",
+                        "-i", f"color=c=0x0a0f1e:s={SHORT_W}x{SHORT_H}:r=30",
+                        "-t", f"{total:.2f}", "-c:v", "libx264", "-preset", "fast",
+                        "-crf", "23", "-pix_fmt", "yuv420p", str(bg_video)],
+                       check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    # ── 3. Timed overlays from the timeline ──
+    overlays, k = [], 0
+    for kind, meta, s, e in timeline:
+        if kind == "hook":
+            overlays.append((render_text_card(tmp_dir, k, meta["text"]), s, e)); k += 1
+        elif kind == "question":
+            overlays.append((render_question_card(tmp_dir, k, meta), s, e)); k += 1
+        elif kind == "countdown":
+            fr = render_countdown_frames(tmp_dir, k, meta, s, e); overlays += fr; k += len(fr)
+        elif kind == "reveal":
+            overlays.append((render_question_card(tmp_dir, k, meta,
+                             highlight=meta["answer"], explain=meta["explain"]), s, e)); k += 1
+        elif kind == "outro":
+            overlays.append((render_text_card(tmp_dir, k, meta["text"], sub="👇"), s, e)); k += 1
+
+    # ── 4. Burn overlays over the montage, then mux audio ──
+    silent = tmp_dir / "tr_silent.mp4"
+    burn_captions(bg_video, overlays, total, silent)
+    out_path = tmp_dir / "trivia_final.mp4"
+    subprocess.run(["ffmpeg", "-y", "-i", str(silent), "-i", str(full_audio),
+                    "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", str(out_path)],
+                   check=True, stdout=subprocess.DEVNULL)
+    print(f"  Trivia short built ({total:.0f}s, {len(questions)} questions, "
+          f"{len(overlays)} overlays)", file=sys.stderr)
+    return out_path
+
+
 def upload_short_to_youtube(short_path: Path, short_title: str,
-                            main_video_title: str) -> str:
+                            main_video_title: str, description_override: str = None) -> str:
     """Upload a YouTube Short — vertical, under 60 sec, with #Shorts tag."""
     access_token = get_youtube_access_token()
     today_str    = date.today().strftime("%B %d, %Y")
 
-    description = (
+    description = description_override or (
         f"💥 {main_video_title}\n\n"
         f"Watch the full breakdown 👉 {SITE_URL}\n\n"
         f"New market shorts every weekday. Follow for daily insights.\n\n"
@@ -1675,33 +1946,48 @@ def main():
 
     # ── SHORTS-ONLY path ──────────────────────────────────────────────────────
     if SHORTS_ONLY:
-        print(f"=== Daily Short — {today_display} ===", file=sys.stderr)
+        # Alternate content: narrative Short vs interactive trivia Short.
+        # SHORT_TYPE = auto (default) | narrative | trivia. auto → alternate by date parity.
+        short_type = os.environ.get("SHORT_TYPE", "auto").strip().lower()
+        if short_type not in ("narrative", "trivia"):
+            short_type = "trivia" if (date.today().toordinal() % 2 == 0) else "narrative"
 
+        print(f"=== Daily Short [{short_type}] — {today_display} ===", file=sys.stderr)
         print("Reading digest…", file=sys.stderr)
         digest_summary = read_today_digest()
 
-        print("Generating Short script with Claude…", file=sys.stderr)
-        data       = call_claude_short(digest_summary, today_display)
-        short_hook = data.get("short_hook", "")
-        short_title = data.get("short_title", f"Market Update {today.strftime('%b %d')}").strip()
-        # Prefer the new ordered shot-list; fall back to a single tag for back-compat.
-        clip_tags  = data.get("clip_tags") or data.get("clip_tag")
-        extra_tags = data.get("tags", [])
+        if short_type == "trivia":
+            print("Generating trivia quiz with Claude…", file=sys.stderr)
+            data        = call_claude_trivia(digest_summary, today_display)
+            short_title = (data.get("short_title") or f"Market Quiz {today.strftime('%b %d')}").strip()
+            clip_tags   = data.get("clip_tags")
+            print(f"  Title: {short_title} | {len(data.get('questions', []))} questions", file=sys.stderr)
+            print("Generating trivia Short…", file=sys.stderr)
+            short_path = generate_trivia_short(data, clip_tags, TMP_DIR)
+            desc = ("Can you pass today's market quiz? Comment your score below 👇\n\n"
+                    "New finance quiz & market shorts every weekday. Follow for daily insights.\n\n"
+                    "#Shorts #finance #markets #quiz #investing #stocks #MarketPhase")
+            short_url = upload_short_to_youtube(short_path, short_title,
+                                                f"MarketPhase Quiz — {today_display}",
+                                                description_override=desc)
+        else:
+            print("Generating Short script with Claude…", file=sys.stderr)
+            data        = call_claude_short(digest_summary, today_display)
+            short_hook  = data.get("short_hook", "")
+            short_title = data.get("short_title", f"Market Update {today.strftime('%b %d')}").strip()
+            clip_tags   = data.get("clip_tags") or data.get("clip_tag")
+            if not short_hook:
+                print("ERROR: Claude returned no short_hook", file=sys.stderr)
+                sys.exit(1)
+            print(f"  Title: {short_title}", file=sys.stderr)
+            print(f"  Hook:  {short_hook[:80]}…", file=sys.stderr)
+            print(f"  Clips: {clip_tags}", file=sys.stderr)
+            print("Generating YouTube Short…", file=sys.stderr)
+            short_path = generate_short_video(short_hook, short_title, clip_tags, TMP_DIR)
+            short_url  = upload_short_to_youtube(short_path, short_title,
+                                                 f"MarketPhase Daily — {today_display}")
 
-        if not short_hook:
-            print("ERROR: Claude returned no short_hook", file=sys.stderr)
-            sys.exit(1)
-
-        print(f"  Title: {short_title}", file=sys.stderr)
-        print(f"  Hook:  {short_hook[:80]}…", file=sys.stderr)
-        print(f"  Clips: {clip_tags}", file=sys.stderr)
-
-        print("Generating YouTube Short…", file=sys.stderr)
-        short_path = generate_short_video(short_hook, short_title, clip_tags, TMP_DIR)
-        short_url  = upload_short_to_youtube(short_path, short_title,
-                                             f"MarketPhase Daily — {today_display}")
-        print(f"\n✅ Short live: {short_url}", file=sys.stderr)
-
+        print(f"\n✅ Short live [{short_type}]: {short_url}", file=sys.stderr)
         print("Fetching analytics…", file=sys.stderr)
         fetch_and_save_analytics(REPO_ROOT)
         return
