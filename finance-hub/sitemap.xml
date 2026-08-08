@@ -16,28 +16,28 @@
   <url><loc>https://www.market-phase.com/guides/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
   <!-- Guides -->
-  <url><loc>https://www.market-phase.com/guides/market-timing.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.market-phase.com/guides/vix-explained.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.market-phase.com/guides/cfnai-indicator.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.market-phase.com/guides/soxx-qqq-ratio.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/dollar-cost-averaging.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/pe-ratio-explained.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/earnings-reports.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/business-cycle.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/sp500-explained.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/etfs-vs-mutual-funds.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/market-capitalization.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/treasury-bonds.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/sector-rotation.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/beta-investing.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/inflation-investing.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/cape-ratio.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/portfolio-diversification.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/interest-rate-investing.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/recession-proof-portfolio.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/bear-market-survival.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/fed-interest-rates.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/recession-indicators.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.market-phase.com/guides/yield-curve-explained.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/market-timing</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.market-phase.com/guides/vix-explained</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.market-phase.com/guides/cfnai-indicator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.market-phase.com/guides/soxx-qqq-ratio</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/dollar-cost-averaging</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/pe-ratio-explained</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/earnings-reports</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/business-cycle</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/sp500-explained</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/etfs-vs-mutual-funds</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/market-capitalization</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/treasury-bonds</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/sector-rotation</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/beta-investing</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/inflation-investing</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/cape-ratio</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/portfolio-diversification</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/interest-rate-investing</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/recession-proof-portfolio</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/bear-market-survival</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/fed-interest-rates</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/recession-indicators</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.market-phase.com/guides/yield-curve-explained</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
 
 </urlset>
