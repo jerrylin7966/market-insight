@@ -521,7 +521,7 @@ Output a JSON object with exactly these 5 keys:
    - Middle: two to three sentences of punchy ELI5 context. One surprising data point or
      comparison. Explain like the viewer is 12.
    - Tone: urgent, confident, a little insider — like a friend leaking a secret.
-   - End with exactly: "Follow for tomorrow's move — every weekday."
+   - End with exactly: "Subscribe so tomorrow's biggest move hits your feed first."
    - No stage cues, no filler, no "hey", no intro, no name. Pure spoken words only.
    - MINIMUM 150 WORDS. Count before returning.
 
@@ -1526,16 +1526,16 @@ def generate_short_video(short_hook: str, short_title: str,
     # ── Follow CTA (host photo removed → faceless/dynamic format) ──
     # Shorts "Related video" links are Studio-only (not in the Data API), so we
     # drive follows rather than point to a "link in bio" that YouTube hides.
-    cta_font = get_font(46, bold=True)
-    cta = "▶  Follow for tomorrow's move"
+    cta_font = get_font(48, bold=True)
+    cta = "SUBSCRIBE for tomorrow's move"
     cw  = draw.textlength(cta, font=cta_font)
-    pad = 24
+    pad = 26
     draw.rounded_rectangle(
-        [((SHORT_W - cw) // 2 - pad, SHORT_H - 132),
-         ((SHORT_W + cw) // 2 + pad, SHORT_H - 132 + 68)],
-        radius=16, fill=(0, 0, 0, 150))
+        [((SHORT_W - cw) // 2 - pad, SHORT_H - 134),
+         ((SHORT_W + cw) // 2 + pad, SHORT_H - 134 + 72)],
+        radius=16, fill=(220, 38, 38, 220))   # red pill = the Subscribe colour
     draw.text(((SHORT_W - cw) // 2, SHORT_H - 120), cta,
-              font=cta_font, fill=YELLOW + (255,))
+              font=cta_font, fill=(255, 255, 255, 255))
 
     # ── Bottom bar ──
     draw.rectangle([(0, SHORT_H - 8), (SHORT_W, SHORT_H)], fill=RED + (255,))
@@ -1630,7 +1630,7 @@ def generate_short_video(short_hook: str, short_title: str,
     return out_path
 
 
-TRIVIA_COUNTDOWN = 4.0  # seconds of silence + on-screen timer per question
+TRIVIA_COUNTDOWN = 2.5  # short — long silent countdowns tank retention (quiz avg was 38%)
 
 
 def call_claude_trivia(digest_summary: str, today_display: str, headlines=None) -> dict:
@@ -1806,7 +1806,8 @@ def generate_trivia_short(trivia: dict, clip_tags, tmp_dir: Path) -> Path:
     """Interactive quiz Short: hook → 3×(question → countdown → reveal) → outro."""
     hook      = trivia.get("hook", "Can you pass today's market quiz?")
     questions = (trivia.get("questions") or [])[:3]
-    outro     = trivia.get("outro", "Comment your score below!")
+    outro     = (trivia.get("outro", "Comment your score below!").rstrip(" .!")
+                 + ". And subscribe for a fresh quiz every day.")
     if not questions:
         raise ValueError("trivia: no questions")
 
@@ -1889,7 +1890,8 @@ def generate_trivia_short(trivia: dict, clip_tags, tmp_dir: Path) -> Path:
             overlays.append((render_question_card(tmp_dir, k, meta,
                              highlight=meta["answer"], explain=meta["explain"]), s, e)); k += 1
         elif kind == "outro":
-            overlays.append((render_text_card(tmp_dir, k, meta["text"], sub="👇"), s, e)); k += 1
+            overlays.append((render_text_card(tmp_dir, k, meta["text"],
+                             sub="SUBSCRIBE for a daily quiz"), s, e)); k += 1
 
     # ── 4. Burn overlays over the montage, then mux audio ──
     silent = tmp_dir / "tr_silent.mp4"
