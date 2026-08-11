@@ -1918,12 +1918,13 @@ def fetch_and_save_analytics(repo_root: Path):
         today = date.today().isoformat()
         start = date.fromordinal(date.today().toordinal() - 30).isoformat()
 
-        # 1. Analytics metrics per video
+        # 1. Analytics metrics per video (incl. averageViewPercentage = retention)
         req = urllib.request.Request(
             f"https://youtubeanalytics.googleapis.com/v2/reports"
             f"?ids=channel%3D%3DMINE&startDate={start}&endDate={today}"
             f"&metrics=views,estimatedMinutesWatched,averageViewDuration,"
-            f"subscribersGained&dimensions=video&sort=-views&maxResults=20",
+            f"averageViewPercentage,subscribersGained"
+            f"&dimensions=video&sort=-views&maxResults=30",
             headers={"Authorization": f"Bearer {access_token}"},
         )
         with urlopen_with_retry(req, timeout=60) as resp:
@@ -1934,31 +1935,31 @@ def fetch_and_save_analytics(repo_root: Path):
             print("  Analytics: no data yet", file=sys.stderr)
             return
 
-        # 2. Fetch video titles for each video ID
-        video_ids = ",".join(r[0] for r in rows)
-        req2 = urllib.request.Request(
-            f"https://www.googleapis.com/youtube/v3/videos"
-            f"?part=snippet&id={video_ids}",
-            headers={"Authorization": f"Bearer {access_token}"},
-        )
-        with urlopen_with_retry(req2, timeout=60) as resp:
-            vdata = json.loads(resp.read())
-
-        titles = {item["id"]: item["snippet"]["title"]
-                  for item in vdata.get("items", [])}
+        # 2. Titles via public oEmbed — the youtube.upload scope can't read
+        #    videos.list (403), so don't gate the whole save on it.
+        def _title(vid):
+            try:
+                u = (f"https://www.youtube.com/oembed?format=json"
+                     f"&url=https://www.youtube.com/watch?v={vid}")
+                with urlopen_with_retry(urllib.request.Request(u), timeout=20) as r2:
+                    return json.loads(r2.read()).get("title", vid)
+            except Exception:
+                return vid
+        titles = {r[0]: _title(r[0]) for r in rows}
 
         # 3. Build enriched video list
         videos = []
         for r in rows:
             vid_id = r[0]
             videos.append({
-                "id":               vid_id,
-                "title":            titles.get(vid_id, vid_id),
-                "url":              f"https://www.youtube.com/watch?v={vid_id}",
-                "views":            r[1],
-                "watchMinutes":     r[2],
-                "avgViewDuration":  r[3],
-                "subscribersGained": r[4],
+                "id":                 vid_id,
+                "title":              titles.get(vid_id, vid_id),
+                "url":                f"https://www.youtube.com/watch?v={vid_id}",
+                "views":              r[1],
+                "watchMinutes":       r[2],
+                "avgViewDuration":    r[3],
+                "avgViewPercentage":  r[4],
+                "subscribersGained":  r[5],
             })
 
         totals = {
