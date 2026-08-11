@@ -103,6 +103,41 @@ def read_today_digest() -> str:
     return clean[:2000] if clean else "Markets navigating turbulent macro conditions."
 
 
+_HEADLINE_FEEDS = [
+    "https://finance.yahoo.com/news/rssindex",
+    "https://feeds.reuters.com/reuters/businessNews",
+    "https://seekingalpha.com/market_currents.xml",
+    "https://feeds.marketwatch.com/marketwatch/topstories/",
+    "https://www.cnbc.com/id/10000664/device/rss/rss.html",
+]
+
+
+def fetch_hot_headlines(limit: int = 25):
+    """Fresh, entity-rich RSS headlines for picking a SPECIFIC dramatic story
+    (named company/person/asset). Best-effort — returns [] on failure so the
+    caller falls back to the digest summary. Data shows specific-entity stories
+    massively out-reach generic 'market' takes."""
+    import xml.etree.ElementTree as ET
+    titles, seen = [], set()
+    for url in _HEADLINE_FEEDS:
+        try:
+            req = urllib.request.Request(
+                url, headers={"User-Agent": "Mozilla/5.0 (compatible; MarketPhase/1.0)"})
+            with urllib.request.urlopen(req, timeout=10) as resp:  # fail-fast, best-effort
+                root = ET.fromstring(resp.read())
+            for item in root.iter("item"):
+                t = item.find("title")
+                t = (t.text or "").strip() if t is not None else ""
+                k = t.lower()[:60]
+                if t and k not in seen:
+                    seen.add(k); titles.append(t)
+        except Exception as e:
+            host = url.split("/")[2] if "/" in url else url
+            print(f"  [headlines] {host}: {e}", file=sys.stderr)
+    print(f"  [headlines] {len(titles)} fetched", file=sys.stderr)
+    return titles[:limit]
+
+
 # ── Claude: generate script + slide data ─────────────────────────────────────
 
 def call_claude_topic(topic: str, today_display: str) -> dict:
@@ -418,10 +453,15 @@ Return ONLY valid JSON. No markdown, no explanation."""
 
 # ── Claude: Shorts-only (lean prompt, no full narration) ─────────────────────
 
-def call_claude_short(digest_summary: str, today_display: str) -> dict:
+def call_claude_short(digest_summary: str, today_display: str, headlines=None) -> dict:
     """Generate only what's needed for a YouTube Short — no long narration or slides."""
     if not ANTHROPIC_API_KEY:
         raise ValueError("ANTHROPIC_API_KEY not set")
+    hl_block = ""
+    if headlines:
+        hl_block = ("\n\nTODAY'S RAW HEADLINES (prefer a SPECIFIC, dramatic one — a named "
+                    "company/person/asset with a concrete number or event):\n"
+                    + "\n".join(f"- {h}" for h in headlines[:25]))
 
     # Rotate a HIGH-AROUSAL angle daily. At this channel's scale you need the click
     # first — fear/greed/shock/curiosity drive Shorts reach. Vary WHICH high-arousal
@@ -449,9 +489,15 @@ def call_claude_short(digest_summary: str, today_display: str) -> dict:
     prompt = f"""You are a YouTube Shorts scriptwriter for "Tech Me Home", a financial education channel by MarketPhase.
 Today is {today_display}. Here is a summary of today's market news:
 
-{digest_summary}
+{digest_summary}{hl_block}
 
-Pick the single most compelling story and write a 55-60 second Short.
+Pick ONE story and write a 55-60 second Short.
+
+SUBJECT RULE (most important — this drives reach): the video MUST be about ONE specific
+named entity — a company (Nvidia, Microsoft, SpaceX…), a person, or a specific asset
+(oil, gold, a named stock) — tied to a concrete number or event. NEVER a generic subject
+like "the market", "stocks", "investors", or "the economy". Name that entity in the title
+AND the first spoken line. Specific-entity videos massively out-perform generic ones.
 
 TODAY'S NARRATIVE ANGLE: {angle_name}
 {angle_dir}
@@ -1587,14 +1633,18 @@ def generate_short_video(short_hook: str, short_title: str,
 TRIVIA_COUNTDOWN = 4.0  # seconds of silence + on-screen timer per question
 
 
-def call_claude_trivia(digest_summary: str, today_display: str) -> dict:
+def call_claude_trivia(digest_summary: str, today_display: str, headlines=None) -> dict:
     """Generate a 3-question 'Guess the X' finance quiz from today's news + evergreen."""
     if not ANTHROPIC_API_KEY:
         raise ValueError("ANTHROPIC_API_KEY not set")
+    hl_block = ""
+    if headlines:
+        hl_block = ("\n\nTODAY'S RAW HEADLINES (base the news question on a SPECIFIC named "
+                    "company/person/asset):\n" + "\n".join(f"- {h}" for h in headlines[:25]))
     prompt = f"""You are a YouTube Shorts quiz writer for "Tech Me Home", a finance channel by MarketPhase.
 Today is {today_display}. Today's market news:
 
-{digest_summary}
+{digest_summary}{hl_block}
 
 Write an interactive "Only 1% can pass this" style finance quiz. Output JSON with exactly:
 
@@ -2021,10 +2071,12 @@ def main():
         print(f"=== Daily Short [{short_type}] — {today_display} ===", file=sys.stderr)
         print("Reading digest…", file=sys.stderr)
         digest_summary = read_today_digest()
+        print("Fetching hot headlines…", file=sys.stderr)
+        headlines = fetch_hot_headlines()
 
         if short_type == "trivia":
             print("Generating trivia quiz with Claude…", file=sys.stderr)
-            data        = call_claude_trivia(digest_summary, today_display)
+            data        = call_claude_trivia(digest_summary, today_display, headlines)
             short_title = (data.get("short_title") or f"Market Quiz {today.strftime('%b %d')}").strip()
             clip_tags   = data.get("clip_tags")
             print(f"  Title: {short_title} | {len(data.get('questions', []))} questions", file=sys.stderr)
@@ -2038,7 +2090,7 @@ def main():
                                                 description_override=desc)
         else:
             print("Generating Short script with Claude…", file=sys.stderr)
-            data        = call_claude_short(digest_summary, today_display)
+            data        = call_claude_short(digest_summary, today_display, headlines)
             short_hook  = data.get("short_hook", "")
             short_title = data.get("short_title", f"Market Update {today.strftime('%b %d')}").strip()
             clip_tags   = data.get("clip_tags") or data.get("clip_tag")
