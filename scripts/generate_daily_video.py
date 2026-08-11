@@ -1354,6 +1354,44 @@ def burn_captions(base_video: Path, items, duration: float, out_path: Path) -> P
     return out_path
 
 
+def render_hook_frames(title: str, dur: float, tmp_dir: Path):
+    """Animated opening HOOK card: big centered title that pops in over the montage.
+    Owns the first ~2-3s (the swipe-decision window) instead of a static title card.
+    Returns [(png, start, end)] covering [0, dur]."""
+    from PIL import Image, ImageDraw
+    YELLOW = (251, 191, 36, 255)
+    base   = 108
+
+    def render(scale, k):
+        img = Image.new("RGBA", (SHORT_W, SHORT_H), (0, 0, 0, 0))
+        d   = ImageDraw.Draw(img)
+        # dark scrim behind the hook so it reads over moving footage
+        d.rectangle([(0, int(SHORT_H * 0.27)), (SHORT_W, int(SHORT_H * 0.73))],
+                    fill=(0, 0, 0, 96))
+        size   = max(20, int(base * scale))
+        f      = get_font(size, bold=True)
+        lines  = _wrap_text(d, title.upper(), f, SHORT_W - 110)
+        line_h = int(size * 1.15)
+        y      = (SHORT_H - line_h * len(lines)) // 2
+        for ln in lines:
+            lw = d.textlength(ln, font=f)
+            draw_outlined_text(d, (int((SHORT_W - lw) // 2), y), ln, f,
+                               YELLOW, outline=(0, 0, 0, 255), thickness=8)
+            y += line_h
+        png = tmp_dir / f"hook_{k:02d}.png"; img.save(png, "PNG")
+        return png
+
+    # Pop-in entrance (0.80→1.03 overshoot→1.0), then hold until dur.
+    steps  = [(0.00, 0.80), (0.06, 0.90), (0.12, 0.97), (0.18, 1.03), (0.24, 1.0)]
+    frames = []
+    for i, (t0, sc) in enumerate(steps):
+        png = render(sc, i)
+        t1  = steps[i + 1][0] if i + 1 < len(steps) else 0.30
+        frames.append((png, round(t0, 2), round(t1, 2)))
+    frames.append((render(1.0, len(steps)), 0.30, round(max(dur, 0.5), 2)))
+    return frames
+
+
 def build_montage_bg(clip_paths, duration: float, tmp_dir: Path) -> Path:
     """Fast-cut montage: a new clip every ~3.5s at normal speed. Returns bg video."""
     SEG = 3.5
@@ -1436,16 +1474,8 @@ def generate_short_video(short_hook: str, short_title: str,
     mw = draw.textlength("MARKET", font=brand_font)
     draw.text((40 + mw, 40), "PHASE", font=brand_font, fill=(96, 165, 250, 255))
 
-    # ── Big bold title text (top third) ──
-    title_font = get_font(88, bold=True)
-    wrapped = textwrap.fill(short_title.upper(), width=14)
-    lines   = wrapped.split("\n")
-    y_start = 130
-    for i, line in enumerate(lines):
-        draw.text((42, y_start + i * 100 + 2), line, font=title_font,
-                  fill=(0, 0, 0, 160))
-        draw.text((40, y_start + i * 100), line, font=title_font,
-                  fill=YELLOW + (255,))
+    # (No persistent title — the opening HOOK card, rendered separately, owns the
+    #  first ~2.5s; kinetic captions carry the text after that.)
 
     # ── Follow CTA (host photo removed → faceless/dynamic format) ──
     # Shorts "Related video" links are Studio-only (not in the Data API), so we
@@ -1513,18 +1543,31 @@ def generate_short_video(short_hook: str, short_title: str,
             "-pix_fmt", "yuv420p", "-an", str(composited),
         ], check=True, stdout=subprocess.DEVNULL)
 
-    # ── Kinetic captions (hype color-pop, word-synced) ──
-    # Best-effort: if alignment/caption build fails, ship the uncaptioned video.
+    # ── Opening hook card + kinetic captions (word-synced, hype color-pop) ──
+    # Best-effort: any failure ships the composited video without overlays.
     short_video = composited
     try:
-        cap_items = build_caption_pngs(transcribe_words(short_audio), tmp_dir)
-        if cap_items:
+        words = transcribe_words(short_audio)
+        # Hook card owns the opening clause (until the first real pause), clamped 1.8–3.5s.
+        hook_end = 2.5
+        if words:
+            hook_end = words[0][2]
+            for i in range(len(words) - 1):
+                if words[i + 1][1] - words[i][2] > 0.35:
+                    hook_end = words[i][2]; break
+                hook_end = words[i + 1][2]
+            hook_end = min(max(hook_end, 1.8), 3.5)
+        hook_frames = render_hook_frames(short_title, hook_end, tmp_dir)
+        cap_words   = [w for w in words if w[1] >= hook_end - 0.05]
+        overlays    = hook_frames + build_caption_pngs(cap_words, tmp_dir)
+        if overlays:
             captioned = tmp_dir / "short_silent.mp4"
-            burn_captions(composited, cap_items, short_duration, captioned)
+            burn_captions(composited, overlays, short_duration, captioned)
             short_video = captioned
-            print(f"  Captions burned ({len(cap_items)} frames)", file=sys.stderr)
+            print(f"  Hook + captions burned ({len(overlays)} overlays, hook {hook_end:.1f}s)",
+                  file=sys.stderr)
     except Exception as e:
-        print(f"  [captions] burn failed ({e}); shipping without captions", file=sys.stderr)
+        print(f"  [overlays] failed ({e}); shipping without hook/captions", file=sys.stderr)
         short_video = composited
 
     # Mux audio
