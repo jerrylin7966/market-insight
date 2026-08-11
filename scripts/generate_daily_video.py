@@ -1301,7 +1301,7 @@ def build_caption_pngs(words, tmp_dir: Path):
         chunks.append(cur)
 
     scratch = ImageDraw.Draw(Image.new("RGBA", (10, 10)))
-    items, k = [], 0
+    raw, k = [], 0
     for chunk in chunks:
         txts   = [t.upper() for (t, _, _) in chunk]
         widths = [scratch.textlength(t, font=font) for t in txts]
@@ -1318,8 +1318,13 @@ def build_caption_pngs(words, tmp_dir: Path):
                 x += widths[wi] + space
             png = tmp_dir / f"cap_{k:03d}.png"
             img.save(png, "PNG"); k += 1
-            nxt = chunk[ai + 1][1] if ai + 1 < len(chunk) else we + 0.10
-            items.append((png, round(ws, 2), round(max(nxt, ws + 0.12), 2)))
+            raw.append((png, ws, we))
+    # Contiguous, NON-overlapping windows: each caption ends exactly when the next
+    # begins (minus a tiny margin) → never two captions on screen at once.
+    items = []
+    for i, (png, ws, we) in enumerate(raw):
+        end = (raw[i + 1][1] - 0.02) if i + 1 < len(raw) else we + 0.15
+        items.append((png, round(ws, 2), round(max(end, ws + 0.05), 2)))
     print(f"  [captions] {len(items)} caption frames built", file=sys.stderr)
     return items
 
