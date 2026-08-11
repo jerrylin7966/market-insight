@@ -423,24 +423,26 @@ def call_claude_short(digest_summary: str, today_display: str) -> dict:
     if not ANTHROPIC_API_KEY:
         raise ValueError("ANTHROPIC_API_KEY not set")
 
-    # Rotate the narrative angle daily so the channel isn't wall-to-wall doom.
-    # (Doomsday fatigue tanks CTR once viewers feel they've "seen this panic.")
+    # Rotate a HIGH-AROUSAL angle daily. At this channel's scale you need the click
+    # first — fear/greed/shock/curiosity drive Shorts reach. Vary WHICH high-arousal
+    # lever (not down to "educational"), so it's not the same panic every day.
     ANGLES = [
-        ("Wallet translation",
-         "Translate the macro story into the viewer's daily life — gas, groceries, rent, "
-         "their paycheck, their 401(k). The money-in-their-pocket consequence IS the opening line."),
+        ("Money-at-risk warning",
+         "Lead with what's about to hurt the viewer's money — savings, 401(k), home, job. "
+         "Urgent and visceral. Open on the threat: 'Your retirement just took a hit and nobody "
+         "told you.' Specific and personal, never vague."),
         ("Hidden opportunity",
-         "Frame it as a quiet opportunity most people are missing. What is smart money doing "
-         "while everyone else panics? Positive-leaning, not doom."),
-        ("Contrarian",
-         "Take the counter-narrative to today's headlines. If the media screams panic, explain "
-         "calmly why that's the wrong read (or vice versa). Challenge the obvious take."),
-        ("Myth-buster / educational",
-         "Debunk one common misconception the story exposes and teach one concrete concept the "
-         "viewer can reuse. Curiosity, not fear."),
-        ("Smart money watch",
-         "Contrast what institutions/insiders are actually doing right now with what retail is "
-         "being told. 'Wall Street is quietly ___.'"),
+         "The money-making angle the crowd is missing. What is smart money buying while everyone "
+         "panics? 'While everyone's scared of X, the rich are quietly doing Y.'"),
+        ("Contrarian shock",
+         "Blow up the obvious take. Everyone believes X — here's why they're dead wrong. Bold, "
+         "confrontational, counter-narrative."),
+        ("Insider / smart-money move",
+         "Expose what Wall Street and insiders are actually doing versus what retail is told. "
+         "'Wall Street is quietly ___ — and it's not what they're telling you.'"),
+        ("Wallet translation",
+         "Translate the macro story straight into daily life — gas, groceries, rent, their "
+         "paycheck, their 401(k). The money-in-their-pocket consequence IS the opening line."),
     ]
     angle_name, angle_dir = ANGLES[date.today().toordinal() % len(ANGLES)]
 
@@ -453,23 +455,26 @@ Pick the single most compelling story and write a 55-60 second Short.
 
 TODAY'S NARRATIVE ANGLE: {angle_name}
 {angle_dir}
-Do NOT default to a market-crash / catastrophe framing unless the angle above is explicitly
-about a crash. Vary the emotional register — confident and curious beats panicked.
+Deliver this angle with maximum stop-the-scroll energy. HIGH emotional stakes are the goal —
+fear, greed, shock, and curiosity are what earn reach on Shorts. Vary which lever you pull day
+to day so it's not identical panic, but never be boring, soft, or generic.
 
 Output a JSON object with exactly these 5 keys:
 
-1. "short_title": YouTube Shorts title, max 60 characters. Punchy, curiosity-driven, no hashtags.
-   It does NOT have to be alarming — match the angle.
+1. "short_title": YouTube Shorts title, max 60 characters, no hashtags. High-stakes and
+   impossible to scroll past — a specific number or a bold claim beats a vague summary.
+   Good: "Your 401(k) Just Lost 8 Years Overnight". Bad: "A Look At Today's Market".
 
 2. "short_hook": A 55-60 second spoken script (150-180 words minimum — count carefully).
    CRITICAL RULES — follow exactly:
-   - FIRST SENTENCE lands the personal stakes: what this means for the viewer's money, job,
-     savings, or bills. Never bury this lead.
-     Example: "If you've got a 401(k), today's move just changed your retirement math."
-   - Then deliver the angle above in a fresh, specific voice — no generic panic.
+   - FIRST 5 WORDS must hit hard: open on a shocking number or a personal-stakes threat that
+     stops the swipe. No wind-up. e.g. "Your retirement just lost eight years." /
+     "$1.2 trillion just vanished — here's who pays."
+   - Then land what it means for the viewer's money, job, savings, or bills — never bury it.
+   - Deliver the angle above in a fresh, specific voice with real tension.
    - Middle: two to three sentences of punchy ELI5 context. One surprising data point or
      comparison. Explain like the viewer is 12.
-   - Tone: confident, clear, a little insider — a smart friend, NOT a doomsday siren.
+   - Tone: urgent, confident, a little insider — like a friend leaking a secret.
    - End with exactly: "Follow for tomorrow's move — every weekday."
    - No stage cues, no filler, no "hey", no intro, no name. Pure spoken words only.
    - MINIMUM 150 WORDS. Count before returning.
@@ -1928,7 +1933,19 @@ def fetch_and_save_analytics(repo_root: Path):
         }, indent=2), encoding="utf-8")
         print(f"  Analytics saved → {out.name} ({len(videos)} videos)", file=sys.stderr)
     except Exception as e:
-        print(f"  Analytics fetch failed (non-fatal): {e}", file=sys.stderr)
+        detail = ""
+        if hasattr(e, "read"):
+            try:
+                detail = e.read().decode("utf-8", "ignore")[:400]
+            except Exception:
+                pass
+        code = getattr(e, "code", "")
+        print(f"  Analytics fetch failed (non-fatal): {code} {e} {detail}", file=sys.stderr)
+        if str(code) == "403":
+            print("  → HTTP 403: the OAuth token likely lacks the yt-analytics.readonly "
+                  "scope. Re-run `python scripts/get_youtube_token.py`, update the "
+                  "YOUTUBE_REFRESH_TOKEN secret, and ensure the YouTube Analytics API is "
+                  "enabled in your Google Cloud project.", file=sys.stderr)
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
