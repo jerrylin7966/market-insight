@@ -393,6 +393,43 @@ main{padding:2rem;max-width:1280px;margin:0 auto}
       <div class="mkt-note" style="margin-top:0.75rem">CFNAI-MA3 is a 3-month moving average of 85 US economic indicators. Below −0.70 historically coincides with recession onset. Monthly data via FRED. <span id="cli-source-note" style="color:var(--accent)"></span></div>
     </div>
 
+      <section id="methodology" style="max-width:840px;margin:2.5rem auto 0;padding:1.75rem;background:var(--bg2);border:1px solid var(--border);border-radius:12px;line-height:1.75;color:var(--text)">
+        <h2 style="font-size:1.45rem;margin:0 0 0.6rem;color:var(--text)">How to Read the MarketPhase Dashboard</h2>
+        <p style="color:var(--muted);margin:0 0 0.5rem">MarketPhase combines four independent lenses — market leadership, the volatility regime, market breadth, and the macro backdrop — into a single, rules-based read on which <em>phase</em> the market is in. It does not predict prices. It tells you which environment you are standing in, so you can size risk accordingly instead of guessing.</p>
+
+        <h3 style="font-size:1.12rem;margin:1.5rem 0 0.4rem;color:var(--text)">The four market phases</h3>
+        <ul style="padding-left:1.15rem;color:var(--muted);margin:0">
+          <li><strong style="color:var(--text)">Early / Mid Bull</strong> — leadership rising, volatility calm. Trend is your friend; buy dips.</li>
+          <li><strong style="color:var(--text)">Late Bull</strong> — leadership stalling near highs. The optimal window to take profits, not chase.</li>
+          <li><strong style="color:var(--text)">Early Bear</strong> — leadership rolling over, volatility rising. Reduce growth exposure and protect capital.</li>
+          <li><strong style="color:var(--text)">Transition</strong> — signals disagree. Wait for direction before committing.</li>
+        </ul>
+
+        <h3 style="font-size:1.12rem;margin:1.5rem 0 0.4rem;color:var(--text)">What each signal measures</h3>
+        <ul style="padding-left:1.15rem;color:var(--muted);margin:0">
+          <li><strong style="color:var(--text)">SOX/QQQ ratio</strong> — semiconductors versus the broad Nasdaq. Chips lead the risk cycle: a rising ratio means investors are paying up for the most cyclical corner of tech (risk-on); a falling ratio warns that risk appetite is draining. We track its 7-day slope for direction.</li>
+          <li><strong style="color:var(--text)">VIX term structure</strong> — near-term versus longer-dated volatility. Contango (calm) is normal and supportive; backwardation — near-term fear priced above long-term — flags acute stress and a possible regime change.</li>
+          <li><strong style="color:var(--text)">Breadth &amp; 52-week distance</strong> — how broadly the advance participates and how far the index sits from its high. Narrow breadth near a high is a classic late-cycle warning.</li>
+          <li><strong style="color:var(--text)">CFNAI macro floor</strong> — the Chicago Fed National Activity Index, a 3-month average of 85 US economic series. Above zero is above-trend growth; below −0.70 has historically coincided with recession onset. It is the macro backstop beneath the market signals.</li>
+          <li><strong style="color:var(--text)">Jobless claims</strong> — the fastest-moving read on the labor market, and an early warning when the macro floor begins to crack.</li>
+        </ul>
+
+        <h3 style="font-size:1.12rem;margin:1.5rem 0 0.4rem;color:var(--text)">Why we combine them</h3>
+        <p style="color:var(--muted);margin:0">No single indicator is enough. Leadership and volatility catch turns in market <em>behavior</em> early; breadth confirms whether a move is broad or fragile; and the CFNAI macro floor tells you whether the economic backdrop supports risk at all. When all four align, conviction is high. When they conflict, the dashboard reads “Transition” — a signal to wait rather than force a trade.</p>
+
+        <h3 style="font-size:1.12rem;margin:1.5rem 0 0.4rem;color:var(--text)">Learn the framework in depth</h3>
+        <ul style="padding-left:1.15rem;margin:0">
+          <li><a href="/guides/market-timing" style="color:var(--accent)">How the market-timing phase model works</a></li>
+          <li><a href="/guides/soxx-qqq-ratio" style="color:var(--accent)">The SOXX/QQQ ratio, explained</a></li>
+          <li><a href="/guides/vix-explained" style="color:var(--accent)">Reading the VIX and its term structure</a></li>
+          <li><a href="/guides/cfnai-indicator" style="color:var(--accent)">The CFNAI and the macro floor</a></li>
+          <li><a href="/guides/sector-rotation" style="color:var(--accent)">Sector rotation across market phases</a></li>
+          <li><a href="/guides/recession-indicators" style="color:var(--accent)">Recession indicators that actually lead</a></li>
+        </ul>
+
+        <p class="mkt-note" style="margin-top:1.25rem;color:var(--muted)">Data via the Federal Reserve Economic Data (FRED) API and public market sources. For educational purposes only — not financial advice.</p>
+      </section>
+
   </main>
 </div>
 
