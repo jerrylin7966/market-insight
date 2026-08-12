@@ -236,6 +236,7 @@ def render_html(digest: dict, today: date, headlines: list[dict]) -> str:
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daily Market Digest — {date_display} | MarketPhase</title>
 <meta name="description" content="MarketPhase daily market digest for {date_display}. Key stories, sector watch, and macro notes for investors.">
+<meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://www.market-phase.com/daily/{date_iso}.html">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231d4ed8'/><text x='16' y='23' font-family='Inter,Arial,sans-serif' font-size='20' font-weight='700' text-anchor='middle' fill='white'>M</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
