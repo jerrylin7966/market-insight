@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-12",
-  "period": "2026-07-13 \u2192 2026-08-12",
+  "updated": "2026-08-13",
+  "period": "2026-07-14 \u2192 2026-08-13",
   "videos": [
     {
       "id": "MbCkLV30YoU",
@@ -103,16 +103,6 @@
       "subscribersGained": 1
     },
     {
-      "id": "t1fzVUVkW-0",
-      "title": "Can You Beat Today's Market Test? #Shorts",
-      "url": "https://www.youtube.com/watch?v=t1fzVUVkW-0",
-      "views": 10,
-      "watchMinutes": 4,
-      "avgViewDuration": 48,
-      "avgViewPercentage": 50.73,
-      "subscribersGained": 0
-    },
-    {
       "id": "L_CLxDXPbkk",
       "title": "Inflation Just Crashed\u2014Here's Why You Weren't Ready #Shorts",
       "url": "https://www.youtube.com/watch?v=L_CLxDXPbkk",
@@ -120,6 +110,16 @@
       "watchMinutes": 2,
       "avgViewDuration": 23,
       "avgViewPercentage": 40.34,
+      "subscribersGained": 0
+    },
+    {
+      "id": "t1fzVUVkW-0",
+      "title": "Can You Beat Today's Market Test? #Shorts",
+      "url": "https://www.youtube.com/watch?v=t1fzVUVkW-0",
+      "views": 10,
+      "watchMinutes": 4,
+      "avgViewDuration": 48,
+      "avgViewPercentage": 50.73,
       "subscribersGained": 0
     },
     {
@@ -140,6 +140,16 @@
       "watchMinutes": 5,
       "avgViewDuration": 62,
       "avgViewPercentage": 64.64,
+      "subscribersGained": 0
+    },
+    {
+      "id": "rlhTIIkJL2I",
+      "title": "Can You Beat This Market IQ Test? #Shorts",
+      "url": "https://www.youtube.com/watch?v=rlhTIIkJL2I",
+      "views": 4,
+      "watchMinutes": 3,
+      "avgViewDuration": 54,
+      "avgViewPercentage": 60.78,
       "subscribersGained": 0
     },
     {
@@ -284,8 +294,8 @@
     }
   ],
   "totals": {
-    "views": 799,
-    "watchMinutes": 182,
+    "views": 803,
+    "watchMinutes": 185,
     "subscribersGained": 3
   }
 }
