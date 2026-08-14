@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-13",
-  "period": "2026-07-14 \u2192 2026-08-13",
+  "updated": "2026-08-14",
+  "period": "2026-07-15 \u2192 2026-08-14",
   "videos": [
     {
       "id": "MbCkLV30YoU",
@@ -103,6 +103,16 @@
       "subscribersGained": 1
     },
     {
+      "id": "t1fzVUVkW-0",
+      "title": "Can You Beat Today's Market Test? #Shorts",
+      "url": "https://www.youtube.com/watch?v=t1fzVUVkW-0",
+      "views": 10,
+      "watchMinutes": 4,
+      "avgViewDuration": 48,
+      "avgViewPercentage": 50.73,
+      "subscribersGained": 0
+    },
+    {
       "id": "L_CLxDXPbkk",
       "title": "Inflation Just Crashed\u2014Here's Why You Weren't Ready #Shorts",
       "url": "https://www.youtube.com/watch?v=L_CLxDXPbkk",
@@ -113,13 +123,13 @@
       "subscribersGained": 0
     },
     {
-      "id": "t1fzVUVkW-0",
-      "title": "Can You Beat Today's Market Test? #Shorts",
-      "url": "https://www.youtube.com/watch?v=t1fzVUVkW-0",
-      "views": 10,
-      "watchMinutes": 4,
-      "avgViewDuration": 48,
-      "avgViewPercentage": 50.73,
+      "id": "3J_5v0rMQJo",
+      "title": "Mortgage Rates Hit 6.69%: Your Home Just Got Way More Expensive #Shorts",
+      "url": "https://www.youtube.com/watch?v=3J_5v0rMQJo",
+      "views": 8,
+      "watchMinutes": 2,
+      "avgViewDuration": 23,
+      "avgViewPercentage": 42.77,
       "subscribersGained": 0
     },
     {
@@ -166,10 +176,10 @@
       "id": "uDjvcYZ_zrE",
       "title": "Why Your 401(k) Might Be Living on Borrowed Time #Shorts",
       "url": "https://www.youtube.com/watch?v=uDjvcYZ_zrE",
-      "views": 2,
+      "views": 3,
       "watchMinutes": 0,
-      "avgViewDuration": 0,
-      "avgViewPercentage": 0,
+      "avgViewDuration": 26,
+      "avgViewPercentage": 40.03,
       "subscribersGained": 0
     },
     {
@@ -213,6 +223,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "DCU_CYVkvsE",
+      "title": "Generic Drug Tariffs Just Got Real #Shorts",
+      "url": "https://www.youtube.com/watch?v=DCU_CYVkvsE",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 7,
+      "avgViewPercentage": 16.63,
+      "subscribersGained": 0
+    },
+    {
       "id": "XJpZmsI3WYs",
       "title": "Here you go! Why choose one when you can have all of them \ud83e\udd74 #convoflow #ai",
       "url": "https://www.youtube.com/watch?v=XJpZmsI3WYs",
@@ -223,13 +243,13 @@
       "subscribersGained": 0
     },
     {
-      "id": "DCU_CYVkvsE",
-      "title": "Generic Drug Tariffs Just Got Real #Shorts",
-      "url": "https://www.youtube.com/watch?v=DCU_CYVkvsE",
+      "id": "8ErpmtjjqFQ",
+      "title": "Why Buffett Just Sent a Secret Signal #Shorts",
+      "url": "https://www.youtube.com/watch?v=8ErpmtjjqFQ",
       "views": 1,
       "watchMinutes": 0,
-      "avgViewDuration": 7,
-      "avgViewPercentage": 16.63,
+      "avgViewDuration": 0,
+      "avgViewPercentage": 0,
       "subscribersGained": 0
     },
     {
@@ -251,16 +271,6 @@
       "avgViewDuration": 230,
       "avgViewPercentage": 99.86,
       "subscribersGained": 1
-    },
-    {
-      "id": "8ErpmtjjqFQ",
-      "title": "Why Buffett Just Sent a Secret Signal #Shorts",
-      "url": "https://www.youtube.com/watch?v=8ErpmtjjqFQ",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 0,
-      "avgViewPercentage": 0,
-      "subscribersGained": 0
     },
     {
       "id": "AvDKF1zCE5k",
@@ -294,8 +304,8 @@
     }
   ],
   "totals": {
-    "views": 803,
-    "watchMinutes": 185,
+    "views": 812,
+    "watchMinutes": 187,
     "subscribersGained": 3
   }
 }
