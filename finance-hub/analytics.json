@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-17",
-  "period": "2026-07-18 \u2192 2026-08-17",
+  "updated": "2026-08-18",
+  "period": "2026-07-19 \u2192 2026-08-18",
   "videos": [
     {
       "id": "M3uIiybpOAo",
@@ -166,10 +166,10 @@
       "id": "WhJM5L7jt2Q",
       "title": "Credit Crisis or Spending Spree? Test Your Market IQ #Shorts",
       "url": "https://www.youtube.com/watch?v=WhJM5L7jt2Q",
-      "views": 3,
-      "watchMinutes": 0,
-      "avgViewDuration": 20,
-      "avgViewPercentage": 22.06,
+      "views": 4,
+      "watchMinutes": 2,
+      "avgViewDuration": 42,
+      "avgViewPercentage": 45.9,
       "subscribersGained": 0
     },
     {
@@ -183,16 +183,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "uDjvcYZ_zrE",
-      "title": "Why Your 401(k) Might Be Living on Borrowed Time #Shorts",
-      "url": "https://www.youtube.com/watch?v=uDjvcYZ_zrE",
-      "views": 2,
-      "watchMinutes": 0,
-      "avgViewDuration": 26,
-      "avgViewPercentage": 40.03,
-      "subscribersGained": 0
-    },
-    {
       "id": "5uIBbo_GuFA",
       "title": "Tech Earnings Reality Check: Can You Pass? #Shorts",
       "url": "https://www.youtube.com/watch?v=5uIBbo_GuFA",
@@ -203,9 +193,19 @@
       "subscribersGained": 0
     },
     {
-      "id": "IXABc4OqJ2o",
-      "title": "Fink's AI Secret Wall Street Missed #Shorts",
-      "url": "https://www.youtube.com/watch?v=IXABc4OqJ2o",
+      "id": "uDjvcYZ_zrE",
+      "title": "Why Your 401(k) Might Be Living on Borrowed Time #Shorts",
+      "url": "https://www.youtube.com/watch?v=uDjvcYZ_zrE",
+      "views": 2,
+      "watchMinutes": 0,
+      "avgViewDuration": 26,
+      "avgViewPercentage": 40.03,
+      "subscribersGained": 0
+    },
+    {
+      "id": "zU9P7p6bBn4",
+      "title": "2026\u6700\u591a\u4eba\u4e0b\u8f09\u7684AI\u5de5\u5177\uff01\u4f60\u7528\u4e86\u55ce\uff1f",
+      "url": "https://www.youtube.com/watch?v=zU9P7p6bBn4",
       "views": 1,
       "watchMinutes": 0,
       "avgViewDuration": 0,
@@ -220,6 +220,16 @@
       "watchMinutes": 0,
       "avgViewDuration": 44,
       "avgViewPercentage": 61.94,
+      "subscribersGained": 0
+    },
+    {
+      "id": "IXABc4OqJ2o",
+      "title": "Fink's AI Secret Wall Street Missed #Shorts",
+      "url": "https://www.youtube.com/watch?v=IXABc4OqJ2o",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 0,
+      "avgViewPercentage": 0,
       "subscribersGained": 0
     },
     {
@@ -240,16 +250,6 @@
       "watchMinutes": 0,
       "avgViewDuration": 4,
       "avgViewPercentage": 4.22,
-      "subscribersGained": 0
-    },
-    {
-      "id": "B9ov_2Xc4M0",
-      "title": "Kevin Warsh Just Changed Everything \u2014 Here's What Happens Next",
-      "url": "https://www.youtube.com/watch?v=B9ov_2Xc4M0",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 4,
-      "avgViewPercentage": 1.32,
       "subscribersGained": 0
     },
     {
@@ -304,8 +304,8 @@
     }
   ],
   "totals": {
-    "views": 516,
-    "watchMinutes": 158,
+    "views": 517,
+    "watchMinutes": 160,
     "subscribersGained": 3
   }
 }
