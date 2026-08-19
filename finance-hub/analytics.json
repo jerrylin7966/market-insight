@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-18",
-  "period": "2026-07-19 \u2192 2026-08-18",
+  "updated": "2026-08-19",
+  "period": "2026-07-20 \u2192 2026-08-19",
   "videos": [
     {
       "id": "M3uIiybpOAo",
@@ -173,16 +173,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "MbCkLV30YoU",
-      "title": "AI Stock Crash: $4.5B Pivot Just Started #Shorts",
-      "url": "https://www.youtube.com/watch?v=MbCkLV30YoU",
-      "views": 3,
-      "watchMinutes": 0,
-      "avgViewDuration": 15,
-      "avgViewPercentage": 27.71,
-      "subscribersGained": 0
-    },
-    {
       "id": "5uIBbo_GuFA",
       "title": "Tech Earnings Reality Check: Can You Pass? #Shorts",
       "url": "https://www.youtube.com/watch?v=5uIBbo_GuFA",
@@ -253,6 +243,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "B9ov_2Xc4M0",
+      "title": "Kevin Warsh Just Changed Everything \u2014 Here's What Happens Next",
+      "url": "https://www.youtube.com/watch?v=B9ov_2Xc4M0",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 4,
+      "avgViewPercentage": 1.32,
+      "subscribersGained": 0
+    },
+    {
       "id": "2VZXMMncYQ8",
       "title": "SpaceX Just Revealed the $60B Secret #Shorts",
       "url": "https://www.youtube.com/watch?v=2VZXMMncYQ8",
@@ -304,7 +304,7 @@
     }
   ],
   "totals": {
-    "views": 517,
+    "views": 515,
     "watchMinutes": 160,
     "subscribersGained": 3
   }
