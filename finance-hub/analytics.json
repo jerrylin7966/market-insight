@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-19",
-  "period": "2026-07-20 \u2192 2026-08-19",
+  "updated": "2026-08-20",
+  "period": "2026-07-21 \u2192 2026-08-20",
   "videos": [
     {
       "id": "M3uIiybpOAo",
@@ -21,16 +21,6 @@
       "avgViewDuration": 37,
       "avgViewPercentage": 59.86,
       "subscribersGained": 0
-    },
-    {
-      "id": "Ohww09PZND4",
-      "title": "Magnificent Seven Must Deliver or Market Crashes #Shorts",
-      "url": "https://www.youtube.com/watch?v=Ohww09PZND4",
-      "views": 58,
-      "watchMinutes": 19,
-      "avgViewDuration": 55,
-      "avgViewPercentage": 89.45,
-      "subscribersGained": 1
     },
     {
       "id": "66EE754H78I",
@@ -136,10 +126,10 @@
       "id": "DC_xkNYAzsA",
       "title": "Bank of America Just Warned Nvidia. Here's What Smart Money Does. #Shorts",
       "url": "https://www.youtube.com/watch?v=DC_xkNYAzsA",
-      "views": 5,
-      "watchMinutes": 2,
-      "avgViewDuration": 41,
-      "avgViewPercentage": 76.14,
+      "views": 6,
+      "watchMinutes": 3,
+      "avgViewDuration": 45,
+      "avgViewPercentage": 82.29,
       "subscribersGained": 0
     },
     {
@@ -173,6 +163,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "Ohww09PZND4",
+      "title": "Magnificent Seven Must Deliver or Market Crashes #Shorts",
+      "url": "https://www.youtube.com/watch?v=Ohww09PZND4",
+      "views": 4,
+      "watchMinutes": 4,
+      "avgViewDuration": 242,
+      "avgViewPercentage": 391.39,
+      "subscribersGained": 0
+    },
+    {
       "id": "5uIBbo_GuFA",
       "title": "Tech Earnings Reality Check: Can You Pass? #Shorts",
       "url": "https://www.youtube.com/watch?v=5uIBbo_GuFA",
@@ -190,6 +190,16 @@
       "watchMinutes": 0,
       "avgViewDuration": 26,
       "avgViewPercentage": 40.03,
+      "subscribersGained": 0
+    },
+    {
+      "id": "OISYY0HYbFo",
+      "title": "3 Million Seniors Just Lost Healthcare\u2014Here's Why #Shorts",
+      "url": "https://www.youtube.com/watch?v=OISYY0HYbFo",
+      "views": 2,
+      "watchMinutes": 0,
+      "avgViewDuration": 29,
+      "avgViewPercentage": 54.65,
       "subscribersGained": 0
     },
     {
@@ -243,26 +253,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "B9ov_2Xc4M0",
-      "title": "Kevin Warsh Just Changed Everything \u2014 Here's What Happens Next",
-      "url": "https://www.youtube.com/watch?v=B9ov_2Xc4M0",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 4,
-      "avgViewPercentage": 1.32,
-      "subscribersGained": 0
-    },
-    {
-      "id": "2VZXMMncYQ8",
-      "title": "SpaceX Just Revealed the $60B Secret #Shorts",
-      "url": "https://www.youtube.com/watch?v=2VZXMMncYQ8",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 12,
-      "avgViewPercentage": 24.34,
-      "subscribersGained": 0
-    },
-    {
       "id": "DCU_CYVkvsE",
       "title": "Generic Drug Tariffs Just Got Real #Shorts",
       "url": "https://www.youtube.com/watch?v=DCU_CYVkvsE",
@@ -281,6 +271,16 @@
       "avgViewDuration": 230,
       "avgViewPercentage": 99.86,
       "subscribersGained": 1
+    },
+    {
+      "id": "2VZXMMncYQ8",
+      "title": "SpaceX Just Revealed the $60B Secret #Shorts",
+      "url": "https://www.youtube.com/watch?v=2VZXMMncYQ8",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 12,
+      "avgViewPercentage": 24.34,
+      "subscribersGained": 0
     },
     {
       "id": "8ErpmtjjqFQ",
@@ -304,8 +304,8 @@
     }
   ],
   "totals": {
-    "views": 515,
-    "watchMinutes": 160,
-    "subscribersGained": 3
+    "views": 463,
+    "watchMinutes": 146,
+    "subscribersGained": 2
   }
 }
