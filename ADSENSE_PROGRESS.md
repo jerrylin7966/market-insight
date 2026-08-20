@@ -16,7 +16,10 @@ AdSense rejected the site for **"Low value content"** — a **content-quality** 
 - **Enriched `/signals` with a 410-word framework-methodology section** (5 headings + 7 internal guide links) (`01da061`). Turns the site's genuinely unique asset (live SOX/QQQ + VIX term structure + CFNAI + breadth dashboard with a 6-point phase model) from a text-thin chart page into a content-rich, uniquely valuable one — the "original tool, not scaled text" signal AdSense rewards.
 - (Earlier) redirect/canonical consolidation to clean www (`0edfb47`), E-E-A-T author wiring, disclaimers.
 
-## ⏳ TODO before resubmitting (Aug 19)
+## 📌 Checkpoint — Aug 20
+GSC Pages: Indexed still ~58 (www) / 104 (domain) — barely down. **"Excluded by 'noindex' tag" = 1 of 66** → the noindex has NOT propagated; ~30 digests still indexed. Redirect(60)/Alternate(35) buckets = intentional consolidation, ignore ("Page with redirect" validation will always "fail" — redirects are by design). `/signals` = "available to Google / can be indexed / indexing requested" (on track, not yet confirmed on Google). **DECISION: do NOT resubmit yet** — wait for "Excluded by noindex" to climb toward ~30 and Indexed to drop toward ~30 (guides+signals+core). Accelerator: Request-Index the still-indexed digest URLs to force recrawl→noindex→drop.
+
+## ⏳ TODO before resubmitting (was Aug 19 — now gated on deindex, not date)
 - [ ] Let Google recrawl (~1 week) so the noindexed digests actually **drop from the index**. Confirm in GSC → Pages that `/daily/` dated URLs fall out of "Indexed".
 - [ ] **Strengthen 3–5 flagship guides** with genuinely original analysis/data (not more AI filler) so the indexed footprint reads as human-quality.
 - [ ] Optional: reciprocal **guide → `/signals` "see it live"** callouts (internal linking + reinforces the tool).
