@@ -25,9 +25,16 @@ _Last updated: 2026-08-11._
 - **Trivia retains worse** than narrative (quiz 38% vs 65–82%) — hence the countdown cut.
 - **Sub conversion low**: 18 subs / 9077 views (0.2%) — hence the stronger CTA.
 
-## ⏳ TODO / Next
-- [ ] **Measurement checkpoint (~2026-08-25):** pull `analytics.json`; check whether new **entity-driven** videos get **more impressions/views at the same good retention**. That confirms whether topic sourcing fixed reach. _(Refresh-token → access-token → youtubeanalytics v2 `reports`, `ids=channel==MINE`, metrics incl. `averageViewPercentage`; titles via oEmbed.)_
-- [ ] **Re-introduce a human/character element** — biggest untested lever vs the faceless-AI-slop risk (old human-host videos hit 90–285 views). **Hold** until the above checkpoint isolates the topic/hook effect first.
+## 📊 CHECKPOINT RESULT — 2026-08-20 (entity-topics did NOT fix reach)
+Pulled 28d analytics: **channel 255 views / 2 subs / 100 watch-min (~9 views/day — STALLED).** New entity-driven videos have great retention but near-zero reach: BofA-Nvidia 82%/6v, Cisco 100%/1v, Fink 1v, Warsh 1v. **Engagement = 0 comments / ~0 likes across everything (incl. trivia).** Conclusion: production (hook/captions/v3), script (high-arousal/entity), and format (trivia) are ALL tested — retention proves they work, but NONE moved reach. **The bottleneck is distribution + zero engagement, not code.** More automation tweaks = low expected value.
+Also: off-topic uploads diluting the niche ("2026最多人下載的AI工具", "Here you go…", bare "#geopolitics #iran") — must be finance-only.
+
+## ⏳ TODO / Next (reprioritized — distribution/strategy over production)
+- [ ] **#1 Engagement seeding (manual, biggest lever):** seed first comment + reply/pin on each upload; 0 comments is starving distribution.
+- [ ] **#2 Topical discipline:** stop/remove off-topic uploads; finance-only.
+- [ ] **#3 External seeding:** drive 30–50 initial views/upload from market-phase.com + X + Reddit finance subs to break the chicken-and-egg.
+- [ ] **#4 (code) `/signals`-data content mode** — Shorts from OWN dashboard readings ("model flipped to Phase 2 — here's what that's meant"); the only real differentiation vs commodity AI-news Shorts. ← offered to build.
+- [ ] **#5 (code) human/character element** — old human-host videos still top (90v); faceless AI may read as slop.
 - [ ] Source even hotter / trending topics if entity-sourcing under-delivers.
 - [ ] Dead RSS feed: `feeds.reuters.com` (DNS fail) — replace or drop from `_HEADLINE_FEEDS` / digest `FEEDS`.
 
