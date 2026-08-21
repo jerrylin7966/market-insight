@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-20",
-  "period": "2026-07-21 \u2192 2026-08-20",
+  "updated": "2026-08-21",
+  "period": "2026-07-22 \u2192 2026-08-21",
   "videos": [
     {
       "id": "M3uIiybpOAo",
@@ -20,16 +20,6 @@
       "watchMinutes": 22,
       "avgViewDuration": 37,
       "avgViewPercentage": 59.86,
-      "subscribersGained": 0
-    },
-    {
-      "id": "66EE754H78I",
-      "title": "Earnings Are SAVING the Market Right Now #Shorts",
-      "url": "https://www.youtube.com/watch?v=66EE754H78I",
-      "views": 38,
-      "watchMinutes": 3,
-      "avgViewDuration": 16,
-      "avgViewPercentage": 23.96,
       "subscribersGained": 0
     },
     {
@@ -113,6 +103,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "q9yleMC8rKg",
+      "title": "Can You Beat the Market Quiz? #Shorts",
+      "url": "https://www.youtube.com/watch?v=q9yleMC8rKg",
+      "views": 7,
+      "watchMinutes": 2,
+      "avgViewDuration": 52,
+      "avgViewPercentage": 58.70000000000001,
+      "subscribersGained": 0
+    },
+    {
       "id": "s5ZSi7xCUFA",
       "title": "Fed Decision + Tech Earnings: Can You Pass? #Shorts",
       "url": "https://www.youtube.com/watch?v=s5ZSi7xCUFA",
@@ -143,16 +143,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "rlhTIIkJL2I",
-      "title": "Can You Beat This Market IQ Test? #Shorts",
-      "url": "https://www.youtube.com/watch?v=rlhTIIkJL2I",
-      "views": 4,
-      "watchMinutes": 3,
-      "avgViewDuration": 54,
-      "avgViewPercentage": 60.78,
-      "subscribersGained": 0
-    },
-    {
       "id": "WhJM5L7jt2Q",
       "title": "Credit Crisis or Spending Spree? Test Your Market IQ #Shorts",
       "url": "https://www.youtube.com/watch?v=WhJM5L7jt2Q",
@@ -163,13 +153,23 @@
       "subscribersGained": 0
     },
     {
-      "id": "Ohww09PZND4",
-      "title": "Magnificent Seven Must Deliver or Market Crashes #Shorts",
-      "url": "https://www.youtube.com/watch?v=Ohww09PZND4",
+      "id": "rlhTIIkJL2I",
+      "title": "Can You Beat This Market IQ Test? #Shorts",
+      "url": "https://www.youtube.com/watch?v=rlhTIIkJL2I",
       "views": 4,
-      "watchMinutes": 4,
-      "avgViewDuration": 242,
-      "avgViewPercentage": 391.39,
+      "watchMinutes": 3,
+      "avgViewDuration": 54,
+      "avgViewPercentage": 60.78,
+      "subscribersGained": 0
+    },
+    {
+      "id": "66EE754H78I",
+      "title": "Earnings Are SAVING the Market Right Now #Shorts",
+      "url": "https://www.youtube.com/watch?v=66EE754H78I",
+      "views": 3,
+      "watchMinutes": 1,
+      "avgViewDuration": 36,
+      "avgViewPercentage": 53.81,
       "subscribersGained": 0
     },
     {
@@ -223,16 +223,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "IXABc4OqJ2o",
-      "title": "Fink's AI Secret Wall Street Missed #Shorts",
-      "url": "https://www.youtube.com/watch?v=IXABc4OqJ2o",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 0,
-      "avgViewPercentage": 0,
-      "subscribersGained": 0
-    },
-    {
       "id": "mv7Uzq-zmFo",
       "title": "Cisco Just Unleashed The AI Capex Supercycle Nobody Saw Coming",
       "url": "https://www.youtube.com/watch?v=mv7Uzq-zmFo",
@@ -240,16 +230,6 @@
       "watchMinutes": 2,
       "avgViewDuration": 162,
       "avgViewPercentage": 49.68,
-      "subscribersGained": 0
-    },
-    {
-      "id": "lE2jYwRPodk",
-      "title": "#geopolitics #iran",
-      "url": "https://www.youtube.com/watch?v=lE2jYwRPodk",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 4,
-      "avgViewPercentage": 4.22,
       "subscribersGained": 0
     },
     {
@@ -263,14 +243,14 @@
       "subscribersGained": 0
     },
     {
-      "id": "WpS8f-vt5lA",
-      "title": "Cisco's AI Boom Just Triggered the Dollar's Next Move\u2014Here's Why It Matters",
-      "url": "https://www.youtube.com/watch?v=WpS8f-vt5lA",
+      "id": "lE2jYwRPodk",
+      "title": "#geopolitics #iran",
+      "url": "https://www.youtube.com/watch?v=lE2jYwRPodk",
       "views": 1,
-      "watchMinutes": 3,
-      "avgViewDuration": 230,
-      "avgViewPercentage": 99.86,
-      "subscribersGained": 1
+      "watchMinutes": 0,
+      "avgViewDuration": 4,
+      "avgViewPercentage": 4.22,
+      "subscribersGained": 0
     },
     {
       "id": "2VZXMMncYQ8",
@@ -283,9 +263,29 @@
       "subscribersGained": 0
     },
     {
+      "id": "WpS8f-vt5lA",
+      "title": "Cisco's AI Boom Just Triggered the Dollar's Next Move\u2014Here's Why It Matters",
+      "url": "https://www.youtube.com/watch?v=WpS8f-vt5lA",
+      "views": 1,
+      "watchMinutes": 3,
+      "avgViewDuration": 230,
+      "avgViewPercentage": 99.86,
+      "subscribersGained": 1
+    },
+    {
       "id": "8ErpmtjjqFQ",
       "title": "Why Buffett Just Sent a Secret Signal #Shorts",
       "url": "https://www.youtube.com/watch?v=8ErpmtjjqFQ",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 0,
+      "avgViewPercentage": 0,
+      "subscribersGained": 0
+    },
+    {
+      "id": "IXABc4OqJ2o",
+      "title": "Fink's AI Secret Wall Street Missed #Shorts",
+      "url": "https://www.youtube.com/watch?v=IXABc4OqJ2o",
       "views": 1,
       "watchMinutes": 0,
       "avgViewDuration": 0,
@@ -304,8 +304,8 @@
     }
   ],
   "totals": {
-    "views": 463,
-    "watchMinutes": 146,
+    "views": 431,
+    "watchMinutes": 142,
     "subscribersGained": 2
   }
 }
