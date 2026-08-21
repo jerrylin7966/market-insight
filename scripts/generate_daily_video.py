@@ -1698,6 +1698,90 @@ def generate_short_video(short_hook: str, short_title: str,
 TRIVIA_COUNTDOWN = 2.5  # short — long silent countdowns tank retention (quiz avg was 38%)
 
 
+def fetch_signal_readings():
+    """Today's MarketPhase model reading (phase, score, per-indicator) — OUR original
+    data, the one thing no other channel has. Best-effort; returns None on failure."""
+    try:
+        req = urllib.request.Request(
+            "https://www.market-phase.com/api/market/signals",
+            headers={"User-Agent": "Mozilla/5.0 (compatible; MarketPhase/1.0)"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            d = json.loads(r.read())
+        print(f"  [signals] phase={d.get('phase')} score={d.get('score')}", file=sys.stderr)
+        return d
+    except Exception as e:
+        print(f"  [signals] fetch failed ({e})", file=sys.stderr)
+        return None
+
+
+def call_claude_signals(readings: dict, today_display: str) -> dict:
+    """Scriptwriter for a Short that reports TODAY's proprietary model reading — the
+    differentiation play (original data, not a rewrite of everyone's news)."""
+    if not ANTHROPIC_API_KEY:
+        raise ValueError("ANTHROPIC_API_KEY not set")
+    phase = readings.get("phase", "")
+    score = readings.get("score", "?")
+    bd = "\n".join(f"- {b.get('indicator')}: {b.get('value')}"
+                   for b in readings.get("scoreBreakdown", []))
+    prompt = f"""You are a scriptwriter for "Tech Me Home", a finance channel by MarketPhase.
+Today is {today_display}. Below is OUR proprietary market-timing model's reading RIGHT NOW —
+original data no other channel has. Report it like an insider sharing a signal.
+
+MODEL VERDICT: {phase}  (score {score} / 6)
+Live indicator readings:
+{bd}
+
+Phase → action rules (use the one matching the verdict):
+- Phase 1 / Green (score ≥5): hold longs, buy dips aggressively.
+- Phase 2-3 / Watch (score 3-4): reduce risk, tighten stops, no new longs.
+- Phase 4 / Red (score ≤2): exit growth positions, raise cash.
+
+Write a 55-60 second YouTube Short. Output JSON with exactly:
+
+1. "short_title": max 60 chars, no hashtags. Lead with the model's verdict + a stake.
+   e.g. "My Model Just Hit Phase 2 — Here's the Play".
+
+2. "short_hook": a 150-180 word spoken script (count carefully). RULES:
+   - FIRST 5 WORDS: the model's verdict as a personal-stakes hook.
+     e.g. "My market model just flipped." / "Score: four out of six."
+   - State the phase and score plainly, then what it means for the viewer's money using
+     the matching action rule above.
+   - Cite 2-3 of the ACTUAL indicator readings above as evidence (name them: SOX/QQQ,
+     VIX structure, breadth, CFNAI, jobless claims).
+   - Tone: confident, insider, data-driven — you run a MODEL, not opinions. No generic panic.
+   - End with exactly: "Subscribe so tomorrow's biggest move hits your feed first."
+   - No stage cues, no "hey", no intro. Pure spoken words. MINIMUM 150 WORDS.
+
+3. "clip_tags": ordered array of 4-6 tags for the montage, ONLY from:
+   stock_bull, stock_crash, federal_reserve, wall_street, inflation,
+   tech_stocks, earnings, nyse_open, data_screens, global_economy
+
+4. "tags": 8-10 tags (no #), always incl "finance","markets","investing","Shorts".
+
+Return ONLY valid JSON. No markdown."""
+    payload = json.dumps({
+        "model": "claude-haiku-4-5-20251001", "max_tokens": 1200,
+        "messages": [{"role": "user", "content": prompt}],
+    }).encode()
+    req = urllib.request.Request(
+        "https://api.anthropic.com/v1/messages", data=payload,
+        headers={"x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01",
+                 "content-type": "application/json"}, method="POST")
+    with urlopen_with_retry(req, timeout=90) as resp:
+        result = json.loads(resp.read())
+    raw = result["content"][0]["text"].strip()
+    raw = re.sub(r'^```(?:json)?\s*', '', raw); raw = re.sub(r'\s*```$', '', raw)
+    start = raw.find('{')
+    if start != -1:
+        raw = raw[start:]
+    dec = json.JSONDecoder()
+    try:
+        obj, _ = dec.raw_decode(raw)
+    except json.JSONDecodeError:
+        obj, _ = dec.raw_decode(re.sub(r',\s*([}\]])', r'\1', raw))
+    return obj
+
+
 def call_claude_trivia(digest_summary: str, today_display: str, headlines=None) -> dict:
     """Generate a 3-question 'Guess the X' finance quiz from today's news + evergreen."""
     if not ANTHROPIC_API_KEY:
@@ -2129,11 +2213,11 @@ def main():
 
     # ── SHORTS-ONLY path ──────────────────────────────────────────────────────
     if SHORTS_ONLY:
-        # Alternate content: narrative Short vs interactive trivia Short.
-        # SHORT_TYPE = auto (default) | narrative | trivia. auto → alternate by date parity.
+        # Rotating content: signals (OUR data) / narrative (news) / interactive trivia.
+        # SHORT_TYPE = auto (default) | signals | narrative | trivia. auto → 3-way by date.
         short_type = os.environ.get("SHORT_TYPE", "auto").strip().lower()
-        if short_type not in ("narrative", "trivia"):
-            short_type = "trivia" if (date.today().toordinal() % 2 == 0) else "narrative"
+        if short_type not in ("signals", "narrative", "trivia"):
+            short_type = ["signals", "narrative", "trivia"][date.today().toordinal() % 3]
 
         print(f"=== Daily Short [{short_type}] — {today_display} ===", file=sys.stderr)
         print("Reading digest…", file=sys.stderr)
@@ -2156,8 +2240,18 @@ def main():
                                                 f"MarketPhase Quiz — {today_display}",
                                                 description_override=desc)
         else:
-            print("Generating Short script with Claude…", file=sys.stderr)
-            data        = call_claude_short(digest_summary, today_display, headlines)
+            # signals (our model reading) and narrative (news) both render as a Short.
+            if short_type == "signals":
+                readings = fetch_signal_readings()
+                if readings:
+                    print("Generating signals script with Claude…", file=sys.stderr)
+                    data = call_claude_signals(readings, today_display)
+                else:
+                    print("  [signals] no readings — falling back to narrative", file=sys.stderr)
+                    short_type = "narrative"
+            if short_type == "narrative":
+                print("Generating Short script with Claude…", file=sys.stderr)
+                data = call_claude_short(digest_summary, today_display, headlines)
             short_hook  = data.get("short_hook", "")
             short_title = data.get("short_title", f"Market Update {today.strftime('%b %d')}").strip()
             clip_tags   = data.get("clip_tags") or data.get("clip_tag")
@@ -2166,11 +2260,18 @@ def main():
                 sys.exit(1)
             print(f"  Title: {short_title}", file=sys.stderr)
             print(f"  Hook:  {short_hook[:80]}…", file=sys.stderr)
-            print(f"  Clips: {clip_tags}", file=sys.stderr)
             print("Generating YouTube Short…", file=sys.stderr)
             short_path = generate_short_video(short_hook, short_title, clip_tags, TMP_DIR)
-            short_url  = upload_short_to_youtube(short_path, short_title,
-                                                 f"MarketPhase Daily — {today_display}")
+            if short_type == "signals":
+                desc = ("Today's reading from our market-timing model. See the live dashboard → "
+                        "https://www.market-phase.com/signals\n\n"
+                        "New market shorts every weekday. Subscribe for the daily signal.\n\n"
+                        "#Shorts #finance #markets #investing #stocks #MarketPhase")
+                short_url = upload_short_to_youtube(short_path, short_title,
+                            f"MarketPhase Signal — {today_display}", description_override=desc)
+            else:
+                short_url = upload_short_to_youtube(short_path, short_title,
+                            f"MarketPhase Daily — {today_display}")
 
         print(f"\n✅ Short live [{short_type}]: {short_url}", file=sys.stderr)
         print("Fetching analytics…", file=sys.stderr)
