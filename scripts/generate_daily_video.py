@@ -1047,6 +1047,44 @@ def remove_green_screen(img):
     return Image.fromarray(arr.astype('uint8'), 'RGBA')
 
 
+HOST_POSES = ["host_1.jpeg", "host_2.jpeg"]  # ONE real person, multiple poses (Asian host)
+
+
+def prepare_host_pngs(tmp_dir: Path, target_h: int = 700):
+    """Cutouts of the ONE consistent real host across their poses — green-screen
+    removed + despilled, cropped to head+torso, sized for a bottom-corner presenter.
+    Returns a list of paths to SEQUENCE through (jump-cut between poses = alive, same
+    identity), or [] → faceless fallback. (Rotating *different* faces or a static
+    full-screen photo was the old mistake.)"""
+    from PIL import Image
+    import numpy as np
+    assets, out = Path(__file__).parent / "assets", []
+    for i, name in enumerate(HOST_POSES):
+        src = assets / name
+        if not src.exists():
+            continue
+        try:
+            img = remove_green_screen(Image.open(src))
+            # Despill: clamp green-dominant pixels' green to max(R,B) → kills the keyed
+            # green halo without touching skin/shirt tones.
+            arr = np.array(img).astype(np.int16)
+            mx  = np.maximum(arr[:, :, 0], arr[:, :, 2])
+            arr[:, :, 1] = np.where(arr[:, :, 1] > mx, mx, arr[:, :, 1])
+            img = Image.fromarray(np.clip(arr, 0, 255).astype("uint8"), "RGBA")
+            a   = np.array(img)[:, :, 3]
+            ys, xs = np.where(a > 30)
+            if len(ys) == 0:
+                continue
+            person = img.crop((int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max())))
+            person = person.crop((0, 0, person.width, int(person.height * 0.62)))  # head+torso
+            scale  = target_h / person.height
+            person = person.resize((max(1, int(person.width * scale)), target_h), Image.LANCZOS)
+            p = tmp_dir / f"host_{i}.png"; person.save(p, "PNG"); out.append(p)
+        except Exception as e:
+            print(f"  [host] {name} failed ({e})", file=sys.stderr)
+    return out
+
+
 def draw_outlined_text(draw, pos, text, font, fill, outline=(0,0,0), thickness=4):
     """Draw text with a thick outline for maximum contrast on any background."""
     x, y = pos
@@ -1123,10 +1161,11 @@ def generate_thumbnail(title: str, pexels_keyword: str, tmp_dir: Path) -> Path:
 
     # ── Host photo — large, left side ──
     assets_dir = Path(__file__).parent / "assets"
-    host_files = sorted(assets_dir.glob("host_*.jp*g"))
+    # One consistent real host everywhere (host_1) — not a rotating cast of faces.
+    host_1     = assets_dir / "host_1.jpeg"
+    host_files = [host_1] if host_1.exists() else sorted(assets_dir.glob("host_*.jp*g"))
     if host_files:
-        idx       = date.today().toordinal() % len(host_files)
-        host_path = host_files[idx]
+        host_path = host_files[0]
         print(f"  Thumbnail host: {host_path.name}", file=sys.stderr)
         host_img  = Image.open(host_path)
         host_img  = remove_green_screen(host_img)
@@ -1568,17 +1607,43 @@ def generate_short_video(short_hook: str, short_title: str,
 
     if clip_paths:
         # Fast-cut montage: a new clip every ~3.5s at NORMAL speed (no 4× slowdown).
-        bg_video = build_montage_bg(clip_paths, short_duration, tmp_dir)
+        bg_video  = build_montage_bg(clip_paths, short_duration, tmp_dir)
+        host_pngs = prepare_host_pngs(tmp_dir)
 
-        # Static overlay (branding/title/CTA) on top of the moving montage
-        subprocess.run([
-            "ffmpeg", "-y",
-            "-i", str(bg_video), "-i", str(overlay_path),
-            "-filter_complex", "[0:v][1:v]overlay=0:0[out]",
-            "-map", "[out]", "-t", f"{short_duration:.2f}",
-            "-c:v", "libx264", "-preset", "fast", "-crf", "23",
-            "-pix_fmt", "yuv420p", "-an", str(composited),
-        ], check=True, stdout=subprocess.DEVNULL)
+        if host_pngs:
+            # Presenter host (bottom-right) over the moving montage, gentle drift so
+            # it's never a frozen still; SEQUENCE poses every SLOT sec (jump-cut between
+            # the same person's poses). Then branding/CTA on top.
+            N, SLOT = len(host_pngs), 5.0
+            drift = "x='W-w-16+5*sin(2*t)':y='H-h+4*sin(1.3*t)'"
+            inputs = ["-i", str(bg_video)]
+            for hp in host_pngs:
+                inputs += ["-loop", "1", "-i", str(hp)]
+            inputs += ["-i", str(overlay_path)]
+            fc, cur = [], "0:v"
+            for k in range(N):
+                en = f":enable='eq(mod(floor(t/{SLOT}),{N}),{k})'" if N > 1 else ""
+                nxt = f"h{k}"
+                fc.append(f"[{cur}][{k + 1}:v]overlay={drift}{en}[{nxt}]")
+                cur = nxt
+            fc.append(f"[{cur}][{N + 1}:v]overlay=0:0[out]")
+            subprocess.run([
+                "ffmpeg", "-y", *inputs,
+                "-filter_complex", ";".join(fc),
+                "-map", "[out]", "-t", f"{short_duration:.2f}",
+                "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+                "-pix_fmt", "yuv420p", "-an", str(composited),
+            ], check=True, stdout=subprocess.DEVNULL)
+        else:
+            # Static overlay (branding/title/CTA) on top of the moving montage
+            subprocess.run([
+                "ffmpeg", "-y",
+                "-i", str(bg_video), "-i", str(overlay_path),
+                "-filter_complex", "[0:v][1:v]overlay=0:0[out]",
+                "-map", "[out]", "-t", f"{short_duration:.2f}",
+                "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+                "-pix_fmt", "yuv420p", "-an", str(composited),
+            ], check=True, stdout=subprocess.DEVNULL)
     else:
         # Fallback: static overlay only (no clips matched)
         subprocess.run([
