@@ -33,8 +33,9 @@ Also: off-topic uploads diluting the niche ("2026最多人下載的AI工具", "H
 - [ ] **#1 Engagement seeding (manual, biggest lever):** seed first comment + reply/pin on each upload; 0 comments is starving distribution.
 - [ ] **#2 Topical discipline:** stop/remove off-topic uploads; finance-only.
 - [ ] **#3 External seeding:** drive 30–50 initial views/upload from market-phase.com + X + Reddit finance subs to break the chicken-and-egg.
-- [ ] **#4 (code) `/signals`-data content mode** — Shorts from OWN dashboard readings ("model flipped to Phase 2 — here's what that's meant"); the only real differentiation vs commodity AI-news Shorts. ← offered to build.
-- [ ] **#5 (code) human/character element** — old human-host videos still top (90v); faceless AI may read as slop.
+- [x] **#4 (code) `/signals`-data content mode** — SHIPPED (commit 4d57c9e). `fetch_signal_readings` (live `/api/market/signals` → phase/score/indicators) + `call_claude_signals` → data-driven Short reporting today's model verdict. Rotation now **3-way** (`SHORT_TYPE=auto` → signals/narrative/trivia by `date%3`). Differentiation play.
+- [x] **#5 (code) human/character element** — SHIPPED (commit f6c3eeb). ONE real host (host_1+host_2 = same person, 2 poses), green-screen removed + despilled, presenter over montage, **sequencing poses every 5s**; thumbnail pinned to host_1. Narrative + signals Shorts only (not trivia).
+- [ ] **STILL ON USER (not code, the real levers):** #1 engagement seeding (comment/reply/pin), #2 topical discipline (finance-only; kill off-topic uploads), #3 external seeding (30–50 initial views/upload). Production is done; distribution is the ceiling.
 - [ ] Source even hotter / trending topics if entity-sourcing under-delivers.
 - [ ] Dead RSS feed: `feeds.reuters.com` (DNS fail) — replace or drop from `_HEADLINE_FEEDS` / digest `FEEDS`.
 
