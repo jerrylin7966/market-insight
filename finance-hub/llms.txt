@@ -1,0 +1,21 @@
+# MarketPhase
+
+> MarketPhase is a free market-timing service with a live, rules-based model that reads which phase the US stock market is in. It scores six signals out of 6 — the SOX/QQQ semiconductor-leadership ratio, the VIX term structure, index health (distance from highs), market breadth, jobless claims, and the CFNAI macro floor — and maps the score to a phase: Phase 1 / Green (bull, 5–6), Phase 2–3 / Watch (mixed, 3–4), or Phase 4 / Red (defensive, 0–2). Author: James Whitfield, CFA. Data via the FRED API and public market sources. Educational only, not financial advice.
+
+## Live model & tools
+- [What phase is the market in right now](https://www.market-phase.com/what-phase-is-the-market-in): today's live MarketPhase model reading — the current phase, the 0–6 score, and each signal's value. Updated continuously.
+- [Live signals dashboard](https://www.market-phase.com/signals/): the interactive model — SOX/QQQ ratio chart, VIX term structure, breadth, CFNAI, and the composite phase score.
+
+## Signal guides (how to read each indicator)
+- [Market-timing phase model](https://www.market-phase.com/guides/market-timing): how MarketPhase turns four lenses into one phase read.
+- [SOXX/QQQ ratio explained](https://www.market-phase.com/guides/soxx-qqq-ratio): semiconductor leadership vs the broad Nasdaq as a risk-appetite signal.
+- [VIX and its term structure](https://www.market-phase.com/guides/vix-explained): contango vs backwardation as a volatility-regime signal.
+- [CFNAI macro floor](https://www.market-phase.com/guides/cfnai-indicator): the Chicago Fed National Activity Index and recession risk (below −0.70).
+- [Recession indicators that lead](https://www.market-phase.com/guides/recession-indicators)
+- [Yield curve as a recession signal](https://www.market-phase.com/guides/yield-curve-explained)
+- [Sector rotation across market phases](https://www.market-phase.com/guides/sector-rotation)
+- [The VIX explained](https://www.market-phase.com/guides/vix-explained)
+
+## About
+- [About MarketPhase](https://www.market-phase.com/about)
+- [All guides](https://www.market-phase.com/guides/)
