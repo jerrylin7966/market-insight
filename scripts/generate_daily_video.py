@@ -45,10 +45,10 @@ DAILY_DIR  = REPO_ROOT / "finance-hub" / "daily"
 TMP_DIR    = Path("/tmp/marketphase_video")
 
 ELEVENLABS_VOICE_ID = "G17SuINrv2H9FC6nvetn"
-# Voice model: eleven_v3 = most expressive / natural, ideal for video narration.
-# Override via ELEVENLABS_MODEL env. Any v3 error auto-falls-back to multilingual_v2
-# mid-run so a model/access hiccup never breaks the daily upload.
-ELEVENLABS_MODEL          = os.environ.get("ELEVENLABS_MODEL", "eleven_v3")
+# Voice model. Default eleven_multilingual_v2 (moved back from eleven_v3).
+# Override via ELEVENLABS_MODEL env (e.g. eleven_v3); any model error auto-falls-back
+# to multilingual_v2 mid-run so a hiccup never breaks the daily upload.
+ELEVENLABS_MODEL          = os.environ.get("ELEVENLABS_MODEL", "eleven_multilingual_v2")
 ELEVENLABS_FALLBACK_MODEL = "eleven_multilingual_v2"
 SITE_URL   = "https://market-phase.com/"
 CLIPS_DIR  = Path(__file__).parent / "assets" / "clips"
