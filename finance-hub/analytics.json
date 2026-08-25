@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-24",
-  "period": "2026-07-25 \u2192 2026-08-24",
+  "updated": "2026-08-25",
+  "period": "2026-07-26 \u2192 2026-08-25",
   "videos": [
     {
       "id": "oSlLf_EVDcM",
@@ -133,16 +133,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "3DXZ7xls0j4",
-      "title": "Accenture's AI Collapse Just Exposed the Whole Tech Lie #Shorts",
-      "url": "https://www.youtube.com/watch?v=3DXZ7xls0j4",
-      "views": 4,
-      "watchMinutes": 1,
-      "avgViewDuration": 19,
-      "avgViewPercentage": 35.16,
-      "subscribersGained": 0
-    },
-    {
       "id": "rlhTIIkJL2I",
       "title": "Can You Beat This Market IQ Test? #Shorts",
       "url": "https://www.youtube.com/watch?v=rlhTIIkJL2I",
@@ -163,6 +153,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "3DXZ7xls0j4",
+      "title": "Accenture's AI Collapse Just Exposed the Whole Tech Lie #Shorts",
+      "url": "https://www.youtube.com/watch?v=3DXZ7xls0j4",
+      "views": 4,
+      "watchMinutes": 1,
+      "avgViewDuration": 19,
+      "avgViewPercentage": 35.16,
+      "subscribersGained": 0
+    },
+    {
       "id": "Kdtw4WfMPto",
       "title": "Union Pacific Just Buried Norfolk Southern Deal With One Number #Shorts",
       "url": "https://www.youtube.com/watch?v=Kdtw4WfMPto",
@@ -170,6 +170,16 @@
       "watchMinutes": 0,
       "avgViewDuration": 8,
       "avgViewPercentage": 13.36,
+      "subscribersGained": 0
+    },
+    {
+      "id": "OISYY0HYbFo",
+      "title": "3 Million Seniors Just Lost Healthcare\u2014Here's Why #Shorts",
+      "url": "https://www.youtube.com/watch?v=OISYY0HYbFo",
+      "views": 2,
+      "watchMinutes": 0,
+      "avgViewDuration": 29,
+      "avgViewPercentage": 54.65,
       "subscribersGained": 0
     },
     {
@@ -193,16 +203,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "OISYY0HYbFo",
-      "title": "3 Million Seniors Just Lost Healthcare\u2014Here's Why #Shorts",
-      "url": "https://www.youtube.com/watch?v=OISYY0HYbFo",
-      "views": 2,
-      "watchMinutes": 0,
-      "avgViewDuration": 29,
-      "avgViewPercentage": 54.65,
-      "subscribersGained": 0
-    },
-    {
       "id": "su8KnjJpGYA",
       "title": "AI Insiders Are Quietly Dumping Stocks #Shorts",
       "url": "https://www.youtube.com/watch?v=su8KnjJpGYA",
@@ -210,16 +210,6 @@
       "watchMinutes": 0,
       "avgViewDuration": 44,
       "avgViewPercentage": 61.94,
-      "subscribersGained": 0
-    },
-    {
-      "id": "M3uIiybpOAo",
-      "title": "Big Tech's $1T Bet Is Failing #Shorts",
-      "url": "https://www.youtube.com/watch?v=M3uIiybpOAo",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 25,
-      "avgViewPercentage": 45,
       "subscribersGained": 0
     },
     {
@@ -243,23 +233,13 @@
       "subscribersGained": 0
     },
     {
-      "id": "WpS8f-vt5lA",
-      "title": "Cisco's AI Boom Just Triggered the Dollar's Next Move\u2014Here's Why It Matters",
-      "url": "https://www.youtube.com/watch?v=WpS8f-vt5lA",
-      "views": 1,
-      "watchMinutes": 3,
-      "avgViewDuration": 230,
-      "avgViewPercentage": 99.86,
-      "subscribersGained": 1
-    },
-    {
-      "id": "lE2jYwRPodk",
-      "title": "#geopolitics #iran",
-      "url": "https://www.youtube.com/watch?v=lE2jYwRPodk",
+      "id": "M3uIiybpOAo",
+      "title": "Big Tech's $1T Bet Is Failing #Shorts",
+      "url": "https://www.youtube.com/watch?v=M3uIiybpOAo",
       "views": 1,
       "watchMinutes": 0,
-      "avgViewDuration": 4,
-      "avgViewPercentage": 4.22,
+      "avgViewDuration": 25,
+      "avgViewPercentage": 45,
       "subscribersGained": 0
     },
     {
@@ -283,6 +263,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "lE2jYwRPodk",
+      "title": "#geopolitics #iran",
+      "url": "https://www.youtube.com/watch?v=lE2jYwRPodk",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 4,
+      "avgViewPercentage": 4.22,
+      "subscribersGained": 0
+    },
+    {
       "id": "XJpZmsI3WYs",
       "title": "Here you go! Why choose one when you can have all of them \ud83e\udd74 #convoflow #ai",
       "url": "https://www.youtube.com/watch?v=XJpZmsI3WYs",
@@ -301,11 +291,21 @@
       "avgViewDuration": 0,
       "avgViewPercentage": 0,
       "subscribersGained": 0
+    },
+    {
+      "id": "6kJOYKbnn_I",
+      "title": "AI Bubble Just Broke. Here's What Happens Next #Shorts",
+      "url": "https://www.youtube.com/watch?v=6kJOYKbnn_I",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 6,
+      "avgViewPercentage": 10.2,
+      "subscribersGained": 0
     }
   ],
   "totals": {
     "views": 183,
-    "watchMinutes": 70,
-    "subscribersGained": 2
+    "watchMinutes": 67,
+    "subscribersGained": 1
   }
 }
