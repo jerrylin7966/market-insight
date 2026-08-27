@@ -1,15 +1,15 @@
 {
-  "updated": "2026-08-26",
-  "period": "2026-07-27 \u2192 2026-08-26",
+  "updated": "2026-08-27",
+  "period": "2026-07-28 \u2192 2026-08-27",
   "videos": [
     {
-      "id": "oSlLf_EVDcM",
-      "title": "Oil Crash Just Changed Everything #Shorts",
-      "url": "https://www.youtube.com/watch?v=oSlLf_EVDcM",
-      "views": 25,
-      "watchMinutes": 11,
-      "avgViewDuration": 43,
-      "avgViewPercentage": 82.49,
+      "id": "N4vrXFxxUuc",
+      "title": "AI's Hidden Moat: Microsoft vs. Nvidia #Shorts",
+      "url": "https://www.youtube.com/watch?v=N4vrXFxxUuc",
+      "views": 198,
+      "watchMinutes": 14,
+      "avgViewDuration": 16,
+      "avgViewPercentage": 17.13,
       "subscribersGained": 0
     },
     {
@@ -103,16 +103,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "QNgR2CDLPRM",
-      "title": "Nvidia's $1.5B Ohio Bet Just Backfired #Shorts",
-      "url": "https://www.youtube.com/watch?v=QNgR2CDLPRM",
-      "views": 7,
-      "watchMinutes": 3,
-      "avgViewDuration": 48,
-      "avgViewPercentage": 78.3,
-      "subscribersGained": 0
-    },
-    {
       "id": "s5ZSi7xCUFA",
       "title": "Fed Decision + Tech Earnings: Can You Pass? #Shorts",
       "url": "https://www.youtube.com/watch?v=s5ZSi7xCUFA",
@@ -120,6 +110,16 @@
       "watchMinutes": 5,
       "avgViewDuration": 62,
       "avgViewPercentage": 64.64,
+      "subscribersGained": 0
+    },
+    {
+      "id": "QNgR2CDLPRM",
+      "title": "Nvidia's $1.5B Ohio Bet Just Backfired #Shorts",
+      "url": "https://www.youtube.com/watch?v=QNgR2CDLPRM",
+      "views": 7,
+      "watchMinutes": 3,
+      "avgViewDuration": 48,
+      "avgViewPercentage": 78.3,
       "subscribersGained": 0
     },
     {
@@ -133,16 +133,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "rlhTIIkJL2I",
-      "title": "Can You Beat This Market IQ Test? #Shorts",
-      "url": "https://www.youtube.com/watch?v=rlhTIIkJL2I",
-      "views": 4,
-      "watchMinutes": 3,
-      "avgViewDuration": 54,
-      "avgViewPercentage": 60.78,
-      "subscribersGained": 0
-    },
-    {
       "id": "WhJM5L7jt2Q",
       "title": "Credit Crisis or Spending Spree? Test Your Market IQ #Shorts",
       "url": "https://www.youtube.com/watch?v=WhJM5L7jt2Q",
@@ -153,6 +143,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "rlhTIIkJL2I",
+      "title": "Can You Beat This Market IQ Test? #Shorts",
+      "url": "https://www.youtube.com/watch?v=rlhTIIkJL2I",
+      "views": 4,
+      "watchMinutes": 3,
+      "avgViewDuration": 54,
+      "avgViewPercentage": 60.78,
+      "subscribersGained": 0
+    },
+    {
       "id": "Kdtw4WfMPto",
       "title": "Union Pacific Just Buried Norfolk Southern Deal With One Number #Shorts",
       "url": "https://www.youtube.com/watch?v=Kdtw4WfMPto",
@@ -160,26 +160,6 @@
       "watchMinutes": 0,
       "avgViewDuration": 8,
       "avgViewPercentage": 13.36,
-      "subscribersGained": 0
-    },
-    {
-      "id": "3DXZ7xls0j4",
-      "title": "Accenture's AI Collapse Just Exposed the Whole Tech Lie #Shorts",
-      "url": "https://www.youtube.com/watch?v=3DXZ7xls0j4",
-      "views": 2,
-      "watchMinutes": 0,
-      "avgViewDuration": 18,
-      "avgViewPercentage": 33.74,
-      "subscribersGained": 0
-    },
-    {
-      "id": "5uIBbo_GuFA",
-      "title": "Tech Earnings Reality Check: Can You Pass? #Shorts",
-      "url": "https://www.youtube.com/watch?v=5uIBbo_GuFA",
-      "views": 2,
-      "watchMinutes": 0,
-      "avgViewDuration": 28,
-      "avgViewPercentage": 30.75,
       "subscribersGained": 0
     },
     {
@@ -203,13 +183,53 @@
       "subscribersGained": 0
     },
     {
-      "id": "M3uIiybpOAo",
-      "title": "Big Tech's $1T Bet Is Failing #Shorts",
-      "url": "https://www.youtube.com/watch?v=M3uIiybpOAo",
+      "id": "5uIBbo_GuFA",
+      "title": "Tech Earnings Reality Check: Can You Pass? #Shorts",
+      "url": "https://www.youtube.com/watch?v=5uIBbo_GuFA",
+      "views": 2,
+      "watchMinutes": 0,
+      "avgViewDuration": 28,
+      "avgViewPercentage": 30.75,
+      "subscribersGained": 0
+    },
+    {
+      "id": "3DXZ7xls0j4",
+      "title": "Accenture's AI Collapse Just Exposed the Whole Tech Lie #Shorts",
+      "url": "https://www.youtube.com/watch?v=3DXZ7xls0j4",
+      "views": 2,
+      "watchMinutes": 0,
+      "avgViewDuration": 18,
+      "avgViewPercentage": 33.74,
+      "subscribersGained": 0
+    },
+    {
+      "id": "B9ov_2Xc4M0",
+      "title": "Kevin Warsh Just Changed Everything \u2014 Here's What Happens Next",
+      "url": "https://www.youtube.com/watch?v=B9ov_2Xc4M0",
       "views": 1,
       "watchMinutes": 0,
-      "avgViewDuration": 25,
-      "avgViewPercentage": 45,
+      "avgViewDuration": 4,
+      "avgViewPercentage": 1.32,
+      "subscribersGained": 0
+    },
+    {
+      "id": "IXABc4OqJ2o",
+      "title": "Fink's AI Secret Wall Street Missed #Shorts",
+      "url": "https://www.youtube.com/watch?v=IXABc4OqJ2o",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 0,
+      "avgViewPercentage": 0,
+      "subscribersGained": 0
+    },
+    {
+      "id": "6kJOYKbnn_I",
+      "title": "AI Bubble Just Broke. Here's What Happens Next #Shorts",
+      "url": "https://www.youtube.com/watch?v=6kJOYKbnn_I",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 6,
+      "avgViewPercentage": 10.2,
       "subscribersGained": 0
     },
     {
@@ -223,6 +243,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "zU9P7p6bBn4",
+      "title": "2026\u6700\u591a\u4eba\u4e0b\u8f09\u7684AI\u5de5\u5177\uff01\u4f60\u7528\u4e86\u55ce\uff1f",
+      "url": "https://www.youtube.com/watch?v=zU9P7p6bBn4",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 0,
+      "avgViewPercentage": 0,
+      "subscribersGained": 0
+    },
+    {
       "id": "su8KnjJpGYA",
       "title": "AI Insiders Are Quietly Dumping Stocks #Shorts",
       "url": "https://www.youtube.com/watch?v=su8KnjJpGYA",
@@ -230,46 +260,6 @@
       "watchMinutes": 0,
       "avgViewDuration": 44,
       "avgViewPercentage": 61.94,
-      "subscribersGained": 0
-    },
-    {
-      "id": "E_JWqRVkN6E",
-      "title": "Big Tech's AI Trap Just Sprung #Shorts",
-      "url": "https://www.youtube.com/watch?v=E_JWqRVkN6E",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 5,
-      "avgViewPercentage": 8.6,
-      "subscribersGained": 0
-    },
-    {
-      "id": "66EE754H78I",
-      "title": "Earnings Are SAVING the Market Right Now #Shorts",
-      "url": "https://www.youtube.com/watch?v=66EE754H78I",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 8,
-      "avgViewPercentage": 11.94,
-      "subscribersGained": 0
-    },
-    {
-      "id": "lE2jYwRPodk",
-      "title": "#geopolitics #iran",
-      "url": "https://www.youtube.com/watch?v=lE2jYwRPodk",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 4,
-      "avgViewPercentage": 4.22,
-      "subscribersGained": 0
-    },
-    {
-      "id": "DCU_CYVkvsE",
-      "title": "Generic Drug Tariffs Just Got Real #Shorts",
-      "url": "https://www.youtube.com/watch?v=DCU_CYVkvsE",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 7,
-      "avgViewPercentage": 16.63,
       "subscribersGained": 0
     },
     {
@@ -293,9 +283,9 @@
       "subscribersGained": 0
     },
     {
-      "id": "zU9P7p6bBn4",
-      "title": "2026\u6700\u591a\u4eba\u4e0b\u8f09\u7684AI\u5de5\u5177\uff01\u4f60\u7528\u4e86\u55ce\uff1f",
-      "url": "https://www.youtube.com/watch?v=zU9P7p6bBn4",
+      "id": "8ErpmtjjqFQ",
+      "title": "Why Buffett Just Sent a Secret Signal #Shorts",
+      "url": "https://www.youtube.com/watch?v=8ErpmtjjqFQ",
       "views": 1,
       "watchMinutes": 0,
       "avgViewDuration": 0,
@@ -304,8 +294,8 @@
     }
   ],
   "totals": {
-    "views": 181,
-    "watchMinutes": 68,
+    "views": 353,
+    "watchMinutes": 71,
     "subscribersGained": 1
   }
 }
