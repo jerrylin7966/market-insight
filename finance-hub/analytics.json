@@ -1,12 +1,12 @@
 {
-  "updated": "2026-08-27",
-  "period": "2026-07-28 \u2192 2026-08-27",
+  "updated": "2026-08-28",
+  "period": "2026-07-29 \u2192 2026-08-28",
   "videos": [
     {
       "id": "N4vrXFxxUuc",
       "title": "AI's Hidden Moat: Microsoft vs. Nvidia #Shorts",
       "url": "https://www.youtube.com/watch?v=N4vrXFxxUuc",
-      "views": 198,
+      "views": 200,
       "watchMinutes": 14,
       "avgViewDuration": 16,
       "avgViewPercentage": 17.13,
@@ -83,16 +83,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "PnsvIElTG_Y",
-      "title": "AI Bubble Bursting Right Now #Shorts",
-      "url": "https://www.youtube.com/watch?v=PnsvIElTG_Y",
-      "views": 8,
-      "watchMinutes": 1,
-      "avgViewDuration": 14,
-      "avgViewPercentage": 30.269999999999996,
-      "subscribersGained": 0
-    },
-    {
       "id": "q9yleMC8rKg",
       "title": "Can You Beat the Market Quiz? #Shorts",
       "url": "https://www.youtube.com/watch?v=q9yleMC8rKg",
@@ -100,16 +90,6 @@
       "watchMinutes": 2,
       "avgViewDuration": 52,
       "avgViewPercentage": 58.70000000000001,
-      "subscribersGained": 0
-    },
-    {
-      "id": "s5ZSi7xCUFA",
-      "title": "Fed Decision + Tech Earnings: Can You Pass? #Shorts",
-      "url": "https://www.youtube.com/watch?v=s5ZSi7xCUFA",
-      "views": 7,
-      "watchMinutes": 5,
-      "avgViewDuration": 62,
-      "avgViewPercentage": 64.64,
       "subscribersGained": 0
     },
     {
@@ -123,6 +103,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "s5ZSi7xCUFA",
+      "title": "Fed Decision + Tech Earnings: Can You Pass? #Shorts",
+      "url": "https://www.youtube.com/watch?v=s5ZSi7xCUFA",
+      "views": 7,
+      "watchMinutes": 5,
+      "avgViewDuration": 62,
+      "avgViewPercentage": 64.64,
+      "subscribersGained": 0
+    },
+    {
       "id": "DC_xkNYAzsA",
       "title": "Bank of America Just Warned Nvidia. Here's What Smart Money Does. #Shorts",
       "url": "https://www.youtube.com/watch?v=DC_xkNYAzsA",
@@ -130,6 +120,16 @@
       "watchMinutes": 3,
       "avgViewDuration": 45,
       "avgViewPercentage": 82.29,
+      "subscribersGained": 0
+    },
+    {
+      "id": "6r5zGenPt6o",
+      "title": "Model Hit Phase 2-3 \u2014 Reduce Risk Now #Shorts",
+      "url": "https://www.youtube.com/watch?v=6r5zGenPt6o",
+      "views": 4,
+      "watchMinutes": 2,
+      "avgViewDuration": 60,
+      "avgViewPercentage": 116.97,
       "subscribersGained": 0
     },
     {
@@ -213,9 +213,29 @@
       "subscribersGained": 0
     },
     {
+      "id": "PnsvIElTG_Y",
+      "title": "AI Bubble Bursting Right Now #Shorts",
+      "url": "https://www.youtube.com/watch?v=PnsvIElTG_Y",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 0,
+      "avgViewPercentage": 0,
+      "subscribersGained": 0
+    },
+    {
       "id": "IXABc4OqJ2o",
       "title": "Fink's AI Secret Wall Street Missed #Shorts",
       "url": "https://www.youtube.com/watch?v=IXABc4OqJ2o",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 0,
+      "avgViewPercentage": 0,
+      "subscribersGained": 0
+    },
+    {
+      "id": "zU9P7p6bBn4",
+      "title": "2026\u6700\u591a\u4eba\u4e0b\u8f09\u7684AI\u5de5\u5177\uff01\u4f60\u7528\u4e86\u55ce\uff1f",
+      "url": "https://www.youtube.com/watch?v=zU9P7p6bBn4",
       "views": 1,
       "watchMinutes": 0,
       "avgViewDuration": 0,
@@ -240,16 +260,6 @@
       "watchMinutes": 2,
       "avgViewDuration": 162,
       "avgViewPercentage": 49.68,
-      "subscribersGained": 0
-    },
-    {
-      "id": "zU9P7p6bBn4",
-      "title": "2026\u6700\u591a\u4eba\u4e0b\u8f09\u7684AI\u5de5\u5177\uff01\u4f60\u7528\u4e86\u55ce\uff1f",
-      "url": "https://www.youtube.com/watch?v=zU9P7p6bBn4",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 0,
-      "avgViewPercentage": 0,
       "subscribersGained": 0
     },
     {
@@ -294,8 +304,8 @@
     }
   ],
   "totals": {
-    "views": 353,
-    "watchMinutes": 71,
+    "views": 352,
+    "watchMinutes": 72,
     "subscribersGained": 1
   }
 }
