@@ -51,6 +51,17 @@ ELEVENLABS_VOICE_ID = "G17SuINrv2H9FC6nvetn"
 ELEVENLABS_MODEL          = os.environ.get("ELEVENLABS_MODEL", "eleven_multilingual_v2")
 ELEVENLABS_FALLBACK_MODEL = "eleven_multilingual_v2"
 SITE_URL   = "https://market-phase.com/"
+PHASE_URL  = "https://www.market-phase.com/what-phase-is-the-market-in"  # matched landing for Shorts
+GUIDE_SLUGS = [
+    "bear-market-survival", "beta-investing", "business-cycle", "cape-ratio",
+    "cfnai-indicator", "dollar-cost-averaging", "earnings-reports", "etfs-vs-mutual-funds",
+    "fed-interest-rates", "inflation-investing", "interest-rate-investing",
+    "market-capitalization", "market-timing", "pe-ratio-explained", "portfolio-diversification",
+    "recession-indicators", "recession-proof-portfolio", "sector-rotation", "soxx-qqq-ratio",
+    "sp500-explained", "treasury-bonds", "vix-explained", "yield-curve-explained",
+]
+def _guide_url(slug):
+    return f"https://www.market-phase.com/guides/{slug}" if slug in GUIDE_SLUGS else None
 CLIPS_DIR  = Path(__file__).parent / "assets" / "clips"
 
 SLIDE_W, SLIDE_H = 1920, 1080
@@ -535,6 +546,14 @@ Output a JSON object with exactly these 5 keys:
 
 5. "tags": Array of 8-10 tags (no # prefix). Always include "finance", "markets",
    "investing", "Shorts". Add story-specific tags.
+
+6. "guide": the single MOST relevant explainer slug for this story (or null), from:
+   bear-market-survival, beta-investing, business-cycle, cape-ratio, cfnai-indicator,
+   dollar-cost-averaging, earnings-reports, etfs-vs-mutual-funds, fed-interest-rates,
+   inflation-investing, interest-rate-investing, market-capitalization, market-timing,
+   pe-ratio-explained, portfolio-diversification, recession-indicators,
+   recession-proof-portfolio, sector-rotation, soxx-qqq-ratio, sp500-explained,
+   treasury-bonds, vix-explained, yield-curve-explained. Pick the closest topical match.
 
 Return ONLY valid JSON. No markdown, no explanation."""
 
@@ -1758,6 +1777,10 @@ Write a 55-60 second YouTube Short. Output JSON with exactly:
 
 4. "tags": 8-10 tags (no #), always incl "finance","markets","investing","Shorts".
 
+5. "guide": the most relevant signal-explainer slug for this reading (or null), from:
+   market-timing, soxx-qqq-ratio, vix-explained, cfnai-indicator, yield-curve-explained,
+   recession-indicators, sector-rotation.
+
 Return ONLY valid JSON. No markdown."""
     payload = json.dumps({
         "model": "claude-haiku-4-5-20251001", "max_tokens": 1200,
@@ -2234,7 +2257,8 @@ def main():
             print("Generating trivia Short…", file=sys.stderr)
             short_path = generate_trivia_short(data, clip_tags, TMP_DIR)
             desc = ("Can you pass today's market quiz? Comment your score below 👇\n\n"
-                    "New finance quiz & market shorts every weekday. Follow for daily insights.\n\n"
+                    f"📊 See where the market is now → {PHASE_URL}\n\n"
+                    "New finance quiz & market shorts every weekday. Subscribe for daily insights.\n\n"
                     "#Shorts #finance #markets #quiz #investing #stocks #MarketPhase")
             short_url = upload_short_to_youtube(short_path, short_title,
                                                 f"MarketPhase Quiz — {today_display}",
@@ -2262,16 +2286,26 @@ def main():
             print(f"  Hook:  {short_hook[:80]}…", file=sys.stderr)
             print("Generating YouTube Short…", file=sys.stderr)
             short_path = generate_short_video(short_hook, short_title, clip_tags, TMP_DIR)
+            # Route to matched, high-value pages (replaces the old daily-digest landing).
+            guide_url  = _guide_url(data.get("guide"))
+            guide_line = f"📘 The full explainer → {guide_url}\n\n" if guide_url else ""
             if short_type == "signals":
-                desc = ("Today's reading from our market-timing model. See the live dashboard → "
-                        "https://www.market-phase.com/signals\n\n"
+                desc = (f"📊 Today's full model reading → {PHASE_URL}\n\n"
+                        "📈 The live dashboard → https://www.market-phase.com/signals\n\n"
+                        f"{guide_line}"
                         "New market shorts every weekday. Subscribe for the daily signal.\n\n"
                         "#Shorts #finance #markets #investing #stocks #MarketPhase")
-                short_url = upload_short_to_youtube(short_path, short_title,
-                            f"MarketPhase Signal — {today_display}", description_override=desc)
+                title_tag = f"MarketPhase Signal — {today_display}"
             else:
-                short_url = upload_short_to_youtube(short_path, short_title,
-                            f"MarketPhase Daily — {today_display}")
+                desc = (f"📊 Where's the market right now? Today's live model read → {PHASE_URL}\n\n"
+                        f"{guide_line}"
+                        "📈 Live signals dashboard → https://www.market-phase.com/signals\n\n"
+                        "New market shorts every weekday. Subscribe for the daily read.\n\n"
+                        "#Shorts #finance #markets #investing #stocks #MarketPhase")
+                title_tag = f"MarketPhase Daily — {today_display}"
+            print(f"  Routing → {PHASE_URL}" + (f" + {guide_url}" if guide_url else ""), file=sys.stderr)
+            short_url = upload_short_to_youtube(short_path, short_title, title_tag,
+                                                description_override=desc)
 
         print(f"\n✅ Short live [{short_type}]: {short_url}", file=sys.stderr)
         print("Fetching analytics…", file=sys.stderr)
