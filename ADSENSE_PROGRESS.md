@@ -19,7 +19,11 @@ AdSense rejected the site for **"Low value content"** — a **content-quality** 
 ## 📌 Checkpoint — Aug 20
 GSC Pages: Indexed still ~58 (www) / 104 (domain) — barely down. **"Excluded by 'noindex' tag" = 1 of 66** → the noindex has NOT propagated; ~30 digests still indexed. Redirect(60)/Alternate(35) buckets = intentional consolidation, ignore ("Page with redirect" validation will always "fail" — redirects are by design). `/signals` = "available to Google / can be indexed / indexing requested" (on track, not yet confirmed on Google). **DECISION: do NOT resubmit yet** — wait for "Excluded by noindex" to climb toward ~30 and Indexed to drop toward ~30 (guides+signals+core). Accelerator: Request-Index the still-indexed digest URLs to force recrawl→noindex→drop.
 
-## ⏳ TODO before resubmitting (was Aug 19 — now gated on deindex, not date)
+## 🔴 2nd rejection + THE REAL FIX (Aug 29)
+Resubmitted after Aug 19 → **rejected again, "Low value content."** Reconciliation: **noindex removes pages from Google SEARCH, but AdSense reviews the LIVE site** — the 75 AI-digests were still nav-linked + indexed. GSC Aug-29 proved noindex failed: only **1 of 75** "excluded by noindex" after 17 days. Impressions rose to 100–140/day → guides/signals have real value; digests were the anchor.
+**FIX SHIPPED (ffe2962, c7b946e):** digests **REMOVED from the public site**, not just noindexed — (1) digest gen repointed to PRIVATE `daily_data/` (gitignored, not deployed) so the YouTube pipeline still reads it; `read_today_digest` updated; (2) deleted 75 digest pages + `/daily/` hub; stripped "Daily Digest" from nav/footer (30 pages) + 4 sidebar cards; (3) `_redirects`: `/daily/* → / 301` (live; was soft-404 via SPA fallback); (4) sitemap `/daily/` removed; workflow stops committing `finance-hub/daily/`. Site now = `/signals` + 24 guides + `/what-phase-is-the-market-in`. **Next: let Google recrawl (~1–2 wks) so /daily/ drops, then request review again.**
+
+## ⏳ TODO before resubmitting (gated on deindex, not date)
 - [ ] Let Google recrawl (~1 week) so the noindexed digests actually **drop from the index**. Confirm in GSC → Pages that `/daily/` dated URLs fall out of "Indexed".
 - [ ] **Strengthen 3–5 flagship guides** with genuinely original analysis/data (not more AI filler) so the indexed footprint reads as human-quality.
 - [ ] Optional: reciprocal **guide → `/signals` "see it live"** callouts (internal linking + reinforces the tool).
