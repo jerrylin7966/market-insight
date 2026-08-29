@@ -37,7 +37,7 @@ def urlopen_with_retry(req, timeout=90, retries=3, backoff=15):
 # ── Config ──────────────────────────────────────────────────────────────────
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 REPO_ROOT = Path(__file__).parent.parent
-DAILY_DIR = REPO_ROOT / "finance-hub" / "daily"
+DAILY_DIR = REPO_ROOT / "daily_data"   # private: NOT published (thin AI-news = AdSense low-value); pipeline reads it here
 MAX_HEADLINES = 30   # max headlines to pass to Claude
 
 # RSS feeds — all free, no API key needed

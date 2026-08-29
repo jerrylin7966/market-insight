@@ -41,7 +41,7 @@ YOUTUBE_CLIENT_SECRET  = os.environ.get("YOUTUBE_CLIENT_SECRET", "")
 YOUTUBE_REFRESH_TOKEN  = os.environ.get("YOUTUBE_REFRESH_TOKEN", "")
 
 REPO_ROOT  = Path(__file__).parent.parent
-DAILY_DIR  = REPO_ROOT / "finance-hub" / "daily"
+DAILY_DIR  = REPO_ROOT / "daily_data"   # private digest cache (not deployed); read for the video/signals script only
 TMP_DIR    = Path("/tmp/marketphase_video")
 
 ELEVENLABS_VOICE_ID = "G17SuINrv2H9FC6nvetn"

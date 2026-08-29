@@ -11,7 +11,6 @@
   <url><loc>https://www.market-phase.com/terms</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
 
   <!-- Daily Digest -->
-  <url><loc>https://www.market-phase.com/daily/</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
 
   <!-- Guides index -->
   <url><loc>https://www.market-phase.com/guides/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
