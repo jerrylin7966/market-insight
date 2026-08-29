@@ -1,0 +1,3 @@
+# Deleted daily digests (thin AI-rewritten news removed for AdSense low-value fix)
+# → 301 to the homepage so Google drops the old URLs cleanly instead of soft-404.
+/daily/*  /  301
