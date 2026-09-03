@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-02",
-  "period": "2026-08-03 \u2192 2026-09-02",
+  "updated": "2026-09-03",
+  "period": "2026-08-04 \u2192 2026-09-03",
   "videos": [
     {
       "id": "N4vrXFxxUuc",
@@ -20,6 +20,16 @@
       "watchMinutes": 4,
       "avgViewDuration": 11,
       "avgViewPercentage": 14.38,
+      "subscribersGained": 0
+    },
+    {
+      "id": "hhc22MbnmvM",
+      "title": "Iran Strikes & Rate Hikes: Can You Ace This? #Shorts",
+      "url": "https://www.youtube.com/watch?v=hhc22MbnmvM",
+      "views": 126,
+      "watchMinutes": 13,
+      "avgViewDuration": 38,
+      "avgViewPercentage": 35.95,
       "subscribersGained": 0
     },
     {
@@ -123,16 +133,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "WhJM5L7jt2Q",
-      "title": "Credit Crisis or Spending Spree? Test Your Market IQ #Shorts",
-      "url": "https://www.youtube.com/watch?v=WhJM5L7jt2Q",
-      "views": 4,
-      "watchMinutes": 2,
-      "avgViewDuration": 42,
-      "avgViewPercentage": 45.9,
-      "subscribersGained": 0
-    },
-    {
       "id": "rlhTIIkJL2I",
       "title": "Can You Beat This Market IQ Test? #Shorts",
       "url": "https://www.youtube.com/watch?v=rlhTIIkJL2I",
@@ -140,6 +140,16 @@
       "watchMinutes": 3,
       "avgViewDuration": 54,
       "avgViewPercentage": 60.78,
+      "subscribersGained": 0
+    },
+    {
+      "id": "WhJM5L7jt2Q",
+      "title": "Credit Crisis or Spending Spree? Test Your Market IQ #Shorts",
+      "url": "https://www.youtube.com/watch?v=WhJM5L7jt2Q",
+      "views": 4,
+      "watchMinutes": 2,
+      "avgViewDuration": 42,
+      "avgViewPercentage": 45.9,
       "subscribersGained": 0
     },
     {
@@ -183,6 +193,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "B9ov_2Xc4M0",
+      "title": "Kevin Warsh Just Changed Everything \u2014 Here's What Happens Next",
+      "url": "https://www.youtube.com/watch?v=B9ov_2Xc4M0",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 4,
+      "avgViewPercentage": 1.32,
+      "subscribersGained": 0
+    },
+    {
       "id": "6kJOYKbnn_I",
       "title": "AI Bubble Just Broke. Here's What Happens Next #Shorts",
       "url": "https://www.youtube.com/watch?v=6kJOYKbnn_I",
@@ -203,23 +223,13 @@
       "subscribersGained": 0
     },
     {
-      "id": "DCU_CYVkvsE",
-      "title": "Generic Drug Tariffs Just Got Real #Shorts",
-      "url": "https://www.youtube.com/watch?v=DCU_CYVkvsE",
+      "id": "XJpZmsI3WYs",
+      "title": "Here you go! Why choose one when you can have all of them \ud83e\udd74 #convoflow #ai",
+      "url": "https://www.youtube.com/watch?v=XJpZmsI3WYs",
       "views": 1,
       "watchMinutes": 0,
-      "avgViewDuration": 0,
-      "avgViewPercentage": 0,
-      "subscribersGained": 0
-    },
-    {
-      "id": "8ErpmtjjqFQ",
-      "title": "Why Buffett Just Sent a Secret Signal #Shorts",
-      "url": "https://www.youtube.com/watch?v=8ErpmtjjqFQ",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 0,
-      "avgViewPercentage": 0,
+      "avgViewDuration": 2,
+      "avgViewPercentage": 5.69,
       "subscribersGained": 0
     },
     {
@@ -243,26 +253,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "2VZXMMncYQ8",
-      "title": "SpaceX Just Revealed the $60B Secret #Shorts",
-      "url": "https://www.youtube.com/watch?v=2VZXMMncYQ8",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 12,
-      "avgViewPercentage": 24.34,
-      "subscribersGained": 0
-    },
-    {
-      "id": "B9ov_2Xc4M0",
-      "title": "Kevin Warsh Just Changed Everything \u2014 Here's What Happens Next",
-      "url": "https://www.youtube.com/watch?v=B9ov_2Xc4M0",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 4,
-      "avgViewPercentage": 1.32,
-      "subscribersGained": 0
-    },
-    {
       "id": "3DXZ7xls0j4",
       "title": "Accenture's AI Collapse Just Exposed the Whole Tech Lie #Shorts",
       "url": "https://www.youtube.com/watch?v=3DXZ7xls0j4",
@@ -273,13 +263,23 @@
       "subscribersGained": 0
     },
     {
-      "id": "XJpZmsI3WYs",
-      "title": "Here you go! Why choose one when you can have all of them \ud83e\udd74 #convoflow #ai",
-      "url": "https://www.youtube.com/watch?v=XJpZmsI3WYs",
+      "id": "2VZXMMncYQ8",
+      "title": "SpaceX Just Revealed the $60B Secret #Shorts",
+      "url": "https://www.youtube.com/watch?v=2VZXMMncYQ8",
       "views": 1,
       "watchMinutes": 0,
-      "avgViewDuration": 2,
-      "avgViewPercentage": 5.69,
+      "avgViewDuration": 12,
+      "avgViewPercentage": 24.34,
+      "subscribersGained": 0
+    },
+    {
+      "id": "DCU_CYVkvsE",
+      "title": "Generic Drug Tariffs Just Got Real #Shorts",
+      "url": "https://www.youtube.com/watch?v=DCU_CYVkvsE",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 0,
+      "avgViewPercentage": 0,
       "subscribersGained": 0
     },
     {
@@ -294,8 +294,8 @@
     }
   ],
   "totals": {
-    "views": 498,
-    "watchMinutes": 56,
+    "views": 623,
+    "watchMinutes": 69,
     "subscribersGained": 0
   }
 }
