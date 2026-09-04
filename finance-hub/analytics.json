@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-03",
-  "period": "2026-08-04 \u2192 2026-09-03",
+  "updated": "2026-09-04",
+  "period": "2026-08-05 \u2192 2026-09-04",
   "videos": [
     {
       "id": "N4vrXFxxUuc",
@@ -53,16 +53,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "t1fzVUVkW-0",
-      "title": "Can You Beat Today's Market Test? #Shorts",
-      "url": "https://www.youtube.com/watch?v=t1fzVUVkW-0",
-      "views": 11,
-      "watchMinutes": 4,
-      "avgViewDuration": 48,
-      "avgViewPercentage": 50.73,
-      "subscribersGained": 0
-    },
-    {
       "id": "eOqYIwR--4k",
       "title": "Treasury Yields Hit 19-Year High: Can You Pass? #Shorts",
       "url": "https://www.youtube.com/watch?v=eOqYIwR--4k",
@@ -93,6 +83,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "QNgR2CDLPRM",
+      "title": "Nvidia's $1.5B Ohio Bet Just Backfired #Shorts",
+      "url": "https://www.youtube.com/watch?v=QNgR2CDLPRM",
+      "views": 7,
+      "watchMinutes": 3,
+      "avgViewDuration": 48,
+      "avgViewPercentage": 78.3,
+      "subscribersGained": 0
+    },
+    {
       "id": "6r5zGenPt6o",
       "title": "Model Hit Phase 2-3 \u2014 Reduce Risk Now #Shorts",
       "url": "https://www.youtube.com/watch?v=6r5zGenPt6o",
@@ -103,13 +103,13 @@
       "subscribersGained": 0
     },
     {
-      "id": "QNgR2CDLPRM",
-      "title": "Nvidia's $1.5B Ohio Bet Just Backfired #Shorts",
-      "url": "https://www.youtube.com/watch?v=QNgR2CDLPRM",
-      "views": 7,
-      "watchMinutes": 3,
-      "avgViewDuration": 48,
-      "avgViewPercentage": 78.3,
+      "id": "tvjfJbEyBfc",
+      "title": "Phase 2-3 Watch Signal \u2014 My Model Says Reduce Risk Now #Shorts",
+      "url": "https://www.youtube.com/watch?v=tvjfJbEyBfc",
+      "views": 6,
+      "watchMinutes": 0,
+      "avgViewDuration": 8,
+      "avgViewPercentage": 13.37,
       "subscribersGained": 0
     },
     {
@@ -133,16 +133,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "rlhTIIkJL2I",
-      "title": "Can You Beat This Market IQ Test? #Shorts",
-      "url": "https://www.youtube.com/watch?v=rlhTIIkJL2I",
-      "views": 4,
-      "watchMinutes": 3,
-      "avgViewDuration": 54,
-      "avgViewPercentage": 60.78,
-      "subscribersGained": 0
-    },
-    {
       "id": "WhJM5L7jt2Q",
       "title": "Credit Crisis or Spending Spree? Test Your Market IQ #Shorts",
       "url": "https://www.youtube.com/watch?v=WhJM5L7jt2Q",
@@ -150,6 +140,16 @@
       "watchMinutes": 2,
       "avgViewDuration": 42,
       "avgViewPercentage": 45.9,
+      "subscribersGained": 0
+    },
+    {
+      "id": "rlhTIIkJL2I",
+      "title": "Can You Beat This Market IQ Test? #Shorts",
+      "url": "https://www.youtube.com/watch?v=rlhTIIkJL2I",
+      "views": 4,
+      "watchMinutes": 3,
+      "avgViewDuration": 54,
+      "avgViewPercentage": 60.78,
       "subscribersGained": 0
     },
     {
@@ -163,16 +163,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "uDjvcYZ_zrE",
-      "title": "Why Your 401(k) Might Be Living on Borrowed Time #Shorts",
-      "url": "https://www.youtube.com/watch?v=uDjvcYZ_zrE",
-      "views": 2,
-      "watchMinutes": 0,
-      "avgViewDuration": 26,
-      "avgViewPercentage": 40.03,
-      "subscribersGained": 0
-    },
-    {
       "id": "OISYY0HYbFo",
       "title": "3 Million Seniors Just Lost Healthcare\u2014Here's Why #Shorts",
       "url": "https://www.youtube.com/watch?v=OISYY0HYbFo",
@@ -180,6 +170,16 @@
       "watchMinutes": 0,
       "avgViewDuration": 29,
       "avgViewPercentage": 54.65,
+      "subscribersGained": 0
+    },
+    {
+      "id": "uDjvcYZ_zrE",
+      "title": "Why Your 401(k) Might Be Living on Borrowed Time #Shorts",
+      "url": "https://www.youtube.com/watch?v=uDjvcYZ_zrE",
+      "views": 2,
+      "watchMinutes": 0,
+      "avgViewDuration": 26,
+      "avgViewPercentage": 40.03,
       "subscribersGained": 0
     },
     {
@@ -213,6 +213,26 @@
       "subscribersGained": 0
     },
     {
+      "id": "t1fzVUVkW-0",
+      "title": "Can You Beat Today's Market Test? #Shorts",
+      "url": "https://www.youtube.com/watch?v=t1fzVUVkW-0",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 0,
+      "avgViewPercentage": 0,
+      "subscribersGained": 0
+    },
+    {
+      "id": "IXABc4OqJ2o",
+      "title": "Fink's AI Secret Wall Street Missed #Shorts",
+      "url": "https://www.youtube.com/watch?v=IXABc4OqJ2o",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 0,
+      "avgViewPercentage": 0,
+      "subscribersGained": 0
+    },
+    {
       "id": "mv7Uzq-zmFo",
       "title": "Cisco Just Unleashed The AI Capex Supercycle Nobody Saw Coming",
       "url": "https://www.youtube.com/watch?v=mv7Uzq-zmFo",
@@ -230,16 +250,6 @@
       "watchMinutes": 0,
       "avgViewDuration": 2,
       "avgViewPercentage": 5.69,
-      "subscribersGained": 0
-    },
-    {
-      "id": "IXABc4OqJ2o",
-      "title": "Fink's AI Secret Wall Street Missed #Shorts",
-      "url": "https://www.youtube.com/watch?v=IXABc4OqJ2o",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 0,
-      "avgViewPercentage": 0,
       "subscribersGained": 0
     },
     {
@@ -294,8 +304,8 @@
     }
   ],
   "totals": {
-    "views": 623,
-    "watchMinutes": 69,
+    "views": 619,
+    "watchMinutes": 65,
     "subscribersGained": 0
   }
 }
