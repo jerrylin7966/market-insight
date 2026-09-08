@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-07",
-  "period": "2026-08-08 \u2192 2026-09-07",
+  "updated": "2026-09-08",
+  "period": "2026-08-09 \u2192 2026-09-08",
   "videos": [
     {
       "id": "N4vrXFxxUuc",
@@ -203,13 +203,13 @@
       "subscribersGained": 0
     },
     {
-      "id": "uDjvcYZ_zrE",
-      "title": "Why Your 401(k) Might Be Living on Borrowed Time #Shorts",
-      "url": "https://www.youtube.com/watch?v=uDjvcYZ_zrE",
+      "id": "zU9P7p6bBn4",
+      "title": "2026\u6700\u591a\u4eba\u4e0b\u8f09\u7684AI\u5de5\u5177\uff01\u4f60\u7528\u4e86\u55ce\uff1f",
+      "url": "https://www.youtube.com/watch?v=zU9P7p6bBn4",
       "views": 1,
       "watchMinutes": 0,
-      "avgViewDuration": 26,
-      "avgViewPercentage": 40.03,
+      "avgViewDuration": 0,
+      "avgViewPercentage": 0,
       "subscribersGained": 0
     },
     {
@@ -223,13 +223,23 @@
       "subscribersGained": 0
     },
     {
-      "id": "XJpZmsI3WYs",
-      "title": "Here you go! Why choose one when you can have all of them \ud83e\udd74 #convoflow #ai",
-      "url": "https://www.youtube.com/watch?v=XJpZmsI3WYs",
+      "id": "FovroLaFzsQ",
+      "title": "AI Chip Giant Raises $5.5B in Record IPO #Shorts",
+      "url": "https://www.youtube.com/watch?v=FovroLaFzsQ",
       "views": 1,
       "watchMinutes": 0,
-      "avgViewDuration": 2,
-      "avgViewPercentage": 5.69,
+      "avgViewDuration": 0,
+      "avgViewPercentage": 0,
+      "subscribersGained": 0
+    },
+    {
+      "id": "uDjvcYZ_zrE",
+      "title": "Why Your 401(k) Might Be Living on Borrowed Time #Shorts",
+      "url": "https://www.youtube.com/watch?v=uDjvcYZ_zrE",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 26,
+      "avgViewPercentage": 40.03,
       "subscribersGained": 0
     },
     {
@@ -243,9 +253,9 @@
       "subscribersGained": 0
     },
     {
-      "id": "zU9P7p6bBn4",
-      "title": "2026\u6700\u591a\u4eba\u4e0b\u8f09\u7684AI\u5de5\u5177\uff01\u4f60\u7528\u4e86\u55ce\uff1f",
-      "url": "https://www.youtube.com/watch?v=zU9P7p6bBn4",
+      "id": "YZeMzA2So1A",
+      "title": "Phase 4 Red Alert \u2014 My Model Says Exit Growth Now #Shorts",
+      "url": "https://www.youtube.com/watch?v=YZeMzA2So1A",
       "views": 1,
       "watchMinutes": 0,
       "avgViewDuration": 0,
@@ -294,7 +304,7 @@
     }
   ],
   "totals": {
-    "views": 622,
+    "views": 623,
     "watchMinutes": 68,
     "subscribersGained": 0
   }
