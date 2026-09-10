@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-09",
-  "period": "2026-08-10 \u2192 2026-09-09",
+  "updated": "2026-09-10",
+  "period": "2026-08-11 \u2192 2026-09-10",
   "videos": [
     {
       "id": "N4vrXFxxUuc",
@@ -40,6 +40,16 @@
       "watchMinutes": 3,
       "avgViewDuration": 16,
       "avgViewPercentage": 27.810000000000002,
+      "subscribersGained": 0
+    },
+    {
+      "id": "6CKbX2JwkCo",
+      "title": "Phase 4 Red Alert: My Model Says Exit Growth Now #Shorts",
+      "url": "https://www.youtube.com/watch?v=6CKbX2JwkCo",
+      "views": 15,
+      "watchMinutes": 3,
+      "avgViewDuration": 23,
+      "avgViewPercentage": 36.51,
       "subscribersGained": 0
     },
     {
@@ -153,16 +163,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "rlhTIIkJL2I",
-      "title": "Can You Beat This Market IQ Test? #Shorts",
-      "url": "https://www.youtube.com/watch?v=rlhTIIkJL2I",
-      "views": 4,
-      "watchMinutes": 3,
-      "avgViewDuration": 54,
-      "avgViewPercentage": 60.78,
-      "subscribersGained": 0
-    },
-    {
       "id": "sg0iF0_2D4A",
       "title": "The Grand Bargain: US-China Digital Control Grid Exposed",
       "url": "https://www.youtube.com/watch?v=sg0iF0_2D4A",
@@ -183,16 +183,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "RTvQLbe5OOw",
-      "title": "Dell's Earnings Just Exposed the Real Tech Divide #Shorts",
-      "url": "https://www.youtube.com/watch?v=RTvQLbe5OOw",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 50,
-      "avgViewPercentage": 94.97,
-      "subscribersGained": 0
-    },
-    {
       "id": "6kJOYKbnn_I",
       "title": "AI Bubble Just Broke. Here's What Happens Next #Shorts",
       "url": "https://www.youtube.com/watch?v=6kJOYKbnn_I",
@@ -200,6 +190,26 @@
       "watchMinutes": 0,
       "avgViewDuration": 6,
       "avgViewPercentage": 10.2,
+      "subscribersGained": 0
+    },
+    {
+      "id": "uDjvcYZ_zrE",
+      "title": "Why Your 401(k) Might Be Living on Borrowed Time #Shorts",
+      "url": "https://www.youtube.com/watch?v=uDjvcYZ_zrE",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 26,
+      "avgViewPercentage": 40.03,
+      "subscribersGained": 0
+    },
+    {
+      "id": "zU9P7p6bBn4",
+      "title": "2026\u6700\u591a\u4eba\u4e0b\u8f09\u7684AI\u5de5\u5177\uff01\u4f60\u7528\u4e86\u55ce\uff1f",
+      "url": "https://www.youtube.com/watch?v=zU9P7p6bBn4",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 0,
+      "avgViewPercentage": 0,
       "subscribersGained": 0
     },
     {
@@ -223,16 +233,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "uDjvcYZ_zrE",
-      "title": "Why Your 401(k) Might Be Living on Borrowed Time #Shorts",
-      "url": "https://www.youtube.com/watch?v=uDjvcYZ_zrE",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 26,
-      "avgViewPercentage": 40.03,
-      "subscribersGained": 0
-    },
-    {
       "id": "t1fzVUVkW-0",
       "title": "Can You Beat Today's Market Test? #Shorts",
       "url": "https://www.youtube.com/watch?v=t1fzVUVkW-0",
@@ -243,9 +243,9 @@
       "subscribersGained": 0
     },
     {
-      "id": "zU9P7p6bBn4",
-      "title": "2026\u6700\u591a\u4eba\u4e0b\u8f09\u7684AI\u5de5\u5177\uff01\u4f60\u7528\u4e86\u55ce\uff1f",
-      "url": "https://www.youtube.com/watch?v=zU9P7p6bBn4",
+      "id": "DCU_CYVkvsE",
+      "title": "Generic Drug Tariffs Just Got Real #Shorts",
+      "url": "https://www.youtube.com/watch?v=DCU_CYVkvsE",
       "views": 1,
       "watchMinutes": 0,
       "avgViewDuration": 0,
@@ -273,6 +273,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "RTvQLbe5OOw",
+      "title": "Dell's Earnings Just Exposed the Real Tech Divide #Shorts",
+      "url": "https://www.youtube.com/watch?v=RTvQLbe5OOw",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 50,
+      "avgViewPercentage": 94.97,
+      "subscribersGained": 0
+    },
+    {
       "id": "2VZXMMncYQ8",
       "title": "SpaceX Just Revealed the $60B Secret #Shorts",
       "url": "https://www.youtube.com/watch?v=2VZXMMncYQ8",
@@ -280,16 +290,6 @@
       "watchMinutes": 0,
       "avgViewDuration": 12,
       "avgViewPercentage": 24.34,
-      "subscribersGained": 0
-    },
-    {
-      "id": "DCU_CYVkvsE",
-      "title": "Generic Drug Tariffs Just Got Real #Shorts",
-      "url": "https://www.youtube.com/watch?v=DCU_CYVkvsE",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 0,
-      "avgViewPercentage": 0,
       "subscribersGained": 0
     },
     {
@@ -304,7 +304,7 @@
     }
   ],
   "totals": {
-    "views": 623,
+    "views": 634,
     "watchMinutes": 68,
     "subscribersGained": 0
   }
