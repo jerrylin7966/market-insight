@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-15",
-  "period": "2026-08-16 \u2192 2026-09-15",
+  "updated": "2026-09-16",
+  "period": "2026-08-17 \u2192 2026-09-16",
   "videos": [
     {
       "id": "N4vrXFxxUuc",
@@ -93,16 +93,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "6r5zGenPt6o",
-      "title": "Model Hit Phase 2-3 \u2014 Reduce Risk Now #Shorts",
-      "url": "https://www.youtube.com/watch?v=6r5zGenPt6o",
-      "views": 7,
-      "watchMinutes": 2,
-      "avgViewDuration": 60,
-      "avgViewPercentage": 116.97,
-      "subscribersGained": 0
-    },
-    {
       "id": "QNgR2CDLPRM",
       "title": "Nvidia's $1.5B Ohio Bet Just Backfired #Shorts",
       "url": "https://www.youtube.com/watch?v=QNgR2CDLPRM",
@@ -110,6 +100,16 @@
       "watchMinutes": 3,
       "avgViewDuration": 48,
       "avgViewPercentage": 78.3,
+      "subscribersGained": 0
+    },
+    {
+      "id": "6r5zGenPt6o",
+      "title": "Model Hit Phase 2-3 \u2014 Reduce Risk Now #Shorts",
+      "url": "https://www.youtube.com/watch?v=6r5zGenPt6o",
+      "views": 7,
+      "watchMinutes": 2,
+      "avgViewDuration": 60,
+      "avgViewPercentage": 116.97,
       "subscribersGained": 0
     },
     {
@@ -183,13 +183,13 @@
       "subscribersGained": 0
     },
     {
-      "id": "6kJOYKbnn_I",
-      "title": "AI Bubble Just Broke. Here's What Happens Next #Shorts",
-      "url": "https://www.youtube.com/watch?v=6kJOYKbnn_I",
+      "id": "Ljkgjtbl33E",
+      "title": "NVIDIA Lost $30B in One Day\u2014Trump's Tariff Just Broke AI's Growth Story",
+      "url": "https://www.youtube.com/watch?v=Ljkgjtbl33E",
       "views": 1,
       "watchMinutes": 0,
-      "avgViewDuration": 6,
-      "avgViewPercentage": 10.2,
+      "avgViewDuration": 0,
+      "avgViewPercentage": 0,
       "subscribersGained": 0
     },
     {
@@ -203,9 +203,19 @@
       "subscribersGained": 0
     },
     {
-      "id": "Ljkgjtbl33E",
-      "title": "NVIDIA Lost $30B in One Day\u2014Trump's Tariff Just Broke AI's Growth Story",
-      "url": "https://www.youtube.com/watch?v=Ljkgjtbl33E",
+      "id": "6kJOYKbnn_I",
+      "title": "AI Bubble Just Broke. Here's What Happens Next #Shorts",
+      "url": "https://www.youtube.com/watch?v=6kJOYKbnn_I",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 6,
+      "avgViewPercentage": 10.2,
+      "subscribersGained": 0
+    },
+    {
+      "id": "DCU_CYVkvsE",
+      "title": "Generic Drug Tariffs Just Got Real #Shorts",
+      "url": "https://www.youtube.com/watch?v=DCU_CYVkvsE",
       "views": 1,
       "watchMinutes": 0,
       "avgViewDuration": 0,
@@ -213,9 +223,9 @@
       "subscribersGained": 0
     },
     {
-      "id": "DCU_CYVkvsE",
-      "title": "Generic Drug Tariffs Just Got Real #Shorts",
-      "url": "https://www.youtube.com/watch?v=DCU_CYVkvsE",
+      "id": "3DXZ7xls0j4",
+      "title": "Accenture's AI Collapse Just Exposed the Whole Tech Lie #Shorts",
+      "url": "https://www.youtube.com/watch?v=3DXZ7xls0j4",
       "views": 1,
       "watchMinutes": 0,
       "avgViewDuration": 0,
@@ -274,7 +284,7 @@
     }
   ],
   "totals": {
-    "views": 621,
+    "views": 622,
     "watchMinutes": 57,
     "subscribersGained": 0
   }
