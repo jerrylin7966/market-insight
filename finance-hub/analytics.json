@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-16",
-  "period": "2026-08-17 \u2192 2026-09-16",
+  "updated": "2026-09-17",
+  "period": "2026-08-18 \u2192 2026-09-17",
   "videos": [
     {
       "id": "N4vrXFxxUuc",
@@ -73,16 +73,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "Kdtw4WfMPto",
-      "title": "Union Pacific Just Buried Norfolk Southern Deal With One Number #Shorts",
-      "url": "https://www.youtube.com/watch?v=Kdtw4WfMPto",
-      "views": 8,
-      "watchMinutes": 2,
-      "avgViewDuration": 33,
-      "avgViewPercentage": 50.24999999999999,
-      "subscribersGained": 0
-    },
-    {
       "id": "q9yleMC8rKg",
       "title": "Can You Beat the Market Quiz? #Shorts",
       "url": "https://www.youtube.com/watch?v=q9yleMC8rKg",
@@ -93,13 +83,13 @@
       "subscribersGained": 0
     },
     {
-      "id": "QNgR2CDLPRM",
-      "title": "Nvidia's $1.5B Ohio Bet Just Backfired #Shorts",
-      "url": "https://www.youtube.com/watch?v=QNgR2CDLPRM",
-      "views": 7,
-      "watchMinutes": 3,
-      "avgViewDuration": 48,
-      "avgViewPercentage": 78.3,
+      "id": "Kdtw4WfMPto",
+      "title": "Union Pacific Just Buried Norfolk Southern Deal With One Number #Shorts",
+      "url": "https://www.youtube.com/watch?v=Kdtw4WfMPto",
+      "views": 8,
+      "watchMinutes": 2,
+      "avgViewDuration": 33,
+      "avgViewPercentage": 50.24999999999999,
       "subscribersGained": 0
     },
     {
@@ -123,6 +113,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "QNgR2CDLPRM",
+      "title": "Nvidia's $1.5B Ohio Bet Just Backfired #Shorts",
+      "url": "https://www.youtube.com/watch?v=QNgR2CDLPRM",
+      "views": 7,
+      "watchMinutes": 3,
+      "avgViewDuration": 48,
+      "avgViewPercentage": 78.3,
+      "subscribersGained": 0
+    },
+    {
       "id": "qZmMX7NToMg",
       "title": "Oil at $100: Can You Pass This Market Quiz? #Shorts",
       "url": "https://www.youtube.com/watch?v=qZmMX7NToMg",
@@ -130,6 +130,16 @@
       "watchMinutes": 0,
       "avgViewDuration": 11,
       "avgViewPercentage": 14.05,
+      "subscribersGained": 0
+    },
+    {
+      "id": "2IuHQavJmF0",
+      "title": "Nvidia Just Triggered the Signal Wall Street Feared #Shorts",
+      "url": "https://www.youtube.com/watch?v=2IuHQavJmF0",
+      "views": 6,
+      "watchMinutes": 2,
+      "avgViewDuration": 49,
+      "avgViewPercentage": 74.4,
       "subscribersGained": 0
     },
     {
@@ -160,16 +170,6 @@
       "watchMinutes": 4,
       "avgViewDuration": 126,
       "avgViewPercentage": 36.29,
-      "subscribersGained": 0
-    },
-    {
-      "id": "OISYY0HYbFo",
-      "title": "3 Million Seniors Just Lost Healthcare\u2014Here's Why #Shorts",
-      "url": "https://www.youtube.com/watch?v=OISYY0HYbFo",
-      "views": 2,
-      "watchMinutes": 0,
-      "avgViewDuration": 29,
-      "avgViewPercentage": 54.65,
       "subscribersGained": 0
     },
     {
@@ -243,16 +243,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "DC_xkNYAzsA",
-      "title": "Bank of America Just Warned Nvidia. Here's What Smart Money Does. #Shorts",
-      "url": "https://www.youtube.com/watch?v=DC_xkNYAzsA",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 55,
-      "avgViewPercentage": 100.75,
-      "subscribersGained": 0
-    },
-    {
       "id": "FovroLaFzsQ",
       "title": "AI Chip Giant Raises $5.5B in Record IPO #Shorts",
       "url": "https://www.youtube.com/watch?v=FovroLaFzsQ",
@@ -284,8 +274,8 @@
     }
   ],
   "totals": {
-    "views": 622,
-    "watchMinutes": 57,
+    "views": 625,
+    "watchMinutes": 59,
     "subscribersGained": 0
   }
 }
