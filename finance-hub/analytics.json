@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-18",
-  "period": "2026-08-19 \u2192 2026-09-18",
+  "updated": "2026-09-21",
+  "period": "2026-08-22 \u2192 2026-09-21",
   "videos": [
     {
       "id": "N4vrXFxxUuc",
@@ -30,6 +30,16 @@
       "watchMinutes": 13,
       "avgViewDuration": 36,
       "avgViewPercentage": 34.19,
+      "subscribersGained": 0
+    },
+    {
+      "id": "RUZeAeG2gAQ",
+      "title": "Fed Rate Hike Quiz: Can You Score Perfect? #Shorts",
+      "url": "https://www.youtube.com/watch?v=RUZeAeG2gAQ",
+      "views": 20,
+      "watchMinutes": 5,
+      "avgViewDuration": 34,
+      "avgViewPercentage": 44.17,
       "subscribersGained": 0
     },
     {
@@ -63,6 +73,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "ew-_ncsSPOU",
+      "title": "HPE Just Jumped 9% While Nvidia Sleeps #Shorts",
+      "url": "https://www.youtube.com/watch?v=ew-_ncsSPOU",
+      "views": 11,
+      "watchMinutes": 1,
+      "avgViewDuration": 16,
+      "avgViewPercentage": 26.14,
+      "subscribersGained": 0
+    },
+    {
       "id": "YNiVCc0l01w",
       "title": "Phase 4 Red Alert \u2014 My Model Says Exit Growth Now #Shorts",
       "url": "https://www.youtube.com/watch?v=YNiVCc0l01w",
@@ -73,33 +93,13 @@
       "subscribersGained": 0
     },
     {
-      "id": "eOqYIwR--4k",
-      "title": "Treasury Yields Hit 19-Year High: Can You Pass? #Shorts",
-      "url": "https://www.youtube.com/watch?v=eOqYIwR--4k",
-      "views": 10,
-      "watchMinutes": 3,
-      "avgViewDuration": 31,
-      "avgViewPercentage": 37.17,
-      "subscribersGained": 0
-    },
-    {
-      "id": "Kdtw4WfMPto",
-      "title": "Union Pacific Just Buried Norfolk Southern Deal With One Number #Shorts",
-      "url": "https://www.youtube.com/watch?v=Kdtw4WfMPto",
-      "views": 8,
-      "watchMinutes": 2,
-      "avgViewDuration": 33,
-      "avgViewPercentage": 50.24999999999999,
-      "subscribersGained": 0
-    },
-    {
-      "id": "QNgR2CDLPRM",
-      "title": "Nvidia's $1.5B Ohio Bet Just Backfired #Shorts",
-      "url": "https://www.youtube.com/watch?v=QNgR2CDLPRM",
+      "id": "qZmMX7NToMg",
+      "title": "Oil at $100: Can You Pass This Market Quiz? #Shorts",
+      "url": "https://www.youtube.com/watch?v=qZmMX7NToMg",
       "views": 7,
-      "watchMinutes": 3,
-      "avgViewDuration": 48,
-      "avgViewPercentage": 78.3,
+      "watchMinutes": 0,
+      "avgViewDuration": 11,
+      "avgViewPercentage": 14.05,
       "subscribersGained": 0
     },
     {
@@ -123,13 +123,13 @@
       "subscribersGained": 0
     },
     {
-      "id": "qZmMX7NToMg",
-      "title": "Oil at $100: Can You Pass This Market Quiz? #Shorts",
-      "url": "https://www.youtube.com/watch?v=qZmMX7NToMg",
+      "id": "Kdtw4WfMPto",
+      "title": "Union Pacific Just Buried Norfolk Southern Deal With One Number #Shorts",
+      "url": "https://www.youtube.com/watch?v=Kdtw4WfMPto",
       "views": 6,
-      "watchMinutes": 0,
-      "avgViewDuration": 11,
-      "avgViewPercentage": 14.05,
+      "watchMinutes": 1,
+      "avgViewDuration": 107,
+      "avgViewPercentage": 160.9,
       "subscribersGained": 0
     },
     {
@@ -183,36 +183,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "6kJOYKbnn_I",
-      "title": "AI Bubble Just Broke. Here's What Happens Next #Shorts",
-      "url": "https://www.youtube.com/watch?v=6kJOYKbnn_I",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 6,
-      "avgViewPercentage": 10.2,
-      "subscribersGained": 0
-    },
-    {
-      "id": "FovroLaFzsQ",
-      "title": "AI Chip Giant Raises $5.5B in Record IPO #Shorts",
-      "url": "https://www.youtube.com/watch?v=FovroLaFzsQ",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 0,
-      "avgViewPercentage": 0,
-      "subscribersGained": 0
-    },
-    {
-      "id": "t1fzVUVkW-0",
-      "title": "Can You Beat Today's Market Test? #Shorts",
-      "url": "https://www.youtube.com/watch?v=t1fzVUVkW-0",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 0,
-      "avgViewPercentage": 0,
-      "subscribersGained": 0
-    },
-    {
       "id": "Ljkgjtbl33E",
       "title": "NVIDIA Lost $30B in One Day\u2014Trump's Tariff Just Broke AI's Growth Story",
       "url": "https://www.youtube.com/watch?v=Ljkgjtbl33E",
@@ -223,9 +193,9 @@
       "subscribersGained": 0
     },
     {
-      "id": "DCU_CYVkvsE",
-      "title": "Generic Drug Tariffs Just Got Real #Shorts",
-      "url": "https://www.youtube.com/watch?v=DCU_CYVkvsE",
+      "id": "f2prCQ2oIxo",
+      "title": "Why Oracle's Crash Signals Danger Ahead #Shorts",
+      "url": "https://www.youtube.com/watch?v=f2prCQ2oIxo",
       "views": 1,
       "watchMinutes": 0,
       "avgViewDuration": 0,
@@ -233,9 +203,9 @@
       "subscribersGained": 0
     },
     {
-      "id": "q9yleMC8rKg",
-      "title": "Can You Beat the Market Quiz? #Shorts",
-      "url": "https://www.youtube.com/watch?v=q9yleMC8rKg",
+      "id": "DCU_CYVkvsE",
+      "title": "Generic Drug Tariffs Just Got Real #Shorts",
+      "url": "https://www.youtube.com/watch?v=DCU_CYVkvsE",
       "views": 1,
       "watchMinutes": 0,
       "avgViewDuration": 0,
@@ -263,10 +233,10 @@
       "subscribersGained": 0
     },
     {
-      "id": "s5ZSi7xCUFA",
-      "title": "Fed Decision + Tech Earnings: Can You Pass? #Shorts",
-      "url": "https://www.youtube.com/watch?v=s5ZSi7xCUFA",
-      "views": 0,
+      "id": "FovroLaFzsQ",
+      "title": "AI Chip Giant Raises $5.5B in Record IPO #Shorts",
+      "url": "https://www.youtube.com/watch?v=FovroLaFzsQ",
+      "views": 1,
       "watchMinutes": 0,
       "avgViewDuration": 0,
       "avgViewPercentage": 0,
@@ -284,8 +254,8 @@
     }
   ],
   "totals": {
-    "views": 630,
-    "watchMinutes": 59,
+    "views": 641,
+    "watchMinutes": 58,
     "subscribersGained": 0
   }
 }
