@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-21",
-  "period": "2026-08-22 \u2192 2026-09-21",
+  "updated": "2026-09-22",
+  "period": "2026-08-23 \u2192 2026-09-22",
   "videos": [
     {
       "id": "N4vrXFxxUuc",
@@ -36,7 +36,7 @@
       "id": "RUZeAeG2gAQ",
       "title": "Fed Rate Hike Quiz: Can You Score Perfect? #Shorts",
       "url": "https://www.youtube.com/watch?v=RUZeAeG2gAQ",
-      "views": 20,
+      "views": 21,
       "watchMinutes": 5,
       "avgViewDuration": 34,
       "avgViewPercentage": 44.17,
@@ -63,6 +63,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "ew-_ncsSPOU",
+      "title": "HPE Just Jumped 9% While Nvidia Sleeps #Shorts",
+      "url": "https://www.youtube.com/watch?v=ew-_ncsSPOU",
+      "views": 14,
+      "watchMinutes": 2,
+      "avgViewDuration": 20,
+      "avgViewPercentage": 32.51,
+      "subscribersGained": 0
+    },
+    {
       "id": "2IuHQavJmF0",
       "title": "Nvidia Just Triggered the Signal Wall Street Feared #Shorts",
       "url": "https://www.youtube.com/watch?v=2IuHQavJmF0",
@@ -70,16 +80,6 @@
       "watchMinutes": 3,
       "avgViewDuration": 37,
       "avgViewPercentage": 56.52,
-      "subscribersGained": 0
-    },
-    {
-      "id": "ew-_ncsSPOU",
-      "title": "HPE Just Jumped 9% While Nvidia Sleeps #Shorts",
-      "url": "https://www.youtube.com/watch?v=ew-_ncsSPOU",
-      "views": 11,
-      "watchMinutes": 1,
-      "avgViewDuration": 16,
-      "avgViewPercentage": 26.14,
       "subscribersGained": 0
     },
     {
@@ -93,16 +93,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "qZmMX7NToMg",
-      "title": "Oil at $100: Can You Pass This Market Quiz? #Shorts",
-      "url": "https://www.youtube.com/watch?v=qZmMX7NToMg",
-      "views": 7,
-      "watchMinutes": 0,
-      "avgViewDuration": 11,
-      "avgViewPercentage": 14.05,
-      "subscribersGained": 0
-    },
-    {
       "id": "6r5zGenPt6o",
       "title": "Model Hit Phase 2-3 \u2014 Reduce Risk Now #Shorts",
       "url": "https://www.youtube.com/watch?v=6r5zGenPt6o",
@@ -110,6 +100,16 @@
       "watchMinutes": 2,
       "avgViewDuration": 60,
       "avgViewPercentage": 116.97,
+      "subscribersGained": 0
+    },
+    {
+      "id": "qZmMX7NToMg",
+      "title": "Oil at $100: Can You Pass This Market Quiz? #Shorts",
+      "url": "https://www.youtube.com/watch?v=qZmMX7NToMg",
+      "views": 7,
+      "watchMinutes": 0,
+      "avgViewDuration": 11,
+      "avgViewPercentage": 14.05,
       "subscribersGained": 0
     },
     {
@@ -183,19 +183,19 @@
       "subscribersGained": 0
     },
     {
-      "id": "Ljkgjtbl33E",
-      "title": "NVIDIA Lost $30B in One Day\u2014Trump's Tariff Just Broke AI's Growth Story",
-      "url": "https://www.youtube.com/watch?v=Ljkgjtbl33E",
+      "id": "RTvQLbe5OOw",
+      "title": "Dell's Earnings Just Exposed the Real Tech Divide #Shorts",
+      "url": "https://www.youtube.com/watch?v=RTvQLbe5OOw",
       "views": 1,
       "watchMinutes": 0,
-      "avgViewDuration": 0,
-      "avgViewPercentage": 0,
+      "avgViewDuration": 50,
+      "avgViewPercentage": 94.97,
       "subscribersGained": 0
     },
     {
-      "id": "f2prCQ2oIxo",
-      "title": "Why Oracle's Crash Signals Danger Ahead #Shorts",
-      "url": "https://www.youtube.com/watch?v=f2prCQ2oIxo",
+      "id": "Ljkgjtbl33E",
+      "title": "NVIDIA Lost $30B in One Day\u2014Trump's Tariff Just Broke AI's Growth Story",
+      "url": "https://www.youtube.com/watch?v=Ljkgjtbl33E",
       "views": 1,
       "watchMinutes": 0,
       "avgViewDuration": 0,
@@ -223,16 +223,6 @@
       "subscribersGained": 0
     },
     {
-      "id": "RTvQLbe5OOw",
-      "title": "Dell's Earnings Just Exposed the Real Tech Divide #Shorts",
-      "url": "https://www.youtube.com/watch?v=RTvQLbe5OOw",
-      "views": 1,
-      "watchMinutes": 0,
-      "avgViewDuration": 50,
-      "avgViewPercentage": 94.97,
-      "subscribersGained": 0
-    },
-    {
       "id": "FovroLaFzsQ",
       "title": "AI Chip Giant Raises $5.5B in Record IPO #Shorts",
       "url": "https://www.youtube.com/watch?v=FovroLaFzsQ",
@@ -254,8 +244,8 @@
     }
   ],
   "totals": {
-    "views": 641,
-    "watchMinutes": 58,
+    "views": 644,
+    "watchMinutes": 59,
     "subscribersGained": 0
   }
 }
