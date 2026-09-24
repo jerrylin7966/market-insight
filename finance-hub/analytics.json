@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-23",
-  "period": "2026-08-24 \u2192 2026-09-23",
+  "updated": "2026-09-24",
+  "period": "2026-08-25 \u2192 2026-09-24",
   "videos": [
     {
       "id": "N4vrXFxxUuc",
@@ -183,13 +183,13 @@
       "subscribersGained": 0
     },
     {
-      "id": "RTvQLbe5OOw",
-      "title": "Dell's Earnings Just Exposed the Real Tech Divide #Shorts",
-      "url": "https://www.youtube.com/watch?v=RTvQLbe5OOw",
-      "views": 1,
+      "id": "zJ2H6skj_0g",
+      "title": "Can You Pass Today's Market Quiz? #Shorts",
+      "url": "https://www.youtube.com/watch?v=zJ2H6skj_0g",
+      "views": 2,
       "watchMinutes": 0,
-      "avgViewDuration": 50,
-      "avgViewPercentage": 94.97,
+      "avgViewDuration": 7,
+      "avgViewPercentage": 9.29,
       "subscribersGained": 0
     },
     {
@@ -203,9 +203,9 @@
       "subscribersGained": 0
     },
     {
-      "id": "DCU_CYVkvsE",
-      "title": "Generic Drug Tariffs Just Got Real #Shorts",
-      "url": "https://www.youtube.com/watch?v=DCU_CYVkvsE",
+      "id": "FovroLaFzsQ",
+      "title": "AI Chip Giant Raises $5.5B in Record IPO #Shorts",
+      "url": "https://www.youtube.com/watch?v=FovroLaFzsQ",
       "views": 1,
       "watchMinutes": 0,
       "avgViewDuration": 0,
@@ -223,9 +223,19 @@
       "subscribersGained": 0
     },
     {
-      "id": "FovroLaFzsQ",
-      "title": "AI Chip Giant Raises $5.5B in Record IPO #Shorts",
-      "url": "https://www.youtube.com/watch?v=FovroLaFzsQ",
+      "id": "RTvQLbe5OOw",
+      "title": "Dell's Earnings Just Exposed the Real Tech Divide #Shorts",
+      "url": "https://www.youtube.com/watch?v=RTvQLbe5OOw",
+      "views": 1,
+      "watchMinutes": 0,
+      "avgViewDuration": 50,
+      "avgViewPercentage": 94.97,
+      "subscribersGained": 0
+    },
+    {
+      "id": "DCU_CYVkvsE",
+      "title": "Generic Drug Tariffs Just Got Real #Shorts",
+      "url": "https://www.youtube.com/watch?v=DCU_CYVkvsE",
       "views": 1,
       "watchMinutes": 0,
       "avgViewDuration": 0,
@@ -244,7 +254,7 @@
     }
   ],
   "totals": {
-    "views": 645,
+    "views": 647,
     "watchMinutes": 59,
     "subscribersGained": 0
   }
