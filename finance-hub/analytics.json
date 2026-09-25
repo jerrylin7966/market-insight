@@ -1,17 +1,7 @@
 {
-  "updated": "2026-09-24",
-  "period": "2026-08-25 \u2192 2026-09-24",
+  "updated": "2026-09-25",
+  "period": "2026-08-26 \u2192 2026-09-25",
   "videos": [
-    {
-      "id": "N4vrXFxxUuc",
-      "title": "AI's Hidden Moat: Microsoft vs. Nvidia #Shorts",
-      "url": "https://www.youtube.com/watch?v=N4vrXFxxUuc",
-      "views": 204,
-      "watchMinutes": 14,
-      "avgViewDuration": 16,
-      "avgViewPercentage": 17.06,
-      "subscribersGained": 0
-    },
     {
       "id": "YyOVXmHxU74",
       "title": "AI Chips, Bitcoin & Security: Today's Market Test #Shorts",
@@ -123,6 +113,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "N4vrXFxxUuc",
+      "title": "AI's Hidden Moat: Microsoft vs. Nvidia #Shorts",
+      "url": "https://www.youtube.com/watch?v=N4vrXFxxUuc",
+      "views": 6,
+      "watchMinutes": 0,
+      "avgViewDuration": 13,
+      "avgViewPercentage": 14.19,
+      "subscribersGained": 0
+    },
+    {
       "id": "Kdtw4WfMPto",
       "title": "Union Pacific Just Buried Norfolk Southern Deal With One Number #Shorts",
       "url": "https://www.youtube.com/watch?v=Kdtw4WfMPto",
@@ -163,6 +163,16 @@
       "subscribersGained": 0
     },
     {
+      "id": "zJ2H6skj_0g",
+      "title": "Can You Pass Today's Market Quiz? #Shorts",
+      "url": "https://www.youtube.com/watch?v=zJ2H6skj_0g",
+      "views": 3,
+      "watchMinutes": 0,
+      "avgViewDuration": 7,
+      "avgViewPercentage": 9.29,
+      "subscribersGained": 0
+    },
+    {
       "id": "sg0iF0_2D4A",
       "title": "The Grand Bargain: US-China Digital Control Grid Exposed",
       "url": "https://www.youtube.com/watch?v=sg0iF0_2D4A",
@@ -180,16 +190,6 @@
       "watchMinutes": 0,
       "avgViewDuration": 0,
       "avgViewPercentage": 0,
-      "subscribersGained": 0
-    },
-    {
-      "id": "zJ2H6skj_0g",
-      "title": "Can You Pass Today's Market Quiz? #Shorts",
-      "url": "https://www.youtube.com/watch?v=zJ2H6skj_0g",
-      "views": 2,
-      "watchMinutes": 0,
-      "avgViewDuration": 7,
-      "avgViewPercentage": 9.29,
       "subscribersGained": 0
     },
     {
@@ -254,8 +254,8 @@
     }
   ],
   "totals": {
-    "views": 647,
-    "watchMinutes": 59,
+    "views": 450,
+    "watchMinutes": 45,
     "subscribersGained": 0
   }
 }
