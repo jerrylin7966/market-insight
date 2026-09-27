@@ -1,10 +1,12 @@
 name: Daily Market Digest
 
 on:
-  schedule:
-    # 10:30 UTC = 6:30am ET (weekdays only)
-    - cron: '30 10 * * 1-5'
-  workflow_dispatch:   # allow manual trigger from GitHub UI
+  # PAUSED 2026-09-27 — daily YouTube video project on hold (traffic/audience too low
+  # to justify daily output). Re-enable by uncommenting the schedule below.
+  # schedule:
+  #   # 10:30 UTC = 6:30am ET (weekdays only)
+  #   - cron: '30 10 * * 1-5'
+  workflow_dispatch:   # manual trigger still available (Actions → Run workflow)
 
 permissions:
   contents: write      # needed to auto-commit the generated HTML
